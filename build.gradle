@@ -191,16 +191,16 @@ task shadowTest {
 }
 
 //// Java 9 support (for tests) //////////////////////////////////
-if (!hasProperty('java9Home') && System.env.containsKey('JAVA_9_HOME')) {
-  project.ext.java9Home = System.env['JAVA_9_HOME']
-}
-assert hasProperty('java9Home') : "Set the property 'java9Home' in your your gradle.properties pointing to a Java 9 installation"
-def java9Path = new File(java9Home, 'bin')
-def java9 = [:].withDefault { execName ->
-  def executable = new File(java9Path, execName)
-  assert executable.exists() : "There is no ${execName} executable in ${java9Path}"
-  executable
-}
+//if (!hasProperty('java9Home') && System.env.containsKey('JAVA_9_HOME')) {
+//  project.ext.java9Home = System.env['JAVA_9_HOME']
+//}
+//assert hasProperty('java9Home') : "Set the property 'java9Home' in your your gradle.properties pointing to a Java 9 installation"
+//def java9Path = new File(java9Home, 'bin')
+//def java9 = [:].withDefault { execName ->
+//  def executable = new File(java9Path, execName)
+//  assert executable.exists() : "There is no ${execName} executable in ${java9Path}"
+//  executable
+//}
 
 afterEvaluate {
   tasks.withType(AbstractCompile) {
@@ -229,7 +229,7 @@ task vanillaTest {
   check.dependsOn it
 }
 
-(6..9).each { jdk ->
+(6..8).each { jdk ->
   def sourceSet = sourceSets.create("vanilla${jdk}") {
     java {
       srcDir file('src/it/vanilla/src/main/java')
