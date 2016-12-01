@@ -65,27 +65,33 @@ public class CodeGenerator {
 
     addBuilderTypeDeclaration(code, metadata);
     code.addLine(" {");
-    addStaticFromMethod(code, metadata);
+
+    // TODO: fix from
+    //addStaticFromMethod(code, metadata);
+
     addConstantDeclarations(metadata, code);
     if (any(metadata.getProperties(), IS_REQUIRED)) {
       addPropertyEnum(metadata, code);
     }
 
     addFieldDeclarations(code, metadata);
+    addAbtractMethods(code, metadata);
 
     addAccessors(metadata, code);
     addMergeFromValueMethod(code, metadata);
     addMergeFromBuilderMethod(code, metadata);
     addClearMethod(code, metadata);
-    addBuildMethod(code, metadata);
-    addBuildPartialMethod(code, metadata);
 
-    addValueType(code, metadata);
-    addPartialType(code, metadata);
-    for (Function<Metadata, Excerpt> nestedClass : metadata.getNestedClasses()) {
-      code.add(nestedClass.apply(metadata));
-    }
-    addStaticMethods(code, metadata);
+    // Moved to another builder.
+//    addBuildMethod(code, metadata);
+//    addBuildPartialMethod(code, metadata);
+//
+//    addValueType(code, metadata);
+//    addPartialType(code, metadata);
+//    for (Function<Metadata, Excerpt> nestedClass : metadata.getNestedClasses()) {
+//      code.add(nestedClass.apply(metadata));
+//    }
+//    addStaticMethods(code, metadata);
     code.addLine("}");
   }
 
@@ -98,7 +104,9 @@ public class CodeGenerator {
     for (Excerpt annotation : metadata.getGeneratedBuilderAnnotations()) {
       code.add(annotation);
     }
-    code.add("abstract class %s", metadata.getGeneratedBuilder().declaration());
+    code.add("abstract class %s",
+            metadata.getGeneratedBuilderParametrized().declaration()
+    );
     if (metadata.isBuilderSerializable()) {
       code.add(" implements %s", Serializable.class);
     }
@@ -116,7 +124,7 @@ public class CodeGenerator {
         .addLine("public static %s %s from(%s value) {",
             metadata.getBuilder().declarationParameters(),
             metadata.getBuilder(),
-            metadata.getType())
+            metadata.getTypeGen())
         .addLine("  return %s.mergeFrom(value);",
             builderFactory.newBuilder(metadata.getBuilder(), EXPLICIT_TYPES))
         .addLine("}");
@@ -138,10 +146,17 @@ public class CodeGenerator {
     }
     // Unset properties
     if (any(metadata.getProperties(), IS_REQUIRED)) {
-      code.addLine("private final %s<%s> _unsetProperties =",
+      code.addLine("final %s<%s> _unsetProperties =",
               EnumSet.class, metadata.getPropertyEnum())
           .addLine("    %s.allOf(%s.class);", EnumSet.class, metadata.getPropertyEnum());
     }
+  }
+
+  private static void addAbtractMethods(SourceBuilder code, Metadata metadata) {
+    code.addLine("");
+    code.addLine("public abstract %s build();", metadata.getTypeGen());
+    code.addLine("public abstract %s getThisBuilder();", metadata.getBuildGen());
+    code.addLine("public abstract %s getNewBuilder();", metadata.getBuildGen());
   }
 
   private static void addAccessors(Metadata metadata, SourceBuilder body) {
@@ -176,13 +191,14 @@ public class CodeGenerator {
         .addLine(" * Sets all property values using the given {@code %s} as a template.",
             metadata.getType().getQualifiedName())
         .addLine(" */")
-        .addLine("public %s mergeFrom(%s value) {", metadata.getBuilder(), metadata.getType());
+        .addLine("public %s mergeFrom(%s value) {", metadata.getBuildGen(), metadata.getTypeGen());
     Block body = new Block(code);
     for (Property property : metadata.getProperties()) {
       property.getCodeGenerator().addMergeFromValue(body, "value");
     }
     code.add(body)
-        .addLine("  return (%s) this;", metadata.getBuilder())
+//        .addLine("  return (%s) this;", metadata.getBuilder())
+        .addLine("  return getThisBuilder();")
         .addLine("}");
   }
 
@@ -193,13 +209,14 @@ public class CodeGenerator {
             metadata.getBuilder().getSimpleName())
         .addLine(" * Does not affect any properties not set on the input.")
         .addLine(" */")
-        .addLine("public %1$s mergeFrom(%1$s template) {", metadata.getBuilder());
+        .addLine("public %1$s mergeFrom(%1$s template) {", metadata.getBuildGen());
     Block body = new Block(code);
     for (Property property : metadata.getProperties()) {
       property.getCodeGenerator().addMergeFromBuilder(body, "template");
     }
     code.add(body)
-        .addLine("  return (%s) this;", metadata.getBuilder())
+        .addLine("  return getThisBuilder();")
+//        .addLine("  return (%s) this;", metadata.getBuilder())
         .addLine("}");
   }
 
@@ -208,7 +225,7 @@ public class CodeGenerator {
         .addLine("/**")
         .addLine(" * Resets the state of this builder.")
         .addLine(" */")
-        .addLine("public %s clear() {", metadata.getBuilder());
+        .addLine("public %s clear() {", metadata.getBuildGen());
     Block body = new Block(code);
     List<PropertyCodeGenerator> codeGenerators =
         Lists.transform(metadata.getProperties(), GET_CODE_GENERATOR);
@@ -223,7 +240,8 @@ public class CodeGenerator {
             .addLine("  _unsetProperties.addAll(%s._unsetProperties);", defaults.get());
       }
     }
-    code.addLine("  return (%s) this;", metadata.getBuilder())
+    code.addLine("  return getThisBuilder();")
+      //.addLine("  return (%s) this;", metadata.getBuilder())
         .addLine("}");
   }
 
@@ -252,7 +270,7 @@ public class CodeGenerator {
 
   private static void addPropertyEnum(Metadata metadata, SourceBuilder code) {
     code.addLine("")
-        .addLine("private enum %s {", metadata.getPropertyEnum().getSimpleName());
+        .addLine("enum %s {", metadata.getPropertyEnum().getSimpleName());
     for (Property property : metadata.getProperties()) {
       if (property.getCodeGenerator().getType() == Type.REQUIRED) {
         code.addLine("  %s(\"%s\"),", property.getAllCapsName(), property.getName());
@@ -260,9 +278,9 @@ public class CodeGenerator {
     }
     code.addLine("  ;")
         .addLine("")
-        .addLine("  private final %s name;", String.class)
+        .addLine("  final %s name;", String.class)
         .addLine("")
-        .addLine("  private %s(%s name) {",
+        .addLine("  %s(%s name) {",
             metadata.getPropertyEnum().getSimpleName(), String.class)
         .addLine("    this.name = name;")
         .addLine("  }")

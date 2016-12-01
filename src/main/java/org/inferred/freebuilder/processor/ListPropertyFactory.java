@@ -116,13 +116,13 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
     @Override
     public void addBuilderFieldDeclaration(SourceBuilder code) {
       if (code.feature(GUAVA).isAvailable()) {
-        code.addLine("private %s<%s> %s = %s.of();",
+        code.addLine("%s<%s> %s = %s.of();",
             List.class,
             elementType,
             property.getName(),
             ImmutableList.class);
       } else {
-        code.addLine("private final %1$s<%2$s> %3$s = new %1$s%4$s();",
+        code.addLine("final %1$s<%2$s> %3$s = new %1$s%4$s();",
             ArrayList.class,
             elementType,
             property.getName(),
@@ -152,7 +152,7 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
       }
       code.addLine(" */")
           .addLine("public %s %s(%s element) {",
-              metadata.getBuilder(), addMethod(property), unboxedType.or(elementType));
+              metadata.getBuildGen(), addMethod(property), unboxedType.or(elementType));
       if (code.feature(GUAVA).isAvailable()) {
         code.addLine("  if (this.%s instanceof %s) {", property.getName(), ImmutableList.class)
             .addLine("    this.%1$s = new %2$s%3$s(this.%1$s);",
@@ -167,7 +167,8 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
         code.add(checkNotNullPreamble("element"))
             .addLine("  this.%s.add(%s);", property.getName(), checkNotNullInline("element"));
       }
-      code.addLine("  return (%s) this;", metadata.getBuilder())
+      code.addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -184,7 +185,7 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
       }
       code.addLine(" */")
           .addLine("public %s %s(%s... elements) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               addMethod(property),
               unboxedType.or(elementType));
       Optional<Class<?>> arrayUtils = code.feature(GUAVA).arrayUtils(unboxedType.or(elementType));
@@ -196,7 +197,8 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
             .addLine("  for (%s element : elements) {", unboxedType.get())
             .addLine("    %s(element);", addMethod(property))
             .addLine("  }")
-            .addLine("  return (%s) this;", metadata.getBuilder());
+            .addLine("  return getThisBuilder();");
+            //.addLine("  return (%s) this;", metadata.getBuilder());
       }
       code.addLine("}");
     }
@@ -213,7 +215,7 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" */");
       addAccessorAnnotations(code);
       code.addLine("public %s %s(%s<? extends %s> elements) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               addAllMethod(property),
               Iterable.class,
               elementType);
@@ -235,7 +237,8 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
         code.addLine("  }");
       }
       code.add(Excerpts.forEach(unboxedType.or(elementType), "elements", addMethod(property)))
-          .addLine("  return (%s) this;", metadata.getBuilder())
+          .addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -258,7 +261,7 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" * @throws NullPointerException if {@code mutator} is null")
           .addLine(" */")
           .addLine("public %s %s(%s<? super %s<%s>> mutator) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               mutator(property),
               consumer.getQualifiedName(),
               List.class,
@@ -279,7 +282,8 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
                 addMethod(property))
             .addLine("  mutator.accept(%s);", property.getName());
       }
-      code.addLine("  return (%s) this;", metadata.getBuilder())
+      code.addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -291,7 +295,7 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" *")
           .addLine(" * @return this {@code %s} object", metadata.getBuilder().getSimpleName())
           .addLine(" */")
-          .addLine("public %s %s() {", metadata.getBuilder(), clearMethod(property));
+          .addLine("public %s %s() {", metadata.getBuildGen(), clearMethod(property));
       if (code.feature(GUAVA).isAvailable()) {
         code.addLine("  if (%s instanceof %s) {", property.getName(), ImmutableList.class)
             .addLine("    %s = %s.of();", property.getName(), ImmutableList.class)
@@ -301,7 +305,8 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
       if (code.feature(GUAVA).isAvailable()) {
         code.addLine("  }");
       }
-      code.addLine("  return (%s) this;", metadata.getBuilder())
+      code.addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -336,7 +341,8 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
 
     @Override
     public void addMergeFromValue(Block code, String value) {
-      if (code.feature(GUAVA).isAvailable()) {
+      boolean useGuavablock = code.feature(GUAVA).isAvailable() && false;
+      if (useGuavablock) {
         code.addLine("if (%s instanceof %s && %s == %s.<%s>of()) {",
                 value,
                 metadata.getValueType(),
@@ -347,7 +353,7 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
             .addLine("} else {");
       }
       code.addLine("%s(%s.%s());", addAllMethod(property), value, property.getGetterName());
-      if (code.feature(GUAVA).isAvailable()) {
+      if (useGuavablock) {
         code.addLine("}");
       }
     }

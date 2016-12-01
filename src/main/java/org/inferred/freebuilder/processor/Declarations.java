@@ -37,8 +37,9 @@ class Declarations {
     }
     Excerpt defaults = block.declare("_defaults", "%s _defaults = %s;",
           metadata.getGeneratedBuilder(),
-          metadata.getBuilderFactory().get()
-              .newBuilder(metadata.getBuilder(), TypeInference.INFERRED_TYPES));
+            "getNewBuilder();");
+//          metadata.getBuilderFactory().get()
+//              .newBuilder(metadata.getBuilder(), TypeInference.INFERRED_TYPES));
     return Optional.of(defaults);
   }
 

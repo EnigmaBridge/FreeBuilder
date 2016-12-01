@@ -65,7 +65,7 @@ public class DefaultPropertyFactory implements PropertyCodeGenerator.Factory {
 
     @Override
     public void addBuilderFieldDeclaration(SourceBuilder code) {
-      code.addLine("private %s %s;", property.getType(), property.getName());
+      code.addLine("%s %s;", property.getType(), property.getName());
     }
 
     @Override
@@ -88,7 +88,7 @@ public class DefaultPropertyFactory implements PropertyCodeGenerator.Factory {
       code.addLine(" */");
       addAccessorAnnotations(code);
       code.addLine("public %s %s(%s %s) {",
-          metadata.getBuilder(), setter(property), property.getType(), property.getName());
+          metadata.getBuildGen(), setter(property), property.getType(), property.getName());
       if (isPrimitive) {
         code.addLine("  this.%1$s = %1$s;", property.getName());
       } else {
@@ -99,11 +99,12 @@ public class DefaultPropertyFactory implements PropertyCodeGenerator.Factory {
         code.addLine("  _unsetProperties.remove(%s.%s);",
             metadata.getPropertyEnum(), property.getAllCapsName());
       }
-      if ((metadata.getBuilder() == metadata.getGeneratedBuilder())) {
-        code.addLine("  return this;");
-      } else {
-        code.addLine("  return (%s) this;", metadata.getBuilder());
-      }
+      code.addLine("  return getThisBuilder();");
+//      if ((metadata.getBuilder() == metadata.getGeneratedBuilder())) {
+//        code.addLine("  return this;");
+//      } else {
+//        code.addLine("  return (%s) this;", metadata.getBuilder());
+//      }
       code.addLine("}");
     }
 
@@ -127,7 +128,7 @@ public class DefaultPropertyFactory implements PropertyCodeGenerator.Factory {
       TypeMirror typeParam = firstNonNull(property.getBoxedType(), property.getType());
       code.addLine(" */")
           .add("public %s %s(%s mapper) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               mapper(property),
               unaryOperator.withParameters(typeParam));
       if (!hasDefault) {

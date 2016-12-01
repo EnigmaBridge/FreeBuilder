@@ -83,7 +83,7 @@ public class NullablePropertyFactory implements PropertyCodeGenerator.Factory {
     @Override
     public void addBuilderFieldDeclaration(SourceBuilder code) {
       addGetterAnnotations(code);
-      code.add("private %s %s = null;\n", property.getType(), property.getName());
+      code.add("%s %s = null;\n", property.getType(), property.getName());
     }
 
     @Override
@@ -102,11 +102,12 @@ public class NullablePropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" * @return this {@code %s} object", metadata.getBuilder().getSimpleName())
           .addLine(" */");
       addAccessorAnnotations(code);
-      code.add("public %s %s(", metadata.getBuilder(), setter(property));
+      code.add("public %s %s(", metadata.getBuildGen(), setter(property));
       addGetterAnnotations(code);
       code.add("%s %s) {\n", property.getType(), property.getName())
           .addLine("  this.%1$s = %1$s;", property.getName())
-          .addLine("  return (%s) this;", metadata.getBuilder())
+          .addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -126,7 +127,7 @@ public class NullablePropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" * @throws NullPointerException if {@code mapper} is null")
           .addLine(" */")
           .addLine("public %s %s(%s mapper) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               mapper(property),
               unaryOperator.withParameters(typeParam))
           .add(PreconditionExcerpts.checkNotNull("mapper"))
@@ -135,7 +136,8 @@ public class NullablePropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine("  if (%s != null) {", property.getName())
           .addLine("    %s(mapper.apply(%s));", setter(property), property.getName())
           .addLine("  }")
-          .addLine("  return (%s) this;", metadata.getBuilder())
+          .addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 

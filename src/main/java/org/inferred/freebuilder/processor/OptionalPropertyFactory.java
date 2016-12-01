@@ -65,7 +65,8 @@ public class OptionalPropertyFactory implements PropertyCodeGenerator.Factory {
             .addLine("     %s(mapper.apply(old%s.get()));",
                 nullableSetter(property), property.getCapitalizedName())
             .addLine("  }")
-            .addLine("  return (%s) this;", metadata.getBuilder());
+            .addLine("  return getThisBuilder();");
+            //.addLine("  return (%s) this;", metadata.getBuilder())
       }
 
       @Override
@@ -203,7 +204,7 @@ public class OptionalPropertyFactory implements PropertyCodeGenerator.Factory {
       }
       code.addLine(" */")
           .addLine("public %s %s(%s %s) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               setter(property),
               unboxedType.or(elementType),
               property.getName());
@@ -214,7 +215,8 @@ public class OptionalPropertyFactory implements PropertyCodeGenerator.Factory {
             .addLine("  this.%s = %s;",
                 property.getName(), PreconditionExcerpts.checkNotNullInline(property.getName()));
       }
-      code.addLine("  return (%s) this;", metadata.getBuilder())
+      code.addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -228,7 +230,7 @@ public class OptionalPropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" */");
       addAccessorAnnotations(code);
       code.addLine("public %s %s(%s<? extends %s> %s) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               setter(property),
               optional.cls,
               elementType,
@@ -250,7 +252,7 @@ public class OptionalPropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" * @return this {@code %s} object", metadata.getBuilder().getSimpleName())
           .addLine(" */")
           .addLine("public %s %s(@%s %s %s) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               nullableSetter(property),
               javax.annotation.Nullable.class,
               elementType,
@@ -280,7 +282,7 @@ public class OptionalPropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" * @throws NullPointerException if {@code mapper} is null")
           .addLine(" */")
           .addLine("public %s %s(%s mapper) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               mapper(property),
               unaryOperator.withParameters(elementType));
       optional.applyMapper(code, metadata, property);
@@ -296,9 +298,10 @@ public class OptionalPropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" *")
           .addLine(" * @return this {@code %s} object", metadata.getBuilder().getSimpleName())
           .addLine(" */")
-          .addLine("public %s %s() {", metadata.getBuilder(), clearMethod(property))
+          .addLine("public %s %s() {", metadata.getBuildGen(), clearMethod(property))
           .addLine("  this.%s = null;", property.getName())
-          .addLine("  return (%s) this;", metadata.getBuilder())
+          .addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 

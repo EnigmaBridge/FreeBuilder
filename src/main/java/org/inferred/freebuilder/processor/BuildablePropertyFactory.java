@@ -187,14 +187,15 @@ public class BuildablePropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" */");
       addAccessorAnnotations(code);
       code.addLine("public %s %s(%s %s) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               setter(property),
               property.getType(),
               property.getName())
           .addLine("  this.%s.clear();", property.getName())
           .addLine("  this.%1$s.mergeFrom(%2$s.checkNotNull(%1$s));",
               property.getName(), Preconditions.class)
-          .addLine("  return (%s) this;", metadata.getBuilder())
+          .addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -238,7 +239,8 @@ public class BuildablePropertyFactory implements PropertyCodeGenerator.Factory {
               consumer.getQualifiedName(),
               builderType)
           .addLine("  mutator.accept(%s);", property.getName())
-          .addLine("  return (%s) this;", metadata.getBuilder())
+          .addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 

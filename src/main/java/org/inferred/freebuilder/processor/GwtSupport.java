@@ -89,7 +89,8 @@ class GwtSupport {
           .addLine("  public %s instantiateInstance(%s reader)",
               metadata.getValueType(), SERIALIZATION_STREAM_READER)
           .addLine("      throws %s {", SERIALIZATION_EXCEPTION)
-          .addLine("    %1$s builder = new %1$s();", metadata.getBuilder());
+//          .addLine("    %1$s builder = new %1$s();", metadata.getBuilder());
+          .addLine("    %1$s builder = %s;", metadata.getBuilder(), "getNewBuilder()");
       for (Property property : metadata.getProperties()) {
         if (property.getType().getKind().isPrimitive()) {
           code.addLine("      %s %s = reader.read%s();",

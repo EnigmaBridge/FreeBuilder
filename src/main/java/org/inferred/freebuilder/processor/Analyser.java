@@ -51,10 +51,7 @@ import org.inferred.freebuilder.processor.util.QualifiedName;
 
 import java.beans.Introspector;
 import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -115,7 +112,9 @@ class Analyser {
       new DefaultPropertyFactory()); // Must be last, as it will always return a CodeGenerator
 
   private static final String BUILDER_SIMPLE_NAME_TEMPLATE = "%s_Builder";
+  private static final String ABUILDER_SIMPLE_NAME_TEMPLATE = "%s_ABuilder";
   private static final String USER_BUILDER_NAME = "Builder";
+  private static final String USER_ABUILDER_NAME = "ABuilder";
 
   private static final Pattern GETTER_PATTERN = Pattern.compile("^(get|is)(.+)");
   private static final String GET_PREFIX = "get";
@@ -134,6 +133,10 @@ class Analyser {
     this.types = types;
   }
 
+  private void log(TypeElement type, String fmt, Object... args){
+    messager.printMessage(NOTE, String.format(fmt, args), type);
+  }
+
   /**
    * Returns a {@link Metadata} metadata object for {@code type}.
    *
@@ -143,20 +146,36 @@ class Analyser {
     PackageElement pkg = elements.getPackageOf(type);
     verifyType(type, pkg);
     ImmutableSet<ExecutableElement> methods = methodsOn(type, elements);
+
+    QualifiedName generatedABuilder = QualifiedName.of(
+        pkg.getQualifiedName().toString(), generatedABuilderSimpleName(type));
     QualifiedName generatedBuilder = QualifiedName.of(
         pkg.getQualifiedName().toString(), generatedBuilderSimpleName(type));
-    Optional<TypeElement> builder = tryFindBuilder(generatedBuilder, type);
+
+    Optional<TypeElement> builder = tryFindBuilder(generatedABuilder, type);
+
     QualifiedName valueType = generatedBuilder.nestedType("Value");
     QualifiedName partialType = generatedBuilder.nestedType("Partial");
-    QualifiedName propertyType = generatedBuilder.nestedType("Property");
+    QualifiedName propertyType = generatedABuilder.nestedType("Property");
+
+    // <T> parameters
     List<? extends TypeParameterElement> typeParameters = type.getTypeParameters();
+    log(type, "type %s", type);
+    log(type, "typeParams %s", typeParameters);
+
+    // A builder types: T extends EntA, B extends EntA_Builder
+    List abuilderParams = Arrays.asList("T extends " + type, "B extends " + generatedABuilder);
+    abuilderParams.addAll(typeParameters);
+    log(type, "ABuilder typeParams %s", typeParameters);
+
     Map<ExecutableElement, Property> properties = findProperties(type, methods);
     Metadata.Builder metadataBuilder = new Metadata.Builder()
         .setType(QualifiedName.of(type).withParameters(typeParameters))
         .setInterfaceType(type.getKind().isInterface())
         .setBuilder(parameterized(builder, typeParameters))
         .setBuilderFactory(builderFactory(builder))
-        .setGeneratedBuilder(generatedBuilder.withParameters(typeParameters))
+        .setGeneratedBuilder(generatedABuilder.withParameters(typeParameters))
+        .setGeneratedBuilderParametrized(generatedABuilder.withParameters(abuilderParams))
         .setValueType(valueType.withParameters(typeParameters))
         .setPartialType(partialType.withParameters(typeParameters))
         .setPropertyEnum(propertyType.withParameters())
@@ -166,7 +185,10 @@ class Analyser {
         .addAllVisibleNestedTypes(visibleTypesIn(type))  // Because we inherit from type
         .putAllStandardMethodUnderrides(findUnderriddenMethods(methods))
         .setBuilderSerializable(shouldBuilderBeSerializable(builder))
-        .addAllProperties(properties.values());
+        .addAllProperties(properties.values())
+        .setTypeGen("T")
+        .setBuildGen("B");
+
     Metadata baseMetadata = metadataBuilder.build();
     metadataBuilder.mergeFrom(gwtMetadata(type, baseMetadata));
     if (builder.isPresent()) {
@@ -702,6 +724,13 @@ class Analyser {
     checkState(originalName.startsWith(packageName + "."));
     String nameWithoutPackage = originalName.substring(packageName.length() + 1);
     return String.format(BUILDER_SIMPLE_NAME_TEMPLATE, nameWithoutPackage.replaceAll("\\.", "_"));
+  }
+  private String generatedABuilderSimpleName(TypeElement type) {
+    String packageName = elements.getPackageOf(type).getQualifiedName().toString();
+    String originalName = type.getQualifiedName().toString();
+    checkState(originalName.startsWith(packageName + "."));
+    String nameWithoutPackage = originalName.substring(packageName.length() + 1);
+    return String.format(ABUILDER_SIMPLE_NAME_TEMPLATE, nameWithoutPackage.replaceAll("\\.", "_"));
   }
 
   private boolean shouldBuilderBeSerializable(Optional<TypeElement> builder) {

@@ -101,12 +101,18 @@ public class Processor extends AbstractProcessor {
             metadata.getGeneratedBuilder().getQualifiedName(),
             metadata.getVisibleNestedTypes(),
             firstNonNull(features, environmentFeatures));
+
+        // Abstract base builder
         codeGenerator.writeBuilderSource(code, metadata);
         FilerUtils.writeCompilationUnit(
             processingEnv.getFiler(),
             metadata.getGeneratedBuilder().getQualifiedName(),
             type,
             code.toString());
+
+        // Normal abstract builder
+        // TODO: ...
+
       } catch (Analyser.CannotGenerateCodeException e) {
         // Thrown to skip writing the builder source; the error will already have been issued.
       } catch (FilerException e) {
