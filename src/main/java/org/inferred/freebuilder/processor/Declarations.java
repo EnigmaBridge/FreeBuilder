@@ -2,7 +2,6 @@ package org.inferred.freebuilder.processor;
 
 import com.google.common.base.Optional;
 
-import org.inferred.freebuilder.processor.BuilderFactory.TypeInference;
 import org.inferred.freebuilder.processor.util.Block;
 import org.inferred.freebuilder.processor.util.Excerpt;
 
@@ -21,7 +20,7 @@ class Declarations {
         "base",
         "// Upcast to access private fields; otherwise, oddly, we get an access violation.%n"
             + "%1$s base = (%1$s) %2$s;",
-        metadata.getGeneratedBuilder(),
+        metadata.getGeneratedABuilder(),
         builder);
   }
 
@@ -36,7 +35,7 @@ class Declarations {
       return Optional.absent();
     }
     Excerpt defaults = block.declare("_defaults", "%s _defaults = %s;",
-          metadata.getGeneratedBuilder(),
+          metadata.getGeneratedABuilder(),
             "getNewBuilder();");
 //          metadata.getBuilderFactory().get()
 //              .newBuilder(metadata.getBuilder(), TypeInference.INFERRED_TYPES));

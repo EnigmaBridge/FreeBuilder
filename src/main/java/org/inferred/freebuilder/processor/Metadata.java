@@ -119,10 +119,12 @@ public abstract class Metadata {
   /** Returns the builder factory mechanism the user has exposed, if any. */
   public abstract Optional<BuilderFactory> getBuilderFactory();
 
+  /** Returns the abstract builder class that should be generated. */
+  public abstract ParameterizedType getGeneratedABuilder();
+  /** Returns the abstract builder class that should be generated. */
+  public abstract ParameterizedType getGeneratedABuilderParametrized();
   /** Returns the builder class that should be generated. */
   public abstract ParameterizedType getGeneratedBuilder();
-  /** Returns the builder class that should be generated. */
-  public abstract ParameterizedType getGeneratedBuilderParametrized();
 
   /** Returns the value class that should be generated. */
   public abstract ParameterizedType getValueType();
@@ -263,7 +265,7 @@ public abstract class Metadata {
     @Override
     public org.inferred.freebuilder.processor.Metadata build() {
       org.inferred.freebuilder.processor.Metadata metadata = super.build();
-      QualifiedName generatedBuilder = metadata.getGeneratedBuilder().getQualifiedName();
+      QualifiedName generatedBuilder = metadata.getGeneratedABuilder().getQualifiedName();
 //      checkState(metadata.getValueType().getQualifiedName().getEnclosingType()
 //              .equals(generatedBuilder),
 //          "%s not a nested class of %s", metadata.getValueType(), generatedBuilder);

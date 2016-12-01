@@ -377,7 +377,7 @@ public class ListMultimapPropertyFactory implements PropertyCodeGenerator.Factor
     public void addMergeFromBuilder(Block code, String builder) {
       code.addLine("%s(((%s) %s).%s);",
           putAllMethod(property),
-          metadata.getGeneratedBuilder(),
+          metadata.getGeneratedABuilder(),
           builder,
           property.getName());
     }

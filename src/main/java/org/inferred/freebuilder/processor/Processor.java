@@ -98,7 +98,7 @@ public class Processor extends AbstractProcessor {
         Metadata metadata = analyser.analyse(type);
         CompilationUnitBuilder code = new CompilationUnitBuilder(
             processingEnv,
-            metadata.getGeneratedBuilder().getQualifiedName(),
+            metadata.getGeneratedABuilder().getQualifiedName(),
             metadata.getVisibleNestedTypes(),
             firstNonNull(features, environmentFeatures));
 
@@ -106,7 +106,7 @@ public class Processor extends AbstractProcessor {
         codeGenerator.writeBuilderSource(code, metadata);
         FilerUtils.writeCompilationUnit(
             processingEnv.getFiler(),
-            metadata.getGeneratedBuilder().getQualifiedName(),
+            metadata.getGeneratedABuilder().getQualifiedName(),
             type,
             code.toString());
 

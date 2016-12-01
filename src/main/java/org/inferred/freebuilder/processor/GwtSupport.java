@@ -43,7 +43,7 @@ class GwtSupport {
             "@%s(serializable = true)%n", GwtCompatible.class));
         extraMetadata.addNestedClasses(new CustomValueSerializer());
         extraMetadata.addNestedClasses(new GwtWhitelist());
-        QualifiedName builderName = metadata.getGeneratedBuilder().getQualifiedName();
+        QualifiedName builderName = metadata.getGeneratedABuilder().getQualifiedName();
         extraMetadata.addVisibleNestedTypes(
             builderName.nestedType("Value_CustomFieldSerializer"),
             builderName.nestedType("GwtWhitelist"));

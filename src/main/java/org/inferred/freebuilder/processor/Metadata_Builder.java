@@ -38,8 +38,9 @@ abstract class Metadata_Builder {
     TYPE_GEN("typeGen"),
     BUILD_GEN("buildGen"),
     INTERFACE_TYPE("interfaceType"),
+    GENERATED_A_BUILDER("generatedABuilder"),
+    GENERATED_A_BUILDER_PARAMETRIZED("generatedABuilderParametrized"),
     GENERATED_BUILDER("generatedBuilder"),
-    GENERATED_BUILDER_PARAMETRIZED("generatedBuilderParametrized"),
     VALUE_TYPE("valueType"),
     PARTIAL_TYPE("partialType"),
     PROPERTY_ENUM("propertyEnum"),
@@ -71,8 +72,9 @@ abstract class Metadata_Builder {
   // allows the JVM to optimize away the Optional objects created by and
   // passed to our API.
   private BuilderFactory builderFactory = null;
+  private ParameterizedType generatedABuilder;
+  private ParameterizedType generatedABuilderParametrized;
   private ParameterizedType generatedBuilder;
-  private ParameterizedType generatedBuilderParametrized;
   private ParameterizedType valueType;
   private ParameterizedType partialType;
   private Set<QualifiedName> visibleNestedTypes = ImmutableSet.of();
@@ -294,6 +296,55 @@ abstract class Metadata_Builder {
   }
 
   /**
+   * Sets the value to be returned by {@link Metadata#getGeneratedABuilder()}.
+   *
+   * @return this {@code Builder} object
+   * @throws NullPointerException if {@code generatedABuilder} is null
+   */
+  public Metadata.Builder setGeneratedABuilder(ParameterizedType generatedABuilder) {
+    this.generatedABuilder = Preconditions.checkNotNull(generatedABuilder);
+    _unsetProperties.remove(Metadata_Builder.Property.GENERATED_A_BUILDER);
+    return (Metadata.Builder) this;
+  }
+
+  /**
+   * Returns the value that will be returned by {@link Metadata#getGeneratedABuilder()}.
+   *
+   * @throws IllegalStateException if the field has not been set
+   */
+  public ParameterizedType getGeneratedABuilder() {
+    Preconditions.checkState(
+        !_unsetProperties.contains(Metadata_Builder.Property.GENERATED_A_BUILDER),
+        "generatedABuilder not set");
+    return generatedABuilder;
+  }
+
+  /**
+   * Sets the value to be returned by {@link Metadata#getGeneratedABuilderParametrized()}.
+   *
+   * @return this {@code Builder} object
+   * @throws NullPointerException if {@code generatedABuilderParametrized} is null
+   */
+  public Metadata.Builder setGeneratedABuilderParametrized(
+      ParameterizedType generatedABuilderParametrized) {
+    this.generatedABuilderParametrized = Preconditions.checkNotNull(generatedABuilderParametrized);
+    _unsetProperties.remove(Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED);
+    return (Metadata.Builder) this;
+  }
+
+  /**
+   * Returns the value that will be returned by {@link Metadata#getGeneratedABuilderParametrized()}.
+   *
+   * @throws IllegalStateException if the field has not been set
+   */
+  public ParameterizedType getGeneratedABuilderParametrized() {
+    Preconditions.checkState(
+        !_unsetProperties.contains(Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED),
+        "generatedABuilderParametrized not set");
+    return generatedABuilderParametrized;
+  }
+
+  /**
    * Sets the value to be returned by {@link Metadata#getGeneratedBuilder()}.
    *
    * @return this {@code Builder} object
@@ -315,31 +366,6 @@ abstract class Metadata_Builder {
         !_unsetProperties.contains(Metadata_Builder.Property.GENERATED_BUILDER),
         "generatedBuilder not set");
     return generatedBuilder;
-  }
-
-  /**
-   * Sets the value to be returned by {@link Metadata#getGeneratedBuilderParametrized()}.
-   *
-   * @return this {@code Builder} object
-   * @throws NullPointerException if {@code generatedBuilderParametrized} is null
-   */
-  public Metadata.Builder setGeneratedBuilderParametrized(
-      ParameterizedType generatedBuilderParametrized) {
-    this.generatedBuilderParametrized = Preconditions.checkNotNull(generatedBuilderParametrized);
-    _unsetProperties.remove(Metadata_Builder.Property.GENERATED_BUILDER_PARAMETRIZED);
-    return (Metadata.Builder) this;
-  }
-
-  /**
-   * Returns the value that will be returned by {@link Metadata#getGeneratedBuilderParametrized()}.
-   *
-   * @throws IllegalStateException if the field has not been set
-   */
-  public ParameterizedType getGeneratedBuilderParametrized() {
-    Preconditions.checkState(
-        !_unsetProperties.contains(Metadata_Builder.Property.GENERATED_BUILDER_PARAMETRIZED),
-        "generatedBuilderParametrized not set");
-    return generatedBuilderParametrized;
   }
 
   /**
@@ -954,16 +980,20 @@ abstract class Metadata_Builder {
     if (value.getBuilderFactory().isPresent()) {
       setBuilderFactory(value.getBuilderFactory().get());
     }
+    if (_defaults._unsetProperties.contains(Metadata_Builder.Property.GENERATED_A_BUILDER)
+        || !value.getGeneratedABuilder().equals(_defaults.getGeneratedABuilder())) {
+      setGeneratedABuilder(value.getGeneratedABuilder());
+    }
+    if (_defaults._unsetProperties.contains(
+            Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED)
+        || !value
+            .getGeneratedABuilderParametrized()
+            .equals(_defaults.getGeneratedABuilderParametrized())) {
+      setGeneratedABuilderParametrized(value.getGeneratedABuilderParametrized());
+    }
     if (_defaults._unsetProperties.contains(Metadata_Builder.Property.GENERATED_BUILDER)
         || !value.getGeneratedBuilder().equals(_defaults.getGeneratedBuilder())) {
       setGeneratedBuilder(value.getGeneratedBuilder());
-    }
-    if (_defaults._unsetProperties.contains(
-            Metadata_Builder.Property.GENERATED_BUILDER_PARAMETRIZED)
-        || !value
-            .getGeneratedBuilderParametrized()
-            .equals(_defaults.getGeneratedBuilderParametrized())) {
-      setGeneratedBuilderParametrized(value.getGeneratedBuilderParametrized());
     }
     if (_defaults._unsetProperties.contains(Metadata_Builder.Property.VALUE_TYPE)
         || !value.getValueType().equals(_defaults.getValueType())) {
@@ -1054,18 +1084,23 @@ abstract class Metadata_Builder {
     if (template.getBuilderFactory().isPresent()) {
       setBuilderFactory(template.getBuilderFactory().get());
     }
+    if (!base._unsetProperties.contains(Metadata_Builder.Property.GENERATED_A_BUILDER)
+        && (_defaults._unsetProperties.contains(Metadata_Builder.Property.GENERATED_A_BUILDER)
+            || !template.getGeneratedABuilder().equals(_defaults.getGeneratedABuilder()))) {
+      setGeneratedABuilder(template.getGeneratedABuilder());
+    }
+    if (!base._unsetProperties.contains(Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED)
+        && (_defaults._unsetProperties.contains(
+                Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED)
+            || !template
+                .getGeneratedABuilderParametrized()
+                .equals(_defaults.getGeneratedABuilderParametrized()))) {
+      setGeneratedABuilderParametrized(template.getGeneratedABuilderParametrized());
+    }
     if (!base._unsetProperties.contains(Metadata_Builder.Property.GENERATED_BUILDER)
         && (_defaults._unsetProperties.contains(Metadata_Builder.Property.GENERATED_BUILDER)
             || !template.getGeneratedBuilder().equals(_defaults.getGeneratedBuilder()))) {
       setGeneratedBuilder(template.getGeneratedBuilder());
-    }
-    if (!base._unsetProperties.contains(Metadata_Builder.Property.GENERATED_BUILDER_PARAMETRIZED)
-        && (_defaults._unsetProperties.contains(
-                Metadata_Builder.Property.GENERATED_BUILDER_PARAMETRIZED)
-            || !template
-                .getGeneratedBuilderParametrized()
-                .equals(_defaults.getGeneratedBuilderParametrized()))) {
-      setGeneratedBuilderParametrized(template.getGeneratedBuilderParametrized());
     }
     if (!base._unsetProperties.contains(Metadata_Builder.Property.VALUE_TYPE)
         && (_defaults._unsetProperties.contains(Metadata_Builder.Property.VALUE_TYPE)
@@ -1112,8 +1147,9 @@ abstract class Metadata_Builder {
     interfaceType = _defaults.interfaceType;
     optionalBuilder = _defaults.optionalBuilder;
     builderFactory = _defaults.builderFactory;
+    generatedABuilder = _defaults.generatedABuilder;
+    generatedABuilderParametrized = _defaults.generatedABuilderParametrized;
     generatedBuilder = _defaults.generatedBuilder;
-    generatedBuilderParametrized = _defaults.generatedBuilderParametrized;
     valueType = _defaults.valueType;
     partialType = _defaults.partialType;
     clearVisibleNestedTypes();
@@ -1167,8 +1203,9 @@ abstract class Metadata_Builder {
     // allows the JVM to optimize away the Optional objects created by our
     // getter method.
     private final BuilderFactory builderFactory;
+    private final ParameterizedType generatedABuilder;
+    private final ParameterizedType generatedABuilderParametrized;
     private final ParameterizedType generatedBuilder;
-    private final ParameterizedType generatedBuilderParametrized;
     private final ParameterizedType valueType;
     private final ParameterizedType partialType;
     private final ImmutableSet<QualifiedName> visibleNestedTypes;
@@ -1190,8 +1227,9 @@ abstract class Metadata_Builder {
       this.interfaceType = builder.interfaceType;
       this.optionalBuilder = builder.optionalBuilder;
       this.builderFactory = builder.builderFactory;
+      this.generatedABuilder = builder.generatedABuilder;
+      this.generatedABuilderParametrized = builder.generatedABuilderParametrized;
       this.generatedBuilder = builder.generatedBuilder;
-      this.generatedBuilderParametrized = builder.generatedBuilderParametrized;
       this.valueType = builder.valueType;
       this.partialType = builder.partialType;
       this.visibleNestedTypes = ImmutableSet.copyOf(builder.visibleNestedTypes);
@@ -1236,13 +1274,18 @@ abstract class Metadata_Builder {
     }
 
     @Override
-    public ParameterizedType getGeneratedBuilder() {
-      return generatedBuilder;
+    public ParameterizedType getGeneratedABuilder() {
+      return generatedABuilder;
     }
 
     @Override
-    public ParameterizedType getGeneratedBuilderParametrized() {
-      return generatedBuilderParametrized;
+    public ParameterizedType getGeneratedABuilderParametrized() {
+      return generatedABuilderParametrized;
+    }
+
+    @Override
+    public ParameterizedType getGeneratedBuilder() {
+      return generatedBuilder;
     }
 
     @Override
@@ -1328,10 +1371,13 @@ abstract class Metadata_Builder {
           && (builderFactory == null || !builderFactory.equals(other.builderFactory))) {
         return false;
       }
-      if (!generatedBuilder.equals(other.generatedBuilder)) {
+      if (!generatedABuilder.equals(other.generatedABuilder)) {
         return false;
       }
-      if (!generatedBuilderParametrized.equals(other.generatedBuilderParametrized)) {
+      if (!generatedABuilderParametrized.equals(other.generatedABuilderParametrized)) {
+        return false;
+      }
+      if (!generatedBuilder.equals(other.generatedBuilder)) {
         return false;
       }
       if (!valueType.equals(other.valueType)) {
@@ -1380,8 +1426,9 @@ abstract class Metadata_Builder {
             interfaceType,
             optionalBuilder,
             builderFactory,
+            generatedABuilder,
+            generatedABuilderParametrized,
             generatedBuilder,
-            generatedBuilderParametrized,
             valueType,
             partialType,
             visibleNestedTypes,
@@ -1406,8 +1453,9 @@ abstract class Metadata_Builder {
               "interfaceType=" + interfaceType,
               (optionalBuilder != null ? "optionalBuilder=" + optionalBuilder : null),
               (builderFactory != null ? "builderFactory=" + builderFactory : null),
+              "generatedABuilder=" + generatedABuilder,
+              "generatedABuilderParametrized=" + generatedABuilderParametrized,
               "generatedBuilder=" + generatedBuilder,
-              "generatedBuilderParametrized=" + generatedBuilderParametrized,
               "valueType=" + valueType,
               "partialType=" + partialType,
               "visibleNestedTypes=" + visibleNestedTypes,
@@ -1436,8 +1484,9 @@ abstract class Metadata_Builder {
     // allows the JVM to optimize away the Optional objects created by our
     // getter method.
     private final BuilderFactory builderFactory;
+    private final ParameterizedType generatedABuilder;
+    private final ParameterizedType generatedABuilderParametrized;
     private final ParameterizedType generatedBuilder;
-    private final ParameterizedType generatedBuilderParametrized;
     private final ParameterizedType valueType;
     private final ParameterizedType partialType;
     private final ImmutableSet<QualifiedName> visibleNestedTypes;
@@ -1460,8 +1509,9 @@ abstract class Metadata_Builder {
       this.interfaceType = builder.interfaceType;
       this.optionalBuilder = builder.optionalBuilder;
       this.builderFactory = builder.builderFactory;
+      this.generatedABuilder = builder.generatedABuilder;
+      this.generatedABuilderParametrized = builder.generatedABuilderParametrized;
       this.generatedBuilder = builder.generatedBuilder;
-      this.generatedBuilderParametrized = builder.generatedBuilderParametrized;
       this.valueType = builder.valueType;
       this.partialType = builder.partialType;
       this.visibleNestedTypes = ImmutableSet.copyOf(builder.visibleNestedTypes);
@@ -1519,19 +1569,27 @@ abstract class Metadata_Builder {
     }
 
     @Override
+    public ParameterizedType getGeneratedABuilder() {
+      if (_unsetProperties.contains(Metadata_Builder.Property.GENERATED_A_BUILDER)) {
+        throw new UnsupportedOperationException("generatedABuilder not set");
+      }
+      return generatedABuilder;
+    }
+
+    @Override
+    public ParameterizedType getGeneratedABuilderParametrized() {
+      if (_unsetProperties.contains(Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED)) {
+        throw new UnsupportedOperationException("generatedABuilderParametrized not set");
+      }
+      return generatedABuilderParametrized;
+    }
+
+    @Override
     public ParameterizedType getGeneratedBuilder() {
       if (_unsetProperties.contains(Metadata_Builder.Property.GENERATED_BUILDER)) {
         throw new UnsupportedOperationException("generatedBuilder not set");
       }
       return generatedBuilder;
-    }
-
-    @Override
-    public ParameterizedType getGeneratedBuilderParametrized() {
-      if (_unsetProperties.contains(Metadata_Builder.Property.GENERATED_BUILDER_PARAMETRIZED)) {
-        throw new UnsupportedOperationException("generatedBuilderParametrized not set");
-      }
-      return generatedBuilderParametrized;
     }
 
     @Override
@@ -1632,13 +1690,17 @@ abstract class Metadata_Builder {
           && (builderFactory == null || !builderFactory.equals(other.builderFactory))) {
         return false;
       }
-      if (generatedBuilder != other.generatedBuilder
-          && (generatedBuilder == null || !generatedBuilder.equals(other.generatedBuilder))) {
+      if (generatedABuilder != other.generatedABuilder
+          && (generatedABuilder == null || !generatedABuilder.equals(other.generatedABuilder))) {
         return false;
       }
-      if (generatedBuilderParametrized != other.generatedBuilderParametrized
-          && (generatedBuilderParametrized == null
-              || !generatedBuilderParametrized.equals(other.generatedBuilderParametrized))) {
+      if (generatedABuilderParametrized != other.generatedABuilderParametrized
+          && (generatedABuilderParametrized == null
+              || !generatedABuilderParametrized.equals(other.generatedABuilderParametrized))) {
+        return false;
+      }
+      if (generatedBuilder != other.generatedBuilder
+          && (generatedBuilder == null || !generatedBuilder.equals(other.generatedBuilder))) {
         return false;
       }
       if (valueType != other.valueType
@@ -1692,8 +1754,9 @@ abstract class Metadata_Builder {
             interfaceType,
             optionalBuilder,
             builderFactory,
+            generatedABuilder,
+            generatedABuilderParametrized,
             generatedBuilder,
-            generatedBuilderParametrized,
             valueType,
             partialType,
             visibleNestedTypes,
@@ -1725,11 +1788,15 @@ abstract class Metadata_Builder {
                   : null),
               (optionalBuilder != null ? "optionalBuilder=" + optionalBuilder : null),
               (builderFactory != null ? "builderFactory=" + builderFactory : null),
+              (!_unsetProperties.contains(Metadata_Builder.Property.GENERATED_A_BUILDER)
+                  ? "generatedABuilder=" + generatedABuilder
+                  : null),
+              (!_unsetProperties.contains(
+                      Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED)
+                  ? "generatedABuilderParametrized=" + generatedABuilderParametrized
+                  : null),
               (!_unsetProperties.contains(Metadata_Builder.Property.GENERATED_BUILDER)
                   ? "generatedBuilder=" + generatedBuilder
-                  : null),
-              (!_unsetProperties.contains(Metadata_Builder.Property.GENERATED_BUILDER_PARAMETRIZED)
-                  ? "generatedBuilderParametrized=" + generatedBuilderParametrized
                   : null),
               (!_unsetProperties.contains(Metadata_Builder.Property.VALUE_TYPE)
                   ? "valueType=" + valueType

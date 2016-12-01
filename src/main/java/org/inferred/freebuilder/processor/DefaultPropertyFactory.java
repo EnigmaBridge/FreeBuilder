@@ -100,7 +100,7 @@ public class DefaultPropertyFactory implements PropertyCodeGenerator.Factory {
             metadata.getPropertyEnum(), property.getAllCapsName());
       }
       code.addLine("  return getThisBuilder();");
-//      if ((metadata.getBuilder() == metadata.getGeneratedBuilder())) {
+//      if ((metadata.getBuilder() == metadata.getGeneratedABuilder())) {
 //        code.addLine("  return this;");
 //      } else {
 //        code.addLine("  return (%s) this;", metadata.getBuilder());

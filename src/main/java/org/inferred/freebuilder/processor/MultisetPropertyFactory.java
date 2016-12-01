@@ -319,7 +319,7 @@ public class MultisetPropertyFactory implements PropertyCodeGenerator.Factory {
     public void addMergeFromBuilder(Block code, String builder) {
       code.addLine("%s(((%s) %s).%s);",
           addAllMethod(property),
-          metadata.getGeneratedBuilder(),
+          metadata.getGeneratedABuilder(),
           builder,
           property.getName());
     }

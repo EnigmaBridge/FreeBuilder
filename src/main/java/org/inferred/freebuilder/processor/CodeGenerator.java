@@ -26,7 +26,6 @@ import static org.inferred.freebuilder.processor.util.feature.GuavaLibrary.GUAVA
 import static org.inferred.freebuilder.processor.util.feature.SourceLevel.SOURCE_LEVEL;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -105,7 +104,7 @@ public class CodeGenerator {
       code.add(annotation);
     }
     code.add("abstract class %s",
-            metadata.getGeneratedBuilderParametrized().declaration()
+            metadata.getGeneratedABuilderParametrized().declaration()
     );
     if (metadata.isBuilderSerializable()) {
       code.add(" implements %s", Serializable.class);
@@ -308,7 +307,7 @@ public class CodeGenerator {
     code.addLine("")
         .addLine("  private %s(%s builder) {",
             metadata.getValueType().getSimpleName(),
-            metadata.getGeneratedBuilder());
+            metadata.getGeneratedABuilder());
     for (Property property : metadata.getProperties()) {
       property.getCodeGenerator()
           .addFinalFieldAssignment(code, "this." + property.getName(), "builder");
@@ -499,7 +498,7 @@ public class CodeGenerator {
     code.addLine("")
         .addLine("  %s(%s builder) {",
             metadata.getPartialType().getSimpleName(),
-            metadata.getGeneratedBuilder());
+            metadata.getGeneratedABuilder());
     for (Property property : metadata.getProperties()) {
       property.getCodeGenerator()
           .addPartialFieldAssignment(code, "this." + property.getName(), "builder");
@@ -761,7 +760,7 @@ public class CodeGenerator {
             metadata.getType())
         .addLine(" */")
         .add(Excerpts.generated(getClass()))
-        .addLine("abstract class %s {}", metadata.getGeneratedBuilder().declaration());
+        .addLine("abstract class %s {}", metadata.getGeneratedABuilder().declaration());
   }
 
   /** Returns an {@link Excerpt} of "implements/extends {@code type}". */

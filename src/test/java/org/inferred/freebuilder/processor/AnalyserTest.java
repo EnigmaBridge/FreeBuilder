@@ -153,7 +153,7 @@ public class AnalyserTest {
     assertEquals("com.example.OuterClass.DataType",
         dataType.getType().getQualifiedName().toString());
     assertEquals(QualifiedName.of("com.example", "OuterClass_DataType_Builder").withParameters(),
-        dataType.getGeneratedBuilder());
+        dataType.getGeneratedABuilder());
   }
 
   @Test
@@ -170,7 +170,7 @@ public class AnalyserTest {
         dataType.getType().getQualifiedName().toString());
     assertEquals(
         QualifiedName.of("com.example", "OuterClass_InnerClass_DataType_Builder").withParameters(),
-        dataType.getGeneratedBuilder());
+        dataType.getGeneratedABuilder());
   }
 
   @Test
@@ -181,7 +181,7 @@ public class AnalyserTest {
         "  public static class Builder extends DataType_Builder { }",
         "}"));
     assertEquals(QualifiedName.of("com.example", "DataType_Builder").withParameters(),
-        dataType.getGeneratedBuilder());
+        dataType.getGeneratedABuilder());
     assertEquals("com.example.DataType.Builder",
         dataType.getBuilder().getQualifiedName().toString());
     assertThat(dataType.getBuilderFactory()).hasValue(NO_ARGS_CONSTRUCTOR);
@@ -198,7 +198,7 @@ public class AnalyserTest {
         "      extends DataType_Builder implements java.io.Serializable { }",
         "}"));
     assertEquals(QualifiedName.of("com.example", "DataType_Builder").withParameters(),
-        dataType.getGeneratedBuilder());
+        dataType.getGeneratedABuilder());
     assertEquals("com.example.DataType.Builder",
         dataType.getBuilder().getQualifiedName().toString());
     assertTrue(dataType.isBuilderSerializable());
@@ -214,7 +214,7 @@ public class AnalyserTest {
         "  public static Builder builder() { return new Builder(); }",
         "}"));
     assertEquals(QualifiedName.of("com.example", "DataType_Builder").withParameters(),
-        dataType.getGeneratedBuilder());
+        dataType.getGeneratedABuilder());
     assertEquals("com.example.DataType.Builder",
         dataType.getBuilder().getQualifiedName().toString());
     assertThat(dataType.getBuilderFactory()).hasValue(BUILDER_METHOD);
@@ -231,7 +231,7 @@ public class AnalyserTest {
         "  public static Builder newBuilder() { return new Builder(); }",
         "}"));
     assertEquals(QualifiedName.of("com.example", "DataType_Builder").withParameters(),
-        dataType.getGeneratedBuilder());
+        dataType.getGeneratedABuilder());
     assertEquals("com.example.DataType.Builder",
         dataType.getBuilder().getQualifiedName().toString());
     assertThat(dataType.getBuilderFactory()).hasValue(NEW_BUILDER_METHOD);
@@ -973,7 +973,7 @@ public class AnalyserTest {
         "}"));
     assertEquals("com.example.DataType.Builder<A, B>", dataType.getBuilder().toString());
     assertEquals(Optional.of(BuilderFactory.NO_ARGS_CONSTRUCTOR), dataType.getBuilderFactory());
-    assertEquals("com.example.DataType_Builder<A, B>", dataType.getGeneratedBuilder().toString());
+    assertEquals("com.example.DataType_Builder<A, B>", dataType.getGeneratedABuilder().toString());
     assertEquals("com.example.DataType_Builder.Partial<A, B>",
         dataType.getPartialType().toString());
     assertEquals("com.example.DataType_Builder.Property", dataType.getPropertyEnum().toString());
@@ -1009,7 +1009,7 @@ public class AnalyserTest {
     assertThat(messager.getMessagesByElement().asMap()).isEmpty();
     assertEquals("com.example.DataType.Builder<A, B>", dataType.getBuilder().toString());
     assertEquals(Optional.of(BuilderFactory.NO_ARGS_CONSTRUCTOR), dataType.getBuilderFactory());
-    assertEquals("com.example.DataType_Builder<A, B>", dataType.getGeneratedBuilder().toString());
+    assertEquals("com.example.DataType_Builder<A, B>", dataType.getGeneratedABuilder().toString());
     assertEquals("com.example.DataType_Builder.Partial<A, B>",
         dataType.getPartialType().toString());
     assertEquals("com.example.DataType_Builder.Property", dataType.getPropertyEnum().toString());
