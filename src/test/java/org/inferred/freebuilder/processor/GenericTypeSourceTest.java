@@ -860,7 +860,7 @@ public class GenericTypeSourceTest {
 
   private static String generateSource(Metadata metadata, Feature<?>... features) {
     SourceBuilder sourceBuilder = SourceStringBuilder.simple(features);
-    new CodeGenerator().writeBuilderSource(sourceBuilder, metadata);
+    new CodeGenerator().writeABuilderSource(sourceBuilder, metadata);
     try {
       return new Formatter().formatSource(sourceBuilder.toString());
     } catch (FormatterException e) {
