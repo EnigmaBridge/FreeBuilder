@@ -76,6 +76,14 @@ abstract class Metadata_Builder {
   // Store a nullable object instead of an Optional. Escape analysis then
   // allows the JVM to optimize away the Optional objects created by and
   // passed to our API.
+  private ParameterizedType optionalABuilderAncestor = null;
+  // Store a nullable object instead of an Optional. Escape analysis then
+  // allows the JVM to optimize away the Optional objects created by and
+  // passed to our API.
+  private ParameterizedType optionalABuilderExtension = null;
+  // Store a nullable object instead of an Optional. Escape analysis then
+  // allows the JVM to optimize away the Optional objects created by and
+  // passed to our API.
   private BuilderFactory builderFactory = null;
   private ParameterizedType generatedABuilder;
   private ParameterizedType generatedABuilderParametrized;
@@ -301,6 +309,121 @@ abstract class Metadata_Builder {
    */
   public Optional<ParameterizedType> getOptionalABuilder() {
     return Optional.fromNullable(optionalABuilder);
+  }
+
+  /**
+   * Sets the value to be returned by {@link Metadata#getOptionalABuilderAncestor()}.
+   *
+   * @return this {@code Builder} object
+   * @throws NullPointerException if {@code optionalABuilderAncestor} is null
+   */
+  public Metadata.Builder setOptionalABuilderAncestor(ParameterizedType optionalABuilderAncestor) {
+    this.optionalABuilderAncestor = Preconditions.checkNotNull(optionalABuilderAncestor);
+    return (Metadata.Builder) this;
+  }
+
+  /**
+   * Sets the value to be returned by {@link Metadata#getOptionalABuilderAncestor()}.
+   *
+   * @return this {@code Builder} object
+   */
+  public Metadata.Builder setOptionalABuilderAncestor(
+      Optional<? extends ParameterizedType> optionalABuilderAncestor) {
+    if (optionalABuilderAncestor.isPresent()) {
+      return setOptionalABuilderAncestor(optionalABuilderAncestor.get());
+    } else {
+      return clearOptionalABuilderAncestor();
+    }
+  }
+
+  /**
+   * Sets the value to be returned by {@link Metadata#getOptionalABuilderAncestor()}.
+   *
+   * @return this {@code Builder} object
+   */
+  public Metadata.Builder setNullableOptionalABuilderAncestor(
+      @Nullable ParameterizedType optionalABuilderAncestor) {
+    if (optionalABuilderAncestor != null) {
+      return setOptionalABuilderAncestor(optionalABuilderAncestor);
+    } else {
+      return clearOptionalABuilderAncestor();
+    }
+  }
+
+  /**
+   * Sets the value to be returned by {@link Metadata#getOptionalABuilderAncestor()}
+   * to {@link Optional#absent() Optional.absent()}.
+   *
+   * @return this {@code Builder} object
+   */
+  public Metadata.Builder clearOptionalABuilderAncestor() {
+    this.optionalABuilderAncestor = null;
+    return (Metadata.Builder) this;
+  }
+
+  /**
+   * Returns the value that will be returned by {@link Metadata#getOptionalABuilderAncestor()}.
+   */
+  public Optional<ParameterizedType> getOptionalABuilderAncestor() {
+    return Optional.fromNullable(optionalABuilderAncestor);
+  }
+
+  /**
+   * Sets the value to be returned by {@link Metadata#getOptionalABuilderExtension()}.
+   *
+   * @return this {@code Builder} object
+   * @throws NullPointerException if {@code optionalABuilderExtension} is null
+   */
+  public Metadata.Builder setOptionalABuilderExtension(
+      ParameterizedType optionalABuilderExtension) {
+    this.optionalABuilderExtension = Preconditions.checkNotNull(optionalABuilderExtension);
+    return (Metadata.Builder) this;
+  }
+
+  /**
+   * Sets the value to be returned by {@link Metadata#getOptionalABuilderExtension()}.
+   *
+   * @return this {@code Builder} object
+   */
+  public Metadata.Builder setOptionalABuilderExtension(
+      Optional<? extends ParameterizedType> optionalABuilderExtension) {
+    if (optionalABuilderExtension.isPresent()) {
+      return setOptionalABuilderExtension(optionalABuilderExtension.get());
+    } else {
+      return clearOptionalABuilderExtension();
+    }
+  }
+
+  /**
+   * Sets the value to be returned by {@link Metadata#getOptionalABuilderExtension()}.
+   *
+   * @return this {@code Builder} object
+   */
+  public Metadata.Builder setNullableOptionalABuilderExtension(
+      @Nullable ParameterizedType optionalABuilderExtension) {
+    if (optionalABuilderExtension != null) {
+      return setOptionalABuilderExtension(optionalABuilderExtension);
+    } else {
+      return clearOptionalABuilderExtension();
+    }
+  }
+
+  /**
+   * Sets the value to be returned by {@link Metadata#getOptionalABuilderExtension()}
+   * to {@link Optional#absent() Optional.absent()}.
+   *
+   * @return this {@code Builder} object
+   */
+  public Metadata.Builder clearOptionalABuilderExtension() {
+    this.optionalABuilderExtension = null;
+    return (Metadata.Builder) this;
+  }
+
+  /**
+   * Returns the value that will be returned by {@link Metadata#getOptionalABuilderExtension()}.
+   */
+  public Optional<ParameterizedType> getOptionalABuilderExtension() {
+    return Optional.fromNullable(optionalABuilderExtension);
   }
 
   /**
@@ -1069,6 +1192,12 @@ abstract class Metadata_Builder {
     if (value.getOptionalABuilder().isPresent()) {
       setOptionalABuilder(value.getOptionalABuilder().get());
     }
+    if (value.getOptionalABuilderAncestor().isPresent()) {
+      setOptionalABuilderAncestor(value.getOptionalABuilderAncestor().get());
+    }
+    if (value.getOptionalABuilderExtension().isPresent()) {
+      setOptionalABuilderExtension(value.getOptionalABuilderExtension().get());
+    }
     if (value.getBuilderFactory().isPresent()) {
       setBuilderFactory(value.getBuilderFactory().get());
     }
@@ -1183,6 +1312,12 @@ abstract class Metadata_Builder {
     if (template.getOptionalABuilder().isPresent()) {
       setOptionalABuilder(template.getOptionalABuilder().get());
     }
+    if (template.getOptionalABuilderAncestor().isPresent()) {
+      setOptionalABuilderAncestor(template.getOptionalABuilderAncestor().get());
+    }
+    if (template.getOptionalABuilderExtension().isPresent()) {
+      setOptionalABuilderExtension(template.getOptionalABuilderExtension().get());
+    }
     if (template.getBuilderFactory().isPresent()) {
       setBuilderFactory(template.getBuilderFactory().get());
     }
@@ -1258,6 +1393,8 @@ abstract class Metadata_Builder {
     interfaceType = _defaults.interfaceType;
     optionalBuilder = _defaults.optionalBuilder;
     optionalABuilder = _defaults.optionalABuilder;
+    optionalABuilderAncestor = _defaults.optionalABuilderAncestor;
+    optionalABuilderExtension = _defaults.optionalABuilderExtension;
     builderFactory = _defaults.builderFactory;
     generatedABuilder = _defaults.generatedABuilder;
     generatedABuilderParametrized = _defaults.generatedABuilderParametrized;
@@ -1319,6 +1456,14 @@ abstract class Metadata_Builder {
     // Store a nullable object instead of an Optional. Escape analysis then
     // allows the JVM to optimize away the Optional objects created by our
     // getter method.
+    private final ParameterizedType optionalABuilderAncestor;
+    // Store a nullable object instead of an Optional. Escape analysis then
+    // allows the JVM to optimize away the Optional objects created by our
+    // getter method.
+    private final ParameterizedType optionalABuilderExtension;
+    // Store a nullable object instead of an Optional. Escape analysis then
+    // allows the JVM to optimize away the Optional objects created by our
+    // getter method.
     private final BuilderFactory builderFactory;
     private final ParameterizedType generatedABuilder;
     private final ParameterizedType generatedABuilderParametrized;
@@ -1345,6 +1490,8 @@ abstract class Metadata_Builder {
       this.interfaceType = builder.interfaceType;
       this.optionalBuilder = builder.optionalBuilder;
       this.optionalABuilder = builder.optionalABuilder;
+      this.optionalABuilderAncestor = builder.optionalABuilderAncestor;
+      this.optionalABuilderExtension = builder.optionalABuilderExtension;
       this.builderFactory = builder.builderFactory;
       this.generatedABuilder = builder.generatedABuilder;
       this.generatedABuilderParametrized = builder.generatedABuilderParametrized;
@@ -1391,6 +1538,16 @@ abstract class Metadata_Builder {
     @Override
     public Optional<ParameterizedType> getOptionalABuilder() {
       return Optional.fromNullable(optionalABuilder);
+    }
+
+    @Override
+    public Optional<ParameterizedType> getOptionalABuilderAncestor() {
+      return Optional.fromNullable(optionalABuilderAncestor);
+    }
+
+    @Override
+    public Optional<ParameterizedType> getOptionalABuilderExtension() {
+      return Optional.fromNullable(optionalABuilderExtension);
     }
 
     @Override
@@ -1501,6 +1658,16 @@ abstract class Metadata_Builder {
           && (optionalABuilder == null || !optionalABuilder.equals(other.optionalABuilder))) {
         return false;
       }
+      if (optionalABuilderAncestor != other.optionalABuilderAncestor
+          && (optionalABuilderAncestor == null
+              || !optionalABuilderAncestor.equals(other.optionalABuilderAncestor))) {
+        return false;
+      }
+      if (optionalABuilderExtension != other.optionalABuilderExtension
+          && (optionalABuilderExtension == null
+              || !optionalABuilderExtension.equals(other.optionalABuilderExtension))) {
+        return false;
+      }
       if (builderFactory != other.builderFactory
           && (builderFactory == null || !builderFactory.equals(other.builderFactory))) {
         return false;
@@ -1563,6 +1730,8 @@ abstract class Metadata_Builder {
             interfaceType,
             optionalBuilder,
             optionalABuilder,
+            optionalABuilderAncestor,
+            optionalABuilderExtension,
             builderFactory,
             generatedABuilder,
             generatedABuilderParametrized,
@@ -1592,6 +1761,12 @@ abstract class Metadata_Builder {
               "interfaceType=" + interfaceType,
               (optionalBuilder != null ? "optionalBuilder=" + optionalBuilder : null),
               (optionalABuilder != null ? "optionalABuilder=" + optionalABuilder : null),
+              (optionalABuilderAncestor != null
+                  ? "optionalABuilderAncestor=" + optionalABuilderAncestor
+                  : null),
+              (optionalABuilderExtension != null
+                  ? "optionalABuilderExtension=" + optionalABuilderExtension
+                  : null),
               (builderFactory != null ? "builderFactory=" + builderFactory : null),
               "generatedABuilder=" + generatedABuilder,
               "generatedABuilderParametrized=" + generatedABuilderParametrized,
@@ -1628,6 +1803,14 @@ abstract class Metadata_Builder {
     // Store a nullable object instead of an Optional. Escape analysis then
     // allows the JVM to optimize away the Optional objects created by our
     // getter method.
+    private final ParameterizedType optionalABuilderAncestor;
+    // Store a nullable object instead of an Optional. Escape analysis then
+    // allows the JVM to optimize away the Optional objects created by our
+    // getter method.
+    private final ParameterizedType optionalABuilderExtension;
+    // Store a nullable object instead of an Optional. Escape analysis then
+    // allows the JVM to optimize away the Optional objects created by our
+    // getter method.
     private final BuilderFactory builderFactory;
     private final ParameterizedType generatedABuilder;
     private final ParameterizedType generatedABuilderParametrized;
@@ -1655,6 +1838,8 @@ abstract class Metadata_Builder {
       this.interfaceType = builder.interfaceType;
       this.optionalBuilder = builder.optionalBuilder;
       this.optionalABuilder = builder.optionalABuilder;
+      this.optionalABuilderAncestor = builder.optionalABuilderAncestor;
+      this.optionalABuilderExtension = builder.optionalABuilderExtension;
       this.builderFactory = builder.builderFactory;
       this.generatedABuilder = builder.generatedABuilder;
       this.generatedABuilderParametrized = builder.generatedABuilderParametrized;
@@ -1714,6 +1899,16 @@ abstract class Metadata_Builder {
     @Override
     public Optional<ParameterizedType> getOptionalABuilder() {
       return Optional.fromNullable(optionalABuilder);
+    }
+
+    @Override
+    public Optional<ParameterizedType> getOptionalABuilderAncestor() {
+      return Optional.fromNullable(optionalABuilderAncestor);
+    }
+
+    @Override
+    public Optional<ParameterizedType> getOptionalABuilderExtension() {
+      return Optional.fromNullable(optionalABuilderExtension);
     }
 
     @Override
@@ -1852,6 +2047,16 @@ abstract class Metadata_Builder {
           && (optionalABuilder == null || !optionalABuilder.equals(other.optionalABuilder))) {
         return false;
       }
+      if (optionalABuilderAncestor != other.optionalABuilderAncestor
+          && (optionalABuilderAncestor == null
+              || !optionalABuilderAncestor.equals(other.optionalABuilderAncestor))) {
+        return false;
+      }
+      if (optionalABuilderExtension != other.optionalABuilderExtension
+          && (optionalABuilderExtension == null
+              || !optionalABuilderExtension.equals(other.optionalABuilderExtension))) {
+        return false;
+      }
       if (builderFactory != other.builderFactory
           && (builderFactory == null || !builderFactory.equals(other.builderFactory))) {
         return false;
@@ -1926,6 +2131,8 @@ abstract class Metadata_Builder {
             interfaceType,
             optionalBuilder,
             optionalABuilder,
+            optionalABuilderAncestor,
+            optionalABuilderExtension,
             builderFactory,
             generatedABuilder,
             generatedABuilderParametrized,
@@ -1962,6 +2169,12 @@ abstract class Metadata_Builder {
                   : null),
               (optionalBuilder != null ? "optionalBuilder=" + optionalBuilder : null),
               (optionalABuilder != null ? "optionalABuilder=" + optionalABuilder : null),
+              (optionalABuilderAncestor != null
+                  ? "optionalABuilderAncestor=" + optionalABuilderAncestor
+                  : null),
+              (optionalABuilderExtension != null
+                  ? "optionalABuilderExtension=" + optionalABuilderExtension
+                  : null),
               (builderFactory != null ? "builderFactory=" + builderFactory : null),
               (!_unsetProperties.contains(Metadata_Builder.Property.GENERATED_A_BUILDER)
                   ? "generatedABuilder=" + generatedABuilder

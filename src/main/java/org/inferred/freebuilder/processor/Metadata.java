@@ -100,6 +100,8 @@ public abstract class Metadata {
 
   abstract Optional<ParameterizedType> getOptionalBuilder();
   abstract Optional<ParameterizedType> getOptionalABuilder();
+  abstract Optional<ParameterizedType> getOptionalABuilderAncestor();
+  abstract Optional<ParameterizedType> getOptionalABuilderExtension();
 
   /**
    * Returns true if there is a user-visible Builder subclass defined.

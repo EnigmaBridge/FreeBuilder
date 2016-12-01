@@ -30,9 +30,7 @@ import static javax.tools.Diagnostic.Kind.NOTE;
 import static org.inferred.freebuilder.processor.BuilderFactory.NO_ARGS_CONSTRUCTOR;
 import static org.inferred.freebuilder.processor.GwtSupport.gwtMetadata;
 import static org.inferred.freebuilder.processor.MethodFinder.methodsOn;
-import static org.inferred.freebuilder.processor.util.ModelUtils.asElement;
-import static org.inferred.freebuilder.processor.util.ModelUtils.maybeAsTypeElement;
-import static org.inferred.freebuilder.processor.util.ModelUtils.maybeType;
+import static org.inferred.freebuilder.processor.util.ModelUtils.*;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -45,6 +43,7 @@ import org.inferred.freebuilder.processor.Metadata.Property;
 import org.inferred.freebuilder.processor.Metadata.StandardMethod;
 import org.inferred.freebuilder.processor.Metadata.UnderrideLevel;
 import org.inferred.freebuilder.processor.PropertyCodeGenerator.Config;
+import org.inferred.freebuilder.processor.util.Excerpts;
 import org.inferred.freebuilder.processor.util.IsInvalidTypeVisitor;
 import org.inferred.freebuilder.processor.util.ParameterizedType;
 import org.inferred.freebuilder.processor.util.QualifiedName;
@@ -57,14 +56,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.processing.Messager;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.ErrorType;
@@ -133,6 +125,10 @@ class Analyser {
     this.types = types;
   }
 
+  private void err(TypeElement type, String fmt, Object... args){
+    messager.printMessage(ERROR, String.format(fmt, args), type);
+  }
+
   private void log(TypeElement type, String fmt, Object... args){
     messager.printMessage(NOTE, String.format(fmt, args), type);
   }
@@ -152,25 +148,39 @@ class Analyser {
     QualifiedName generatedBuilder = QualifiedName.of(
         pkg.getQualifiedName().toString(), generatedBuilderSimpleName(type));
 
-    Optional<TypeElement> abuilder = tryFindBuilder(generatedABuilder, type);
-    Optional<TypeElement> builder = tryFindBuilder(generatedBuilder, type);
-
-    QualifiedName valueType = generatedBuilder.nestedType("Value");
-    QualifiedName partialType = generatedBuilder.nestedType("Partial");
-    QualifiedName propertyType = generatedABuilder.nestedType("Property");
+    Optional<TypeElement> abuilder = tryFindABuilder(generatedABuilder, type, USER_ABUILDER_NAME);
+    Optional<TypeElement> builder = tryFindBuilder(generatedBuilder, type, USER_BUILDER_NAME);
 
     // <T> parameters
     List<? extends TypeParameterElement> typeParameters = type.getTypeParameters();
     log(type, "type %s", type);
     log(type, "typeParams %s", typeParameters);
 
+    // If abstract builder is overriden, use that one.
+    Optional<ParameterizedType> generatedABuilderExt = Optional.absent();
+    if (abuilder.isPresent()){
+      // TODO: fix for generics...
+      //List<? extends TypeParameterElement> abuilderTypeParameters = abuilder.get().getTypeParameters();
+
+      // A builder types - specific
+      ArrayList abuilderExtParamsSpec = new ArrayList(Arrays.asList(type, generatedABuilder));
+      // abuilderExtParamsSpec.addAll(abuilderTypeParameters);
+
+      log(type, "ABuilderExt name: %s", generatedABuilderExt);
+      generatedABuilderExt = parameterized(abuilder, abuilderExtParamsSpec);
+    }
+
+    QualifiedName valueType = generatedBuilder.nestedType("Value");
+    QualifiedName partialType = generatedBuilder.nestedType("Partial");
+    QualifiedName propertyType = generatedABuilder.nestedType("Property");
+
     // A builder types: T extends EntA, B extends EntA_Builder
-    List abuilderParams = Arrays.asList("T extends " + type, "B extends " + generatedABuilder);
+    ArrayList abuilderParams = new ArrayList(Arrays.asList("T extends " + type, "B extends " + generatedABuilder));
     abuilderParams.addAll(typeParameters);
     log(type, "ABuilder typeParams %s", typeParameters);
 
     // A builder types - specific
-    List abuilderParamsSpec = Arrays.asList(type, generatedABuilder);
+    ArrayList abuilderParamsSpec = new ArrayList(Arrays.asList(type, generatedABuilder));
     abuilderParamsSpec.addAll(typeParameters);
     log(type, "ABuilderSpec typeParams %s", abuilderParamsSpec);
 
@@ -185,6 +195,7 @@ class Analyser {
         .setGeneratedABuilder(generatedABuilder.withParameters(typeParameters))
         .setGeneratedABuilderParametrized(generatedABuilder.withParameters(abuilderParams))
         .setGeneratedABuilderParametrizedSpec(generatedABuilder.withParameters(abuilderParamsSpec))
+        .setOptionalABuilderExtension(generatedABuilderExt)
         .setValueType(valueType.withParameters(typeParameters))
         .setPartialType(partialType.withParameters(typeParameters))
         .setPropertyEnum(propertyType.withParameters())
@@ -198,6 +209,9 @@ class Analyser {
         .setTypeGen("T")
         .setBuildGen("B");
 
+    // Super class has FreeBuilder also?
+    analyseSuperclass(type, metadataBuilder);
+
     Metadata baseMetadata = metadataBuilder.build();
     metadataBuilder.mergeFrom(gwtMetadata(type, baseMetadata));
     if (builder.isPresent()) {
@@ -206,6 +220,56 @@ class Analyser {
           .addAllProperties(codeGenerators(properties, baseMetadata, builder.get()));
     }
     return metadataBuilder.build();
+  }
+
+  private void analyseSuperclass(TypeElement type, Metadata.Builder metadataBuilder){
+    final TypeMirror superClass = type.getSuperclass();
+    final TypeKind scType = superClass.getKind();
+    if (scType == TypeKind.NONE){
+      return;
+    }
+
+    // Can be either DECLARED or ERROR
+    if (scType != TypeKind.DECLARED){
+      return;
+    }
+
+    // Is superclass also using the FreeBuilder?
+    final DeclaredType scDecType = (DeclaredType) superClass;
+    final Element scElem = scDecType.asElement();
+    final ElementKind scKind = scElem.getKind();
+    log(type, "Type %s has super class type %s, kind: %s", type, scElem, scKind);
+
+    final Optional<AnnotationMirror> freeBuilderMirror =
+            findAnnotationMirror(scElem, "org.inferred.freebuilder.FreeBuilder");
+    if (!freeBuilderMirror.isPresent()){
+      metadataBuilder.setOptionalABuilderAncestor(Optional.<ParameterizedType>absent());
+      return;
+    }
+
+    final PackageElement pkg = elements.getPackageOf(type);
+    log(type, "Super class %s has free builder annotation, package: %s", scElem, pkg);
+
+    final TypeElement scTElem = (TypeElement) scElem;
+
+    // If ABuilder is overridden in the superclass, extend that one.
+    QualifiedName generatedABuilder = QualifiedName.of(
+            pkg.getQualifiedName().toString(), generatedABuilderSimpleName(scTElem));
+
+    Optional<TypeElement> abuilder = tryFindABuilder(generatedABuilder, scTElem, USER_ABUILDER_NAME);
+    List<? extends TypeParameterElement> typeParameters = scTElem.getTypeParameters();
+
+    List abuilderParams = Arrays.asList(metadataBuilder.getTypeGen(), metadataBuilder.getBuildGen());
+    abuilderParams.addAll(typeParameters);
+
+    Optional<ParameterizedType> ancestorBuilder = Optional.absent();
+    if (abuilder.isPresent()){
+      ancestorBuilder = parameterized(abuilder, abuilderParams);
+    } else {
+      ancestorBuilder = Optional.of(generatedABuilder.withParameters(abuilderParams));
+    }
+
+    metadataBuilder.setOptionalABuilderAncestor(ancestorBuilder);
   }
 
   private static Set<QualifiedName> visibleTypesIn(TypeElement type) {
@@ -355,10 +419,15 @@ class Analyser {
    */
   private Optional<TypeElement> tryFindBuilder(
       final QualifiedName generatedBuilder, TypeElement type) {
+    return tryFindBuilder(generatedBuilder, type, USER_BUILDER_NAME);
+  }
+
+  private Optional<TypeElement> tryFindBuilder(
+      final QualifiedName generatedBuilder, final TypeElement type, final String builderName) {
     Optional<TypeElement> userClass =
         tryFind(typesIn(type.getEnclosedElements()), new Predicate<Element>() {
           @Override public boolean apply(Element input) {
-            return input.getSimpleName().contentEquals(USER_BUILDER_NAME);
+            return input.getSimpleName().contentEquals(builderName);
           }
         });
     if (!userClass.isPresent()) {
@@ -384,10 +453,65 @@ class Analyser {
         new IsSubclassOfGeneratedTypeVisitor(generatedBuilder, type.getTypeParameters())
             .visit(userClass.get().getSuperclass());
     if (!extendsSuperclass) {
-      messager.printMessage(
-          ERROR,
-          "Builder extends the wrong type (should be " + generatedBuilder.getSimpleName() + ")",
-          userClass.get());
+      err(userClass.get(), "%s extends the wrong type (should be %s, but is %s)",
+              builderName, generatedBuilder.getSimpleName(), type.getSimpleName());
+      return Optional.absent();
+    }
+
+    return userClass;
+  }
+
+  private Optional<TypeElement> tryFindABuilder(
+      final QualifiedName generatedBuilder, final TypeElement type, final String builderName) {
+    Optional<TypeElement> userClass =
+        tryFind(typesIn(type.getEnclosedElements()), new Predicate<Element>() {
+          @Override public boolean apply(Element input) {
+            return input.getSimpleName().contentEquals(builderName);
+          }
+        });
+
+    if (!userClass.isPresent()) {
+      if (type.getKind() == INTERFACE) {
+        messager.printMessage(
+            NOTE,
+            "Add \"abstract class ABuilder extends "
+                + generatedBuilder.getSimpleName()
+                + " {}\" to your interface to enable the @FreeBuilder API",
+            type);
+      } else {
+        messager.printMessage(
+            NOTE,
+            "Add \"public static abstract class ABuilder extends "
+                + generatedBuilder.getSimpleName()
+                + " {}\" to your class to enable the @FreeBuilder API",
+            type);
+      }
+      return Optional.absent();
+    }
+
+    final TypeMirror scType = userClass.get().getSuperclass();
+    final TypeKind scKind = scType.getKind();
+
+    // Error - not yet generated... thus check only the prefix. What can we do...
+    if (scKind == TypeKind.ERROR){
+      String prefix = generatedBuilder.getSimpleName()+"<";
+      if (scType.toString().startsWith(prefix)){
+        log(userClass.get(),"Matching %s with %s", generatedBuilder, scType);
+        return userClass;
+
+      } else {
+        err(userClass.get(), "%s extends the wrong type (should be %s, but is %s), err-type",
+                builderName, generatedBuilder.getSimpleName(), type.getSimpleName());
+        return Optional.absent();
+      }
+    }
+
+    boolean extendsSuperclass =
+        new IsSubclassOfGeneratedTypeVisitor(generatedBuilder, type.getTypeParameters())
+            .visit(scType);
+    if (!extendsSuperclass) {
+      err(userClass.get(), "%s extends the wrong type (should be %s, but is %s)",
+              builderName, generatedBuilder.getSimpleName(), type.getSimpleName());
       return Optional.absent();
     }
 

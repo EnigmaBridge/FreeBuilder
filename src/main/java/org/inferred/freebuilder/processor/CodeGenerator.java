@@ -38,11 +38,7 @@ import org.inferred.freebuilder.FreeBuilder;
 import org.inferred.freebuilder.processor.Metadata.Property;
 import org.inferred.freebuilder.processor.Metadata.StandardMethod;
 import org.inferred.freebuilder.processor.PropertyCodeGenerator.Type;
-import org.inferred.freebuilder.processor.util.Block;
-import org.inferred.freebuilder.processor.util.Excerpt;
-import org.inferred.freebuilder.processor.util.Excerpts;
-import org.inferred.freebuilder.processor.util.PreconditionExcerpts;
-import org.inferred.freebuilder.processor.util.SourceBuilder;
+import org.inferred.freebuilder.processor.util.*;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -142,9 +138,14 @@ public class CodeGenerator {
     }
 
     //EntB_Builder<EntB, EntB_Builder>
+    final Optional<ParameterizedType> optionalABuilderExtension = metadata.getOptionalABuilderExtension();
+    Excerpt extendsWhat = optionalABuilderExtension.isPresent() ?
+            optionalABuilderExtension.get().fullDeclaration() :
+            metadata.getGeneratedABuilderParametrizedSpec().declaration();
+
     code.add("abstract class %s extends %s",
             metadata.getGeneratedBuilder().declaration(),
-            metadata.getGeneratedABuilderParametrizedSpec().declaration()
+            extendsWhat
     );
   }
 
