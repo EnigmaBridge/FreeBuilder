@@ -5,18 +5,12 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
+import org.inferred.freebuilder.processor.util.Excerpt;
+
 import javax.annotation.Generated;
 import javax.annotation.Nullable;
 import javax.lang.model.type.TypeMirror;
-import org.inferred.freebuilder.processor.Metadata;
-import org.inferred.freebuilder.processor.PropertyCodeGenerator;
-import org.inferred.freebuilder.processor.util.Excerpt;
+import java.util.*;
 
 /**
  * Auto-generated superclass of {@link Metadata.Property.Builder},
@@ -63,8 +57,8 @@ abstract class Metadata_Property_Builder {
   private String getterName;
   @Nullable private PropertyCodeGenerator codeGenerator = null;
   private boolean fullyCheckedCast;
-  private final ArrayList<Excerpt> accessorAnnotations = new ArrayList<Excerpt>();
-  private final EnumSet<Metadata_Property_Builder.Property> _unsetProperties =
+  private List<Excerpt> accessorAnnotations = ImmutableList.of();
+  private final EnumSet<Property> _unsetProperties =
       EnumSet.allOf(Metadata_Property_Builder.Property.class);
 
   /**
@@ -251,6 +245,9 @@ abstract class Metadata_Property_Builder {
    * @throws NullPointerException if {@code element} is null
    */
   public Metadata.Property.Builder addAccessorAnnotations(Excerpt element) {
+    if (this.accessorAnnotations instanceof ImmutableList) {
+      this.accessorAnnotations = new ArrayList<Excerpt>(this.accessorAnnotations);
+    }
     this.accessorAnnotations.add(Preconditions.checkNotNull(element));
     return (Metadata.Property.Builder) this;
   }
@@ -264,11 +261,7 @@ abstract class Metadata_Property_Builder {
    *     null element
    */
   public Metadata.Property.Builder addAccessorAnnotations(Excerpt... elements) {
-    accessorAnnotations.ensureCapacity(accessorAnnotations.size() + elements.length);
-    for (Excerpt element : elements) {
-      addAccessorAnnotations(element);
-    }
-    return (Metadata.Property.Builder) this;
+    return addAllAccessorAnnotations(Arrays.asList(elements));
   }
 
   /**
@@ -281,8 +274,14 @@ abstract class Metadata_Property_Builder {
    */
   public Metadata.Property.Builder addAllAccessorAnnotations(Iterable<? extends Excerpt> elements) {
     if (elements instanceof Collection) {
-      accessorAnnotations.ensureCapacity(
-          accessorAnnotations.size() + ((Collection<?>) elements).size());
+      int elementsSize = ((Collection<?>) elements).size();
+      if (elementsSize != 0) {
+        if (accessorAnnotations instanceof ImmutableList) {
+          accessorAnnotations = new ArrayList<Excerpt>(accessorAnnotations);
+        }
+        ((ArrayList<?>) accessorAnnotations)
+            .ensureCapacity(accessorAnnotations.size() + elementsSize);
+      }
     }
     for (Excerpt element : elements) {
       addAccessorAnnotations(element);
@@ -296,7 +295,11 @@ abstract class Metadata_Property_Builder {
    * @return this {@code Builder} object
    */
   public Metadata.Property.Builder clearAccessorAnnotations() {
-    this.accessorAnnotations.clear();
+    if (accessorAnnotations instanceof ImmutableList) {
+      accessorAnnotations = ImmutableList.of();
+    } else {
+      accessorAnnotations.clear();
+    }
     return (Metadata.Property.Builder) this;
   }
 
@@ -306,6 +309,9 @@ abstract class Metadata_Property_Builder {
    * Changes to this builder will be reflected in the view.
    */
   public List<Excerpt> getAccessorAnnotations() {
+    if (accessorAnnotations instanceof ImmutableList) {
+      accessorAnnotations = new ArrayList<Excerpt>(accessorAnnotations);
+    }
     return Collections.unmodifiableList(accessorAnnotations);
   }
 
@@ -340,7 +346,12 @@ abstract class Metadata_Property_Builder {
         || value.isFullyCheckedCast() != _defaults.isFullyCheckedCast()) {
       setFullyCheckedCast(value.isFullyCheckedCast());
     }
-    addAllAccessorAnnotations(value.getAccessorAnnotations());
+    if (value instanceof Metadata_Property_Builder.Value
+        && accessorAnnotations == ImmutableList.<Excerpt>of()) {
+      accessorAnnotations = value.getAccessorAnnotations();
+    } else {
+      addAllAccessorAnnotations(value.getAccessorAnnotations());
+    }
     return (Metadata.Property.Builder) this;
   }
 
@@ -385,7 +396,7 @@ abstract class Metadata_Property_Builder {
             || template.isFullyCheckedCast() != _defaults.isFullyCheckedCast())) {
       setFullyCheckedCast(template.isFullyCheckedCast());
     }
-    addAllAccessorAnnotations(((Metadata_Property_Builder) template).accessorAnnotations);
+    addAllAccessorAnnotations(base.accessorAnnotations);
     return (Metadata.Property.Builder) this;
   }
 
@@ -402,7 +413,7 @@ abstract class Metadata_Property_Builder {
     getterName = _defaults.getterName;
     codeGenerator = _defaults.codeGenerator;
     fullyCheckedCast = _defaults.fullyCheckedCast;
-    accessorAnnotations.clear();
+    clearAccessorAnnotations();
     _unsetProperties.clear();
     _unsetProperties.addAll(_defaults._unsetProperties);
     return (Metadata.Property.Builder) this;
@@ -583,7 +594,7 @@ abstract class Metadata_Property_Builder {
     @Nullable private final PropertyCodeGenerator codeGenerator;
     private final boolean fullyCheckedCast;
     private final ImmutableList<Excerpt> accessorAnnotations;
-    private final EnumSet<Metadata_Property_Builder.Property> _unsetProperties;
+    private final EnumSet<Property> _unsetProperties;
 
     Partial(Metadata_Property_Builder builder) {
       this.type = builder.type;

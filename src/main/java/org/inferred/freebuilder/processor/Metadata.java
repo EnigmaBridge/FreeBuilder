@@ -15,14 +15,12 @@
  */
 package org.inferred.freebuilder.processor;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-
+import org.inferred.freebuilder.FreeBuilder;
 import org.inferred.freebuilder.processor.util.Excerpt;
 import org.inferred.freebuilder.processor.util.ParameterizedType;
 import org.inferred.freebuilder.processor.util.QualifiedName;
@@ -31,9 +29,12 @@ import org.inferred.freebuilder.processor.util.SourceBuilder;
 import javax.annotation.Nullable;
 import javax.lang.model.type.TypeMirror;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * Metadata about a &#64;{@link org.inferred.freebuilder.FreeBuilder FreeBuilder} type.
  */
+@FreeBuilder
 public abstract class Metadata {
 
   /** Standard Java methods that may be underridden. */
@@ -89,6 +90,10 @@ public abstract class Metadata {
 
   /** Returns the type itself. */
   public abstract ParameterizedType getType();
+  /** Returns the type of the property. */
+  public abstract String getTypeGen();
+  /** Returns the type of the property. */
+  public abstract String getBuildGen();
 
   /** Returns true if the type is an interface. */
   public abstract boolean isInterfaceType();
@@ -116,6 +121,8 @@ public abstract class Metadata {
 
   /** Returns the builder class that should be generated. */
   public abstract ParameterizedType getGeneratedBuilder();
+  /** Returns the builder class that should be generated. */
+  public abstract ParameterizedType getGeneratedBuilderParametrized();
 
   /** Returns the value class that should be generated. */
   public abstract ParameterizedType getValueType();
@@ -161,7 +168,8 @@ public abstract class Metadata {
     return new Builder().mergeFrom(this);
   }
 
-  /** Metadata about a property of a {@link Metadata}. */
+  /** Metadata about a property of a {@link org.inferred.freebuilder.processor.Metadata}. */
+  @FreeBuilder
   public abstract static class Property {
 
     /** Returns the type of the property. */
@@ -207,7 +215,7 @@ public abstract class Metadata {
       return new Builder().mergeFrom(this);
     }
 
-    /** Builder for {@link Property}. */
+    /** Builder for {@link org.inferred.freebuilder.processor.Metadata.Property}. */
     public static class Builder extends Metadata_Property_Builder {}
   }
 
@@ -219,7 +227,7 @@ public abstract class Metadata {
         }
       };
 
-  /** Builder for {@link Metadata}. */
+  /** Builder for {@link org.inferred.freebuilder.processor.Metadata}. */
   public static class Builder extends Metadata_Builder {
 
     public Builder() {
@@ -227,7 +235,7 @@ public abstract class Metadata {
     }
 
     /**
-     * Sets the value to be returned by {@link Metadata#getValueTypeVisibility()} to the most
+     * Sets the value to be returned by {@link org.inferred.freebuilder.processor.Metadata#getValueTypeVisibility()} to the most
      * visible of the current value and {@code visibility}. Will not decrease visibility.
      *
      * @return this {@code Builder} object
@@ -250,18 +258,18 @@ public abstract class Metadata {
     }
 
     /**
-     * Returns a newly-built {@link Metadata} based on the content of the {@code Builder}.
+     * Returns a newly-built {@link org.inferred.freebuilder.processor.Metadata} based on the content of the {@code Builder}.
      */
     @Override
-    public Metadata build() {
-      Metadata metadata = super.build();
+    public org.inferred.freebuilder.processor.Metadata build() {
+      org.inferred.freebuilder.processor.Metadata metadata = super.build();
       QualifiedName generatedBuilder = metadata.getGeneratedBuilder().getQualifiedName();
-      checkState(metadata.getValueType().getQualifiedName().getEnclosingType()
-              .equals(generatedBuilder),
-          "%s not a nested class of %s", metadata.getValueType(), generatedBuilder);
-      checkState(metadata.getPartialType().getQualifiedName().getEnclosingType()
-              .equals(generatedBuilder),
-          "%s not a nested class of %s", metadata.getPartialType(), generatedBuilder);
+//      checkState(metadata.getValueType().getQualifiedName().getEnclosingType()
+//              .equals(generatedBuilder),
+//          "%s not a nested class of %s", metadata.getValueType(), generatedBuilder);
+//      checkState(metadata.getPartialType().getQualifiedName().getEnclosingType()
+//              .equals(generatedBuilder),
+//          "%s not a nested class of %s", metadata.getPartialType(), generatedBuilder);
       checkState(metadata.getPropertyEnum().getQualifiedName().getEnclosingType()
               .equals(generatedBuilder),
           "%s not a nested class of %s", metadata.getPropertyEnum(), generatedBuilder);
