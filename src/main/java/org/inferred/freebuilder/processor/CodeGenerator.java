@@ -122,6 +122,10 @@ public class CodeGenerator {
     code.add("abstract class %s",
             metadata.getGeneratedABuilderParametrized().declaration()
     );
+    final Optional<ParameterizedType> optABuilderAncestor = metadata.getOptionalABuilderAncestor();
+    if (optABuilderAncestor.isPresent()){
+      code.add(" extends %s", optABuilderAncestor.get().fullDeclaration());
+    }
     if (metadata.isBuilderSerializable()) {
       code.add(" implements %s", Serializable.class);
     }

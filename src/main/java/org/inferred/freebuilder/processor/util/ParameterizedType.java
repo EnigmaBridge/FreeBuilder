@@ -119,6 +119,12 @@ public class ParameterizedType extends Excerpt {
   public Excerpt declaration() {
     return Excerpts.add("%s%s", qualifiedName.getSimpleName(), declarationParameters());
   }
+  /**
+   * Returns a source excerpt suitable for declaring this type, i.e. {@code SimpleName<...>}
+   */
+  public Excerpt fullDeclaration() {
+    return Excerpts.add("%s%s", qualifiedName, declarationParameters());
+  }
 
   /**
    * Returns a source excerpt of the type parameters of this type, including angle brackets.
