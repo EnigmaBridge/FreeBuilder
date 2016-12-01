@@ -26,6 +26,7 @@ import static org.inferred.freebuilder.processor.util.feature.GuavaLibrary.GUAVA
 import static org.inferred.freebuilder.processor.util.feature.SourceLevel.SOURCE_LEVEL;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -56,13 +57,13 @@ import java.util.TreeSet;
 public class CodeGenerator {
 
   /** Write the source code for a generated builder. */
-  void writeBuilderSource(SourceBuilder code, Metadata metadata) {
+  void writeABuilderSource(SourceBuilder code, Metadata metadata) {
     if (!metadata.hasBuilder()) {
       writeStubSource(code, metadata);
       return;
     }
 
-    addBuilderTypeDeclaration(code, metadata);
+    addABuilderTypeDeclaration(code, metadata);
     code.addLine(" {");
 
     // TODO: fix from
@@ -74,27 +75,42 @@ public class CodeGenerator {
     }
 
     addFieldDeclarations(code, metadata);
-    addAbtractMethods(code, metadata);
+    addAbstractMethods(code, metadata);
 
     addAccessors(metadata, code);
     addMergeFromValueMethod(code, metadata);
     addMergeFromBuilderMethod(code, metadata);
     addClearMethod(code, metadata);
 
-    // Moved to another builder.
-//    addBuildMethod(code, metadata);
-//    addBuildPartialMethod(code, metadata);
-//
-//    addValueType(code, metadata);
-//    addPartialType(code, metadata);
-//    for (Function<Metadata, Excerpt> nestedClass : metadata.getNestedClasses()) {
-//      code.add(nestedClass.apply(metadata));
-//    }
-//    addStaticMethods(code, metadata);
     code.addLine("}");
   }
 
-  private void addBuilderTypeDeclaration(SourceBuilder code, Metadata metadata) {
+  void writeBuilderSource(SourceBuilder code, Metadata metadata) {
+    if (!metadata.hasBuilder()) {
+      writeStubSource(code, metadata);
+      return;
+    }
+
+    addBuilderTypeDeclaration(code, metadata);
+    code.addLine(" {");
+
+    addConstantDeclarations(metadata, code);
+    addAbstractMethodsImpl(code, metadata);
+
+    // Moved to another builder.
+    addBuildMethod(code, metadata);
+    addBuildPartialMethod(code, metadata);
+
+    addValueType(code, metadata);
+    addPartialType(code, metadata);
+    for (Function<Metadata, Excerpt> nestedClass : metadata.getNestedClasses()) {
+      code.add(nestedClass.apply(metadata));
+    }
+    addStaticMethods(code, metadata);
+    code.addLine("}");
+  }
+
+  private void addABuilderTypeDeclaration(SourceBuilder code, Metadata metadata) {
     code.addLine("/**")
         .addLine(" * Auto-generated superclass of %s,", metadata.getBuilder().javadocLink())
         .addLine(" * derived from the API of %s.", metadata.getType().javadocLink())
@@ -109,6 +125,23 @@ public class CodeGenerator {
     if (metadata.isBuilderSerializable()) {
       code.add(" implements %s", Serializable.class);
     }
+  }
+
+  private void addBuilderTypeDeclaration(SourceBuilder code, Metadata metadata) {
+    code.addLine("/**")
+        .addLine(" * Auto-generated superclass of %s,", metadata.getBuilder().javadocLink())
+        .addLine(" * derived from the API of %s.", metadata.getType().javadocLink())
+        .addLine(" */")
+        .add(Excerpts.generated(getClass()));
+    for (Excerpt annotation : metadata.getGeneratedBuilderAnnotations()) {
+      code.add(annotation);
+    }
+
+    //EntB_Builder<EntB, EntB_Builder>
+    code.add("abstract class %s extends %s",
+            metadata.getGeneratedBuilder().declaration(),
+            metadata.getGeneratedABuilderParametrizedSpec().declaration()
+    );
   }
 
   private static void addStaticFromMethod(SourceBuilder code, Metadata metadata) {
@@ -151,11 +184,25 @@ public class CodeGenerator {
     }
   }
 
-  private static void addAbtractMethods(SourceBuilder code, Metadata metadata) {
+  private static void addAbstractMethods(SourceBuilder code, Metadata metadata) {
     code.addLine("");
     code.addLine("public abstract %s build();", metadata.getTypeGen());
     code.addLine("public abstract %s getThisBuilder();", metadata.getBuildGen());
     code.addLine("public abstract %s getNewBuilder();", metadata.getBuildGen());
+  }
+
+  private static void addAbstractMethodsImpl(SourceBuilder code, Metadata metadata) {
+    code.addLine("");
+    code.addLine("@Override");
+    code.addLine("public %s getThisBuilder() {", metadata.getGeneratedABuilder());
+    code.addLine("  return this;");
+    code.addLine("}");
+    code.addLine("");
+
+    code.addLine("@Override");
+    code.addLine("public %s getNewBuilder() {", metadata.getGeneratedABuilder());
+    code.addLine("  return this;");
+    code.addLine("}");
   }
 
   private static void addAccessors(Metadata metadata, SourceBuilder body) {

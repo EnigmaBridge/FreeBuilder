@@ -99,6 +99,7 @@ public abstract class Metadata {
   public abstract boolean isInterfaceType();
 
   abstract Optional<ParameterizedType> getOptionalBuilder();
+  abstract Optional<ParameterizedType> getOptionalABuilder();
 
   /**
    * Returns true if there is a user-visible Builder subclass defined.
@@ -115,14 +116,19 @@ public abstract class Metadata {
   public ParameterizedType getBuilder() {
     return getOptionalBuilder().get();
   }
+  public ParameterizedType getABuilder() {
+    return getOptionalABuilder().get();
+  }
 
   /** Returns the builder factory mechanism the user has exposed, if any. */
   public abstract Optional<BuilderFactory> getBuilderFactory();
 
   /** Returns the abstract builder class that should be generated. */
   public abstract ParameterizedType getGeneratedABuilder();
-  /** Returns the abstract builder class that should be generated. */
+  /** Returns the abstract builder class that should be generated. Parametrized - extendable */
   public abstract ParameterizedType getGeneratedABuilderParametrized();
+  /** Returns the abstract builder class that should be generated. Parametrized - specific */
+  public abstract ParameterizedType getGeneratedABuilderParametrizedSpec();
   /** Returns the builder class that should be generated. */
   public abstract ParameterizedType getGeneratedBuilder();
 
@@ -257,6 +263,16 @@ public abstract class Metadata {
     /** Sets the builder class that users will see. */
     public Builder setBuilder(ParameterizedType builder) {
       return setOptionalBuilder(builder);
+    }
+
+    /** Sets the builder class that users will see, if any. */
+    public Builder setABuilder(Optional<ParameterizedType> builder) {
+      return setOptionalABuilder(builder);
+    }
+
+    /** Sets the builder class that users will see. */
+    public Builder setABuilder(ParameterizedType builder) {
+      return setOptionalABuilder(builder);
     }
 
     /**

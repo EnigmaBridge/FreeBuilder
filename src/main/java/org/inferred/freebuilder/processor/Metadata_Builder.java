@@ -40,6 +40,7 @@ abstract class Metadata_Builder {
     INTERFACE_TYPE("interfaceType"),
     GENERATED_A_BUILDER("generatedABuilder"),
     GENERATED_A_BUILDER_PARAMETRIZED("generatedABuilderParametrized"),
+    GENERATED_A_BUILDER_PARAMETRIZED_SPEC("generatedABuilderParametrizedSpec"),
     GENERATED_BUILDER("generatedBuilder"),
     VALUE_TYPE("valueType"),
     PARTIAL_TYPE("partialType"),
@@ -71,9 +72,14 @@ abstract class Metadata_Builder {
   // Store a nullable object instead of an Optional. Escape analysis then
   // allows the JVM to optimize away the Optional objects created by and
   // passed to our API.
+  private ParameterizedType optionalABuilder = null;
+  // Store a nullable object instead of an Optional. Escape analysis then
+  // allows the JVM to optimize away the Optional objects created by and
+  // passed to our API.
   private BuilderFactory builderFactory = null;
   private ParameterizedType generatedABuilder;
   private ParameterizedType generatedABuilderParametrized;
+  private ParameterizedType generatedABuilderParametrizedSpec;
   private ParameterizedType generatedBuilder;
   private ParameterizedType valueType;
   private ParameterizedType partialType;
@@ -241,6 +247,63 @@ abstract class Metadata_Builder {
   }
 
   /**
+   * Sets the value to be returned by {@link Metadata#getOptionalABuilder()}.
+   *
+   * @return this {@code Builder} object
+   * @throws NullPointerException if {@code optionalABuilder} is null
+   */
+  public Metadata.Builder setOptionalABuilder(ParameterizedType optionalABuilder) {
+    this.optionalABuilder = Preconditions.checkNotNull(optionalABuilder);
+    return (Metadata.Builder) this;
+  }
+
+  /**
+   * Sets the value to be returned by {@link Metadata#getOptionalABuilder()}.
+   *
+   * @return this {@code Builder} object
+   */
+  public Metadata.Builder setOptionalABuilder(
+      Optional<? extends ParameterizedType> optionalABuilder) {
+    if (optionalABuilder.isPresent()) {
+      return setOptionalABuilder(optionalABuilder.get());
+    } else {
+      return clearOptionalABuilder();
+    }
+  }
+
+  /**
+   * Sets the value to be returned by {@link Metadata#getOptionalABuilder()}.
+   *
+   * @return this {@code Builder} object
+   */
+  public Metadata.Builder setNullableOptionalABuilder(
+      @Nullable ParameterizedType optionalABuilder) {
+    if (optionalABuilder != null) {
+      return setOptionalABuilder(optionalABuilder);
+    } else {
+      return clearOptionalABuilder();
+    }
+  }
+
+  /**
+   * Sets the value to be returned by {@link Metadata#getOptionalABuilder()}
+   * to {@link Optional#absent() Optional.absent()}.
+   *
+   * @return this {@code Builder} object
+   */
+  public Metadata.Builder clearOptionalABuilder() {
+    this.optionalABuilder = null;
+    return (Metadata.Builder) this;
+  }
+
+  /**
+   * Returns the value that will be returned by {@link Metadata#getOptionalABuilder()}.
+   */
+  public Optional<ParameterizedType> getOptionalABuilder() {
+    return Optional.fromNullable(optionalABuilder);
+  }
+
+  /**
    * Sets the value to be returned by {@link Metadata#getBuilderFactory()}.
    *
    * @return this {@code Builder} object
@@ -342,6 +405,32 @@ abstract class Metadata_Builder {
         !_unsetProperties.contains(Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED),
         "generatedABuilderParametrized not set");
     return generatedABuilderParametrized;
+  }
+
+  /**
+   * Sets the value to be returned by {@link Metadata#getGeneratedABuilderParametrizedSpec()}.
+   *
+   * @return this {@code Builder} object
+   * @throws NullPointerException if {@code generatedABuilderParametrizedSpec} is null
+   */
+  public Metadata.Builder setGeneratedABuilderParametrizedSpec(
+      ParameterizedType generatedABuilderParametrizedSpec) {
+    this.generatedABuilderParametrizedSpec =
+        Preconditions.checkNotNull(generatedABuilderParametrizedSpec);
+    _unsetProperties.remove(Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED_SPEC);
+    return (Metadata.Builder) this;
+  }
+
+  /**
+   * Returns the value that will be returned by {@link Metadata#getGeneratedABuilderParametrizedSpec()}.
+   *
+   * @throws IllegalStateException if the field has not been set
+   */
+  public ParameterizedType getGeneratedABuilderParametrizedSpec() {
+    Preconditions.checkState(
+        !_unsetProperties.contains(Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED_SPEC),
+        "generatedABuilderParametrizedSpec not set");
+    return generatedABuilderParametrizedSpec;
   }
 
   /**
@@ -977,6 +1066,9 @@ abstract class Metadata_Builder {
     if (value.getOptionalBuilder().isPresent()) {
       setOptionalBuilder(value.getOptionalBuilder().get());
     }
+    if (value.getOptionalABuilder().isPresent()) {
+      setOptionalABuilder(value.getOptionalABuilder().get());
+    }
     if (value.getBuilderFactory().isPresent()) {
       setBuilderFactory(value.getBuilderFactory().get());
     }
@@ -990,6 +1082,13 @@ abstract class Metadata_Builder {
             .getGeneratedABuilderParametrized()
             .equals(_defaults.getGeneratedABuilderParametrized())) {
       setGeneratedABuilderParametrized(value.getGeneratedABuilderParametrized());
+    }
+    if (_defaults._unsetProperties.contains(
+            Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED_SPEC)
+        || !value
+            .getGeneratedABuilderParametrizedSpec()
+            .equals(_defaults.getGeneratedABuilderParametrizedSpec())) {
+      setGeneratedABuilderParametrizedSpec(value.getGeneratedABuilderParametrizedSpec());
     }
     if (_defaults._unsetProperties.contains(Metadata_Builder.Property.GENERATED_BUILDER)
         || !value.getGeneratedBuilder().equals(_defaults.getGeneratedBuilder())) {
@@ -1081,6 +1180,9 @@ abstract class Metadata_Builder {
     if (template.getOptionalBuilder().isPresent()) {
       setOptionalBuilder(template.getOptionalBuilder().get());
     }
+    if (template.getOptionalABuilder().isPresent()) {
+      setOptionalABuilder(template.getOptionalABuilder().get());
+    }
     if (template.getBuilderFactory().isPresent()) {
       setBuilderFactory(template.getBuilderFactory().get());
     }
@@ -1096,6 +1198,15 @@ abstract class Metadata_Builder {
                 .getGeneratedABuilderParametrized()
                 .equals(_defaults.getGeneratedABuilderParametrized()))) {
       setGeneratedABuilderParametrized(template.getGeneratedABuilderParametrized());
+    }
+    if (!base._unsetProperties.contains(
+            Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED_SPEC)
+        && (_defaults._unsetProperties.contains(
+                Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED_SPEC)
+            || !template
+                .getGeneratedABuilderParametrizedSpec()
+                .equals(_defaults.getGeneratedABuilderParametrizedSpec()))) {
+      setGeneratedABuilderParametrizedSpec(template.getGeneratedABuilderParametrizedSpec());
     }
     if (!base._unsetProperties.contains(Metadata_Builder.Property.GENERATED_BUILDER)
         && (_defaults._unsetProperties.contains(Metadata_Builder.Property.GENERATED_BUILDER)
@@ -1146,9 +1257,11 @@ abstract class Metadata_Builder {
     buildGen = _defaults.buildGen;
     interfaceType = _defaults.interfaceType;
     optionalBuilder = _defaults.optionalBuilder;
+    optionalABuilder = _defaults.optionalABuilder;
     builderFactory = _defaults.builderFactory;
     generatedABuilder = _defaults.generatedABuilder;
     generatedABuilderParametrized = _defaults.generatedABuilderParametrized;
+    generatedABuilderParametrizedSpec = _defaults.generatedABuilderParametrizedSpec;
     generatedBuilder = _defaults.generatedBuilder;
     valueType = _defaults.valueType;
     partialType = _defaults.partialType;
@@ -1202,9 +1315,14 @@ abstract class Metadata_Builder {
     // Store a nullable object instead of an Optional. Escape analysis then
     // allows the JVM to optimize away the Optional objects created by our
     // getter method.
+    private final ParameterizedType optionalABuilder;
+    // Store a nullable object instead of an Optional. Escape analysis then
+    // allows the JVM to optimize away the Optional objects created by our
+    // getter method.
     private final BuilderFactory builderFactory;
     private final ParameterizedType generatedABuilder;
     private final ParameterizedType generatedABuilderParametrized;
+    private final ParameterizedType generatedABuilderParametrizedSpec;
     private final ParameterizedType generatedBuilder;
     private final ParameterizedType valueType;
     private final ParameterizedType partialType;
@@ -1226,9 +1344,11 @@ abstract class Metadata_Builder {
       this.buildGen = builder.buildGen;
       this.interfaceType = builder.interfaceType;
       this.optionalBuilder = builder.optionalBuilder;
+      this.optionalABuilder = builder.optionalABuilder;
       this.builderFactory = builder.builderFactory;
       this.generatedABuilder = builder.generatedABuilder;
       this.generatedABuilderParametrized = builder.generatedABuilderParametrized;
+      this.generatedABuilderParametrizedSpec = builder.generatedABuilderParametrizedSpec;
       this.generatedBuilder = builder.generatedBuilder;
       this.valueType = builder.valueType;
       this.partialType = builder.partialType;
@@ -1269,6 +1389,11 @@ abstract class Metadata_Builder {
     }
 
     @Override
+    public Optional<ParameterizedType> getOptionalABuilder() {
+      return Optional.fromNullable(optionalABuilder);
+    }
+
+    @Override
     public Optional<BuilderFactory> getBuilderFactory() {
       return Optional.fromNullable(builderFactory);
     }
@@ -1281,6 +1406,11 @@ abstract class Metadata_Builder {
     @Override
     public ParameterizedType getGeneratedABuilderParametrized() {
       return generatedABuilderParametrized;
+    }
+
+    @Override
+    public ParameterizedType getGeneratedABuilderParametrizedSpec() {
+      return generatedABuilderParametrizedSpec;
     }
 
     @Override
@@ -1367,6 +1497,10 @@ abstract class Metadata_Builder {
           && (optionalBuilder == null || !optionalBuilder.equals(other.optionalBuilder))) {
         return false;
       }
+      if (optionalABuilder != other.optionalABuilder
+          && (optionalABuilder == null || !optionalABuilder.equals(other.optionalABuilder))) {
+        return false;
+      }
       if (builderFactory != other.builderFactory
           && (builderFactory == null || !builderFactory.equals(other.builderFactory))) {
         return false;
@@ -1375,6 +1509,9 @@ abstract class Metadata_Builder {
         return false;
       }
       if (!generatedABuilderParametrized.equals(other.generatedABuilderParametrized)) {
+        return false;
+      }
+      if (!generatedABuilderParametrizedSpec.equals(other.generatedABuilderParametrizedSpec)) {
         return false;
       }
       if (!generatedBuilder.equals(other.generatedBuilder)) {
@@ -1425,9 +1562,11 @@ abstract class Metadata_Builder {
             buildGen,
             interfaceType,
             optionalBuilder,
+            optionalABuilder,
             builderFactory,
             generatedABuilder,
             generatedABuilderParametrized,
+            generatedABuilderParametrizedSpec,
             generatedBuilder,
             valueType,
             partialType,
@@ -1452,9 +1591,11 @@ abstract class Metadata_Builder {
               "buildGen=" + buildGen,
               "interfaceType=" + interfaceType,
               (optionalBuilder != null ? "optionalBuilder=" + optionalBuilder : null),
+              (optionalABuilder != null ? "optionalABuilder=" + optionalABuilder : null),
               (builderFactory != null ? "builderFactory=" + builderFactory : null),
               "generatedABuilder=" + generatedABuilder,
               "generatedABuilderParametrized=" + generatedABuilderParametrized,
+              "generatedABuilderParametrizedSpec=" + generatedABuilderParametrizedSpec,
               "generatedBuilder=" + generatedBuilder,
               "valueType=" + valueType,
               "partialType=" + partialType,
@@ -1483,9 +1624,14 @@ abstract class Metadata_Builder {
     // Store a nullable object instead of an Optional. Escape analysis then
     // allows the JVM to optimize away the Optional objects created by our
     // getter method.
+    private final ParameterizedType optionalABuilder;
+    // Store a nullable object instead of an Optional. Escape analysis then
+    // allows the JVM to optimize away the Optional objects created by our
+    // getter method.
     private final BuilderFactory builderFactory;
     private final ParameterizedType generatedABuilder;
     private final ParameterizedType generatedABuilderParametrized;
+    private final ParameterizedType generatedABuilderParametrizedSpec;
     private final ParameterizedType generatedBuilder;
     private final ParameterizedType valueType;
     private final ParameterizedType partialType;
@@ -1508,9 +1654,11 @@ abstract class Metadata_Builder {
       this.buildGen = builder.buildGen;
       this.interfaceType = builder.interfaceType;
       this.optionalBuilder = builder.optionalBuilder;
+      this.optionalABuilder = builder.optionalABuilder;
       this.builderFactory = builder.builderFactory;
       this.generatedABuilder = builder.generatedABuilder;
       this.generatedABuilderParametrized = builder.generatedABuilderParametrized;
+      this.generatedABuilderParametrizedSpec = builder.generatedABuilderParametrizedSpec;
       this.generatedBuilder = builder.generatedBuilder;
       this.valueType = builder.valueType;
       this.partialType = builder.partialType;
@@ -1564,6 +1712,11 @@ abstract class Metadata_Builder {
     }
 
     @Override
+    public Optional<ParameterizedType> getOptionalABuilder() {
+      return Optional.fromNullable(optionalABuilder);
+    }
+
+    @Override
     public Optional<BuilderFactory> getBuilderFactory() {
       return Optional.fromNullable(builderFactory);
     }
@@ -1582,6 +1735,15 @@ abstract class Metadata_Builder {
         throw new UnsupportedOperationException("generatedABuilderParametrized not set");
       }
       return generatedABuilderParametrized;
+    }
+
+    @Override
+    public ParameterizedType getGeneratedABuilderParametrizedSpec() {
+      if (_unsetProperties.contains(
+          Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED_SPEC)) {
+        throw new UnsupportedOperationException("generatedABuilderParametrizedSpec not set");
+      }
+      return generatedABuilderParametrizedSpec;
     }
 
     @Override
@@ -1686,6 +1848,10 @@ abstract class Metadata_Builder {
           && (optionalBuilder == null || !optionalBuilder.equals(other.optionalBuilder))) {
         return false;
       }
+      if (optionalABuilder != other.optionalABuilder
+          && (optionalABuilder == null || !optionalABuilder.equals(other.optionalABuilder))) {
+        return false;
+      }
       if (builderFactory != other.builderFactory
           && (builderFactory == null || !builderFactory.equals(other.builderFactory))) {
         return false;
@@ -1697,6 +1863,12 @@ abstract class Metadata_Builder {
       if (generatedABuilderParametrized != other.generatedABuilderParametrized
           && (generatedABuilderParametrized == null
               || !generatedABuilderParametrized.equals(other.generatedABuilderParametrized))) {
+        return false;
+      }
+      if (generatedABuilderParametrizedSpec != other.generatedABuilderParametrizedSpec
+          && (generatedABuilderParametrizedSpec == null
+              || !generatedABuilderParametrizedSpec.equals(
+                  other.generatedABuilderParametrizedSpec))) {
         return false;
       }
       if (generatedBuilder != other.generatedBuilder
@@ -1753,9 +1925,11 @@ abstract class Metadata_Builder {
             buildGen,
             interfaceType,
             optionalBuilder,
+            optionalABuilder,
             builderFactory,
             generatedABuilder,
             generatedABuilderParametrized,
+            generatedABuilderParametrizedSpec,
             generatedBuilder,
             valueType,
             partialType,
@@ -1787,6 +1961,7 @@ abstract class Metadata_Builder {
                   ? "interfaceType=" + interfaceType
                   : null),
               (optionalBuilder != null ? "optionalBuilder=" + optionalBuilder : null),
+              (optionalABuilder != null ? "optionalABuilder=" + optionalABuilder : null),
               (builderFactory != null ? "builderFactory=" + builderFactory : null),
               (!_unsetProperties.contains(Metadata_Builder.Property.GENERATED_A_BUILDER)
                   ? "generatedABuilder=" + generatedABuilder
@@ -1794,6 +1969,10 @@ abstract class Metadata_Builder {
               (!_unsetProperties.contains(
                       Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED)
                   ? "generatedABuilderParametrized=" + generatedABuilderParametrized
+                  : null),
+              (!_unsetProperties.contains(
+                      Metadata_Builder.Property.GENERATED_A_BUILDER_PARAMETRIZED_SPEC)
+                  ? "generatedABuilderParametrizedSpec=" + generatedABuilderParametrizedSpec
                   : null),
               (!_unsetProperties.contains(Metadata_Builder.Property.GENERATED_BUILDER)
                   ? "generatedBuilder=" + generatedBuilder

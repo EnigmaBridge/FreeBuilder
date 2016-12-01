@@ -152,7 +152,8 @@ class Analyser {
     QualifiedName generatedBuilder = QualifiedName.of(
         pkg.getQualifiedName().toString(), generatedBuilderSimpleName(type));
 
-    Optional<TypeElement> builder = tryFindBuilder(generatedABuilder, type);
+    Optional<TypeElement> abuilder = tryFindBuilder(generatedABuilder, type);
+    Optional<TypeElement> builder = tryFindBuilder(generatedBuilder, type);
 
     QualifiedName valueType = generatedBuilder.nestedType("Value");
     QualifiedName partialType = generatedBuilder.nestedType("Partial");
@@ -168,15 +169,22 @@ class Analyser {
     abuilderParams.addAll(typeParameters);
     log(type, "ABuilder typeParams %s", typeParameters);
 
+    // A builder types - specific
+    List abuilderParamsSpec = Arrays.asList(type, generatedABuilder);
+    abuilderParamsSpec.addAll(typeParameters);
+    log(type, "ABuilderSpec typeParams %s", abuilderParamsSpec);
+
     Map<ExecutableElement, Property> properties = findProperties(type, methods);
     Metadata.Builder metadataBuilder = new Metadata.Builder()
         .setType(QualifiedName.of(type).withParameters(typeParameters))
         .setInterfaceType(type.getKind().isInterface())
+        .setABuilder(parameterized(abuilder, typeParameters))
         .setBuilder(parameterized(builder, typeParameters))
         .setBuilderFactory(builderFactory(builder))
         .setGeneratedBuilder(generatedBuilder.withParameters(typeParameters))
         .setGeneratedABuilder(generatedABuilder.withParameters(typeParameters))
         .setGeneratedABuilderParametrized(generatedABuilder.withParameters(abuilderParams))
+        .setGeneratedABuilderParametrizedSpec(generatedABuilder.withParameters(abuilderParamsSpec))
         .setValueType(valueType.withParameters(typeParameters))
         .setPartialType(partialType.withParameters(typeParameters))
         .setPropertyEnum(propertyType.withParameters())
