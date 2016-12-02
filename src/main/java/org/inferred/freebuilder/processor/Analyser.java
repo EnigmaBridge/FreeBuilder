@@ -164,7 +164,7 @@ class Analyser {
       //List<? extends TypeParameterElement> abuilderTypeParameters = abuilder.get().getTypeParameters();
 
       // A builder types - specific
-      ArrayList abuilderExtParamsSpec = new ArrayList(Arrays.asList(type, generatedABuilder));
+      ArrayList abuilderExtParamsSpec = new ArrayList(Arrays.asList(type, generatedBuilder));
       // abuilderExtParamsSpec.addAll(abuilderTypeParameters);
 
       log(type, "ABuilderExt name: %s", generatedABuilderExt);
@@ -181,7 +181,7 @@ class Analyser {
     log(type, "ABuilder typeParams %s", typeParameters);
 
     // A builder types - specific
-    ArrayList abuilderParamsSpec = new ArrayList(Arrays.asList(type, generatedABuilder));
+    ArrayList abuilderParamsSpec = new ArrayList(Arrays.asList(type, generatedBuilder));
     abuilderParamsSpec.addAll(typeParameters);
     log(type, "ABuilderSpec typeParams %s", abuilderParamsSpec);
 
