@@ -192,8 +192,8 @@ public class CodeGenerator {
   private static void addAbstractMethods(SourceBuilder code, Metadata metadata) {
     code.addLine("");
     code.addLine("public abstract %s build();", metadata.getTypeGen());
-    code.addLine("public abstract %s getThisBuilder();", metadata.getBuildGen());
-    code.addLine("public abstract %s getNewBuilder();", metadata.getBuildGen());
+    code.addLine("protected abstract %s getThisBuilder();", metadata.getBuildGen());
+    code.addLine("protected abstract %s getNewBuilder();", metadata.getBuildGen());
   }
 
   private static void addAbstractMethodsImpl(SourceBuilder code, Metadata metadata) {
