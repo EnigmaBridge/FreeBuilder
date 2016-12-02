@@ -194,19 +194,37 @@ public class CodeGenerator {
     code.addLine("public abstract %s build();", metadata.getTypeGen());
     code.addLine("protected abstract %s getThisBuilder();", metadata.getBuildGen());
     code.addLine("protected abstract %s getNewBuilder();", metadata.getBuildGen());
+
+    if (metadata.getOptionalABuilderAncestor().isPresent()){
+      code.addLine("protected void defaultValues(){", metadata.getBuildGen());
+      code.addLine("  super.defaultValues();", metadata.getBuildGen());
+      code.addLine("}", metadata.getBuildGen());
+    } else {
+      code.addLine("protected void defaultValues(){}", metadata.getBuildGen());
+    }
   }
 
   private static void addAbstractMethodsImpl(SourceBuilder code, Metadata metadata) {
     code.addLine("");
     code.addLine("@Override");
-    code.addLine("public %s getThisBuilder() {", metadata.getGeneratedABuilder());
+    code.addLine("protected %s getThisBuilder() {", metadata.getGeneratedABuilder());
     code.addLine("  return this;");
     code.addLine("}");
     code.addLine("");
 
+    BuilderFactory builderFactory = metadata.getBuilderFactory().orNull();
     code.addLine("@Override");
-    code.addLine("public %s getNewBuilder() {", metadata.getGeneratedABuilder());
-    code.addLine("  return this;");
+    code.addLine("protected %s getNewBuilder() {", metadata.getGeneratedABuilder());
+    if (builderFactory == null) {
+      code.addLine("  return %s;", metadata.getBuilder().constructor());
+    } else {
+      code.addLine("  return %s;", builderFactory.newBuilder(metadata.getBuilder(), EXPLICIT_TYPES));
+    }
+    code.addLine("}");
+
+    code.addLine("protected <BBuilder extends %s> BBuilder initBuilder() {", metadata.getGeneratedABuilder());
+    code.addLine("  defaultValues();");
+    code.addLine("  return (BBuilder) this;");
     code.addLine("}");
   }
 

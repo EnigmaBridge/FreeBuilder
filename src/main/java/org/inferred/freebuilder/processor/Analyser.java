@@ -107,6 +107,7 @@ class Analyser {
   private static final String ABUILDER_SIMPLE_NAME_TEMPLATE = "%s_ABuilder";
   private static final String USER_BUILDER_NAME = "Builder";
   private static final String USER_ABUILDER_NAME = "ABuilder";
+  private static final String USER_DEFAULT_VALUES_NAME = "defaultValues";
 
   private static final Pattern GETTER_PATTERN = Pattern.compile("^(get|is)(.+)");
   private static final String GET_PREFIX = "get";
@@ -151,12 +152,12 @@ class Analyser {
     Optional<TypeElement> abuilder = tryFindABuilder(generatedABuilder, type, USER_ABUILDER_NAME);
     Optional<TypeElement> builder = tryFindBuilder(generatedBuilder, type, USER_BUILDER_NAME);
 
-    // <T> parameters
+    // <T> parameters on annotated type
     List<? extends TypeParameterElement> typeParameters = type.getTypeParameters();
     log(type, "type %s", type);
     log(type, "typeParams %s", typeParameters);
 
-    // If abstract builder is overriden, use that one.
+    // If abstract builder is overridden by the user code, use that one, otherwise use our abstract builder.
     Optional<ParameterizedType> generatedABuilderExt = Optional.absent();
     if (abuilder.isPresent()){
       // TODO: fix for generics...
