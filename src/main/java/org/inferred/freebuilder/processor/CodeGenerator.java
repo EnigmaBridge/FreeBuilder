@@ -200,18 +200,47 @@ public class CodeGenerator {
   }
 
   private static void addAbstractMethods(SourceBuilder code, Metadata metadata) {
-    code.addLine("");
-    code.addLine("public abstract %s build();", metadata.getTypeGen());
-    code.addLine("protected abstract %s getThisBuilder();", metadata.getBuildGen());
-    code.addLine("protected abstract %s getNewBuilder();", metadata.getBuildGen());
+    code.addLine("")
+        .addLine("/**")
+        .addLine(" * Abstract build method, returns immutable value class.")
+        .addLine(" * Implemented in side (non-inherited) builder.")
+        .addLine(" * ")
+        .addLine(" * @return this {@code %s} object", metadata.getTypeGen())
+        .addLine(" */")
+        .addLine("public abstract %s build();", metadata.getTypeGen());
 
+    code.addLine("")
+        .addLine("/**")
+        .addLine(" * Abstract method returns the actual builder instance with the ")
+        .addLine(" * high type. This is returned in each value setter so the return ")
+        .addLine(" * value is compatible with top-level builder. Used in builder inheritance.")
+        .addLine(" * ")
+        .addLine(" * @return this {@code %s} object", metadata.getBuildGen())
+        .addLine(" */")
+        .addLine("protected abstract %s getThisBuilder();", metadata.getBuildGen());
+
+    code.addLine("")
+        .addLine("/**")
+        .addLine(" * Abstract method returns a new builder instance of the  ")
+        .addLine(" * high type. It is used to detect default values on runtime for merging purposes.")
+        .addLine(" * ")
+        .addLine(" * @return this {@code %s} object", metadata.getBuildGen())
+        .addLine(" */")
+        .addLine("protected abstract %s getNewBuilder();", metadata.getBuildGen());
+
+    code.addLine("")
+        .addLine("/**")
+        .addLine(" * Method for setting default values to builder properties.")
+        .addLine(" * By default it is empty or calls super.")
+        .addLine(" * In order to set inheritable default values, override this method in .")
+        .addLine(" * the abstract builder. For local default values inherit in specific builder.")
+        .addLine(" */")
+        .addLine("protected void defaultValues(){");
     if (metadata.getOptionalABuilderAncestor().isPresent()){
-      code.addLine("protected void defaultValues(){", metadata.getBuildGen());
-      code.addLine("  super.defaultValues();", metadata.getBuildGen());
-      code.addLine("}", metadata.getBuildGen());
-    } else {
-      code.addLine("protected void defaultValues(){}", metadata.getBuildGen());
+      code.addLine("  super.defaultValues();");
     }
+    code.addLine("}");
+
   }
 
   private static void addAbstractMethodsImpl(SourceBuilder code, Metadata metadata) {
