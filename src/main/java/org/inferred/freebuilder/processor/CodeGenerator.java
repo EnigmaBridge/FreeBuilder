@@ -62,9 +62,6 @@ public class CodeGenerator {
     addABuilderTypeDeclaration(code, metadata);
     code.addLine(" {");
 
-    // TODO: fix from
-    //addStaticFromMethod(code, metadata);
-
     addConstantDeclarations(metadata, code);
     if (any(metadata.getProperties(), IS_REQUIRED)) {
       addPropertyEnum(metadata, code);
@@ -91,6 +88,7 @@ public class CodeGenerator {
     code.addLine(" {");
 
     addConstantDeclarations(metadata, code);
+    addStaticFromMethod(code, metadata);
     addAbstractMethodsImpl(code, metadata);
 
     // Moved to another builder.
@@ -161,8 +159,9 @@ public class CodeGenerator {
         .addLine("public static %s %s from(%s value) {",
             metadata.getBuilder().declarationParameters(),
             metadata.getBuilder(),
-            metadata.getTypeGen())
-        .addLine("  return %s.mergeFrom(value);",
+            metadata.getType())
+        .addLine("  return (%s)%s.mergeFrom(value);",
+            metadata.getBuilder(),
             builderFactory.newBuilder(metadata.getBuilder(), EXPLICIT_TYPES))
         .addLine("}");
   }
