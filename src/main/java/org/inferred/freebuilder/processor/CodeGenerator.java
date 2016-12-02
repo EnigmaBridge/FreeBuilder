@@ -204,16 +204,27 @@ public class CodeGenerator {
   }
 
   private static void addAbstractMethodsImpl(SourceBuilder code, Metadata metadata) {
-    code.addLine("");
-    code.addLine("@Override");
-    code.addLine("protected %s getThisBuilder() {", metadata.getGeneratedABuilder());
-    code.addLine("  return this;");
-    code.addLine("}");
-    code.addLine("");
+    code.addLine("")
+        .addLine("/**")
+        .addLine(" * Returns this builder object as a top-level {@link %s} builder ", metadata.getBuilder())
+        .addLine(" * class extending this abstract class {@link %s}.", metadata.getGeneratedBuilder())
+        .addLine(" */")
+        .addLine("@Override")
+        .addLine("protected %s getThisBuilder() {", metadata.getBuilder())
+        .addLine("  return (%s)this;", metadata.getBuilder())
+        .addLine("}")
+        .addLine("");
 
     BuilderFactory builderFactory = metadata.getBuilderFactory().orNull();
-    code.addLine("@Override");
-    code.addLine("protected %s getNewBuilder() {", metadata.getGeneratedABuilder());
+    code.addLine("")
+        .addLine("/**")
+        .addLine(" * Returns a new builder instance as a top-level {@link %s} builder ", metadata.getBuilder())
+        .addLine(" * class extending this abstract class {@link %s}.", metadata.getGeneratedBuilder())
+        .addLine(" * Used for default value generation.")
+        .addLine(" */")
+        .addLine("@Override")
+        .addLine("protected %s getNewBuilder() {", metadata.getBuilder());
+
     if (builderFactory == null) {
       code.addLine("  return %s;", metadata.getBuilder().constructor());
     } else {
@@ -221,10 +232,15 @@ public class CodeGenerator {
     }
     code.addLine("}");
 
-    code.addLine("protected <BBuilder extends %s> BBuilder initBuilder() {", metadata.getGeneratedABuilder());
-    code.addLine("  defaultValues();");
-    code.addLine("  return (BBuilder) this;");
-    code.addLine("}");
+    code.addLine("")
+        .addLine("/**")
+        .addLine(" * Initializes the builder object with default values.")
+        .addLine(" * Returns the builder type - usable in upper builder factory.")
+        .addLine(" */")
+        .addLine("protected <BB extends %s> BB initBuilder() {", metadata.getGeneratedABuilder())
+        .addLine("  defaultValues();")
+        .addLine("  return (BB) this;")
+        .addLine("}");
   }
 
   private static void addAccessors(Metadata metadata, SourceBuilder body) {
