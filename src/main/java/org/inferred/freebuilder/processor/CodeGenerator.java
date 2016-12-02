@@ -89,6 +89,7 @@ public class CodeGenerator {
 
     addConstantDeclarations(metadata, code);
     addStaticFromMethod(code, metadata);
+    addBuilderConstructor(code, metadata);
     addAbstractMethodsImpl(code, metadata);
 
     // Moved to another builder.
@@ -186,6 +187,16 @@ public class CodeGenerator {
               EnumSet.class, metadata.getPropertyEnum())
           .addLine("    %s.allOf(%s.class);", EnumSet.class, metadata.getPropertyEnum());
     }
+  }
+
+  private static void addBuilderConstructor(SourceBuilder code, Metadata metadata) {
+    code.addLine("")
+        .addLine("/**")
+        .addLine(" * Default constructor with default values.")
+        .addLine(" */")
+        .addLine("public %s() {", metadata.getGeneratedBuilder().getSimpleName())
+        .addLine("  initBuilder();")
+        .addLine("}");
   }
 
   private static void addAbstractMethods(SourceBuilder code, Metadata metadata) {
