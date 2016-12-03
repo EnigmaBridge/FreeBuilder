@@ -34,9 +34,8 @@ class Declarations {
     if (!metadata.getBuilderFactory().isPresent()) {
       return Optional.absent();
     }
-    Excerpt defaults = block.declare("_defaults", "%s _defaults = %s;",
-          metadata.getGeneratedABuilder(),
-            "getNewBuilder();");
+    Excerpt defaults = block.declare("_defaults", "%s _defaults = getNewBuilder();",
+          metadata.getGeneratedABuilder());
 //          metadata.getBuilderFactory().get()
 //              .newBuilder(metadata.getBuilder(), TypeInference.INFERRED_TYPES));
     return Optional.of(defaults);
