@@ -556,21 +556,6 @@ class Analyser {
         });
 
     if (!userClass.isPresent()) {
-      if (type.getKind() == INTERFACE) {
-        messager.printMessage(
-            NOTE,
-            "Add \"abstract class ABuilder extends "
-                + generatedBuilder.getSimpleName()
-                + " {}\" to your interface to enable the @FreeBuilder API",
-            type);
-      } else {
-        messager.printMessage(
-            NOTE,
-            "Add \"public static abstract class ABuilder extends "
-                + generatedBuilder.getSimpleName()
-                + " {}\" to your class to enable the @FreeBuilder API",
-            type);
-      }
       return Optional.absent();
     }
 
