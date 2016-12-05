@@ -229,7 +229,7 @@ class Analyser {
       // mergeFrom from super types
       metadataBuilder.putAllSuperTypeProperties(processSuperTypeProperties(type, builder));
     }
-    log(type, "metadata model: %s", metadataBuilder.buildPartial().toString());
+    //log(type, "metadata model: %s", metadataBuilder.buildPartial().toString());
     return metadataBuilder.build();
   }
 
@@ -284,7 +284,7 @@ class Analyser {
         }
 
         toRet.put(pType, ImmutableList.copyOf(superPropertiesRet.values()));
-        log(type, "supertype %s, properties: %s", pType, superPropertiesRet);
+        log(type, "supertype %s", pType);
       }
     } catch (CannotGenerateCodeException e) {
       log(type, "Exception in finding super types %s", e);
