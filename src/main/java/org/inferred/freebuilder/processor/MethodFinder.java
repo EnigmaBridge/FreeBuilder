@@ -51,9 +51,14 @@ public class MethodFinder {
    */
   public static ImmutableSet<ExecutableElement> methodsOn(TypeElement type, Elements elements)
       throws CannotGenerateCodeException {
+    return methodsOn(type, elements, true);
+  }
+
+  public static ImmutableSet<ExecutableElement> methodsOn(TypeElement type, Elements elements, boolean superTypes)
+      throws CannotGenerateCodeException {
     TypeElement objectType = elements.getTypeElement(Object.class.getCanonicalName());
     SetMultimap<Signature, ExecutableElement> methods = LinkedHashMultimap.create();
-    for (TypeElement supertype : getSupertypes(type)) {
+    for (TypeElement supertype : superTypes ? getSupertypes(type) : ImmutableSet.<TypeElement>of(type)) {
       for (ExecutableElement method : methodsIn(supertype.getEnclosedElements())) {
         if (method.getEnclosingElement().equals(objectType)) {
           continue;  // Skip methods specified by Object.
@@ -73,25 +78,41 @@ public class MethodFinder {
     return ImmutableSet.copyOf(methods.values());
   }
 
-  private static ImmutableSet<TypeElement> getSupertypes(TypeElement type)
+  public static ImmutableSet<TypeElement> getSupertypes(TypeElement type)
+      throws CannotGenerateCodeException {
+    return getSupertypes(type, true, true, true);
+  }
+
+  public static ImmutableSet<TypeElement> getSupertypes(TypeElement type, boolean addSelf, boolean addIfaces, boolean addSuperClass)
       throws CannotGenerateCodeException {
     Set<TypeElement> supertypes = new LinkedHashSet<TypeElement>();
-    addSupertypesToSet(type, supertypes);
+    addSupertypesToSet(type, supertypes, addSelf, addIfaces, addSuperClass);
     return ImmutableSet.copyOf(supertypes);
   }
 
-  private static void addSupertypesToSet(TypeElement type, Set<TypeElement> mutableSet)
+  public static void addSupertypesToSet(TypeElement type, Set<TypeElement> mutableSet)
       throws CannotGenerateCodeException {
-    for (TypeMirror iface : type.getInterfaces()) {
-      addSupertypesToSet(asTypeElement(iface), mutableSet);
-    }
-    if (type.getSuperclass().getKind() != TypeKind.NONE) {
-      addSupertypesToSet(asTypeElement(type.getSuperclass()), mutableSet);
-    }
-    mutableSet.add(type);
+      addSupertypesToSet(type, mutableSet, true, true, true);
   }
 
-  private static TypeElement asTypeElement(TypeMirror iface) throws CannotGenerateCodeException {
+  public static void addSupertypesToSet(TypeElement type, Set<TypeElement> mutableSet, boolean addSelf, boolean addIfaces, boolean addSuperClass)
+      throws CannotGenerateCodeException {
+    if (addIfaces) {
+      for (TypeMirror iface : type.getInterfaces()) {
+        addSupertypesToSet(asTypeElement(iface), mutableSet, true, addIfaces, addSuperClass);
+      }
+    }
+    if (addSuperClass) {
+      if (type.getSuperclass().getKind() != TypeKind.NONE) {
+        addSupertypesToSet(asTypeElement(type.getSuperclass()), mutableSet, true, addIfaces, addSuperClass);
+      }
+    }
+    if (addSelf) {
+      mutableSet.add(type);
+    }
+  }
+
+  public static TypeElement asTypeElement(TypeMirror iface) throws CannotGenerateCodeException {
     if (iface.getKind() != TypeKind.DECLARED) {
       throw new CannotGenerateCodeException();
     }

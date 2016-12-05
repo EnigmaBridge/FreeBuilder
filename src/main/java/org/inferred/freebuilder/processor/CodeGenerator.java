@@ -31,6 +31,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -41,11 +42,7 @@ import org.inferred.freebuilder.processor.PropertyCodeGenerator.Type;
 import org.inferred.freebuilder.processor.util.*;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Code generation for the &#64;{@link FreeBuilder} annotation.
@@ -73,6 +70,7 @@ public class CodeGenerator {
     addAccessors(metadata, code);
     addMergeFromValueMethod(code, metadata);
     addMergeFromBuilderMethod(code, metadata);
+    addMergeFromSuperTypes(code, metadata);
     addClearMethod(code, metadata);
 
     code.addLine("}");
@@ -342,6 +340,48 @@ public class CodeGenerator {
         .addLine("  return getThisBuilder();")
 //        .addLine("  return (%s) this;", metadata.getBuilder())
         .addLine("}");
+  }
+
+  private static void addMergeFromSuperTypes(SourceBuilder code, Metadata metadata) {
+    for(Map.Entry<ParameterizedType, ImmutableList<Property>> e : metadata.getSuperTypeProperties().entrySet()){
+      final ParameterizedType type = e.getKey();
+      final ImmutableList<Property> properties = e.getValue();
+
+      // mergeFrom - value
+      code.addLine("")
+          .addLine("/**")
+          .addLine(" * Sets all property values using the given {@code %s} as a template.", type.getQualifiedName())
+          .addLine(" */")
+          .addLine("public %s mergeFromSuper(%s value) {", metadata.getBuildGen(), type.getQualifiedName());
+      Block body = new Block(code);
+      for (Property property : properties) {
+        property.getCodeGenerator().addMergeFromValue(body, "value");
+      }
+      code.add(body)
+          .addLine("  return getThisBuilder();")
+          .addLine("}");
+
+      // has builder ?
+      if (!metadata.getSuperBuilderTypes().contains(type)){
+        continue;
+      }
+
+      // mergeFrom - builder
+      final QualifiedName builder = type.getQualifiedName().nestedType("Builder");
+      code.addLine("")
+          .addLine("/**")
+          .addLine(" * Copies values from the given {@code %s}.", builder.getSimpleName())
+          .addLine(" * Does not affect any properties not set on the input.")
+          .addLine(" */")
+          .addLine("public %s mergeFromSuper(%s template) {", metadata.getBuildGen(), builder);
+      Block fromBuilderBody = new Block(code);
+      for (Property property : properties) {
+        property.getCodeGenerator().addMergeFromBuilder(fromBuilderBody, "template");
+      }
+      code.add(fromBuilderBody)
+          .addLine("  return getThisBuilder();")
+          .addLine("}");
+    }
   }
 
   private static void addClearMethod(SourceBuilder code, Metadata metadata) {

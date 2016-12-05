@@ -152,6 +152,15 @@ public abstract class Metadata {
   /** Returns metadata about the properties of the type. */
   public abstract ImmutableList<Property> getProperties();
 
+  /** Returns metadata about the properties of the type. Only own properties - not inherited */
+  public abstract ImmutableList<Property> getOwnProperties();
+
+  /** super types implementing builder */
+  public abstract ImmutableSet<ParameterizedType> getSuperBuilderTypes();
+
+  /** Super type properties */
+  public abstract ImmutableMap<ParameterizedType, ImmutableList<Property>> getSuperTypeProperties();
+
   public UnderrideLevel standardMethodUnderride(StandardMethod standardMethod) {
     UnderrideLevel underrideLevel = getStandardMethodUnderrides().get(standardMethod);
     return (underrideLevel == null) ? UnderrideLevel.ABSENT : underrideLevel;

@@ -108,6 +108,7 @@ class Analyser {
   private static final String USER_BUILDER_NAME = "Builder";
   private static final String USER_ABUILDER_NAME = "ABuilder";
   private static final String USER_DEFAULT_VALUES_NAME = "defaultValues";
+  private static final String BUILDER_ANNOTATION = "org.inferred.freebuilder.FreeBuilder";
 
   private static final Pattern GETTER_PATTERN = Pattern.compile("^(get|is)(.+)");
   private static final String GET_PREFIX = "get";
@@ -142,6 +143,7 @@ class Analyser {
   Metadata analyse(TypeElement type) throws CannotGenerateCodeException {
     PackageElement pkg = elements.getPackageOf(type);
     verifyType(type, pkg);
+    ImmutableSet<ExecutableElement> ownMethods = methodsOn(type, elements, false);
     ImmutableSet<ExecutableElement> methods = methodsOn(type, elements);
 
     QualifiedName generatedABuilder = QualifiedName.of(
@@ -207,11 +209,15 @@ class Analyser {
         .putAllStandardMethodUnderrides(findUnderriddenMethods(methods))
         .setBuilderSerializable(shouldBuilderBeSerializable(builder))
         .addAllProperties(properties.values())
+        .addAllOwnProperties(findProperties(type, ownMethods).values())
         .setTypeGen("T")
         .setBuildGen("B");
 
     // Super class has FreeBuilder also?
-    analyseSuperclass(type, metadataBuilder);
+    analyseSuperclass(type, metadataBuilder, methods, properties);
+
+    // All super types implementing builder
+    metadataBuilder.addAllSuperBuilderTypes(superBuilders(type));
 
     Metadata baseMetadata = metadataBuilder.build();
     metadataBuilder.mergeFrom(gwtMetadata(type, baseMetadata));
@@ -219,30 +225,108 @@ class Analyser {
       metadataBuilder
           .clearProperties()
           .addAllProperties(codeGenerators(properties, baseMetadata, builder.get()));
+
+      // mergeFrom from super types
+      metadataBuilder.putAllSuperTypeProperties(processSuperTypeProperties(type, builder));
     }
+    log(type, "metadata model: %s", metadataBuilder.buildPartial().toString());
     return metadataBuilder.build();
   }
 
-  private void analyseSuperclass(TypeElement type, Metadata.Builder metadataBuilder){
+  private Optional<DeclaredType> getDeclaredSuperclass(TypeElement type){
     final TypeMirror superClass = type.getSuperclass();
     final TypeKind scType = superClass.getKind();
     if (scType == TypeKind.NONE){
-      return;
+      return Optional.absent();
     }
 
     // Can be either DECLARED or ERROR
     if (scType != TypeKind.DECLARED){
+      return Optional.absent();
+    }
+
+    return Optional.of((DeclaredType) superClass);
+  }
+
+  private ImmutableMap<ParameterizedType, ImmutableList<Property>> processSuperTypeProperties(
+          TypeElement type,
+          Optional<TypeElement> builder)
+  {
+    // For mergeFrom - iterate all super types, add properties from all supertypes.
+    Map<ParameterizedType, ImmutableList<Property>> toRet = new HashMap<ParameterizedType, ImmutableList<Property>>();
+    try {
+      final ImmutableSet<TypeElement> superTypes = MethodFinder.getSupertypes(type, false, true, true);
+      for(TypeElement superType : superTypes){
+        final ImmutableSet<ExecutableElement> superMethods = methodsOn(superType, elements);
+        final Map<ExecutableElement, Property> superPropertiesRet = findProperties(superType, superMethods);
+        if (superPropertiesRet.isEmpty()){
+          continue;
+        }
+
+        ParameterizedType pType = QualifiedName.of(superType).withParameters(superType.getTypeParameters());
+
+        // Code builder dance
+        if (builder.isPresent()) {
+          final Metadata metadataSuperType = analyse(superType);
+          for (Map.Entry<ExecutableElement, Property> entry : superPropertiesRet.entrySet()) {
+            Config config = new ConfigImpl(
+                    builder.get(),
+                    metadataSuperType,
+                    entry.getValue(),
+                    entry.getKey(),
+                    ImmutableSet.<String>of());
+
+            entry.setValue(new Property.Builder()
+                    .mergeFrom(entry.getValue())
+                    .setCodeGenerator(createCodeGenerator(config))
+                    .build());
+          }
+        }
+
+        toRet.put(pType, ImmutableList.copyOf(superPropertiesRet.values()));
+        log(type, "supertype %s, properties: %s", pType, superPropertiesRet);
+      }
+    } catch (CannotGenerateCodeException e) {
+      log(type, "Exception in finding super types %s", e);
+    }
+    return ImmutableMap.copyOf(toRet);
+  }
+
+  private ImmutableSet<ParameterizedType> superBuilders(TypeElement type){
+    Set<ParameterizedType> toRet = new HashSet<ParameterizedType>();
+    try {
+      final ImmutableSet<TypeElement> superTypes = MethodFinder.getSupertypes(type, false, true, true);
+      for(TypeElement superType : superTypes){
+        final Optional<AnnotationMirror> freeBuilderMirror =
+                findAnnotationMirror(superType, BUILDER_ANNOTATION);
+
+        if (freeBuilderMirror.isPresent()){
+          ParameterizedType pType = QualifiedName.of(superType).withParameters(superType.getTypeParameters());
+          toRet.add(pType);
+        }
+      }
+    } catch (CannotGenerateCodeException e) {
+      log(type, "Exception in finding super types %s", e);
+    }
+    return ImmutableSet.copyOf(toRet);
+  }
+
+  private void analyseSuperclass(TypeElement type, Metadata.Builder metadataBuilder,
+                                 ImmutableSet<ExecutableElement> methods, Map<ExecutableElement, Property> properties)
+  {
+    final Optional<DeclaredType> optSuperDecl = getDeclaredSuperclass(type);
+    if (!optSuperDecl.isPresent()){
       return;
     }
 
-    // Is superclass also using the FreeBuilder?
-    final DeclaredType scDecType = (DeclaredType) superClass;
+    final TypeMirror superClass = type.getSuperclass();
+    final DeclaredType scDecType = optSuperDecl.get();
     final Element scElem = scDecType.asElement();
     final ElementKind scKind = scElem.getKind();
     log(type, "Type %s has super class type %s, kind: %s", type, scElem, scKind);
 
     final Optional<AnnotationMirror> freeBuilderMirror =
-            findAnnotationMirror(scElem, "org.inferred.freebuilder.FreeBuilder");
+            findAnnotationMirror(scElem, BUILDER_ANNOTATION);
     if (!freeBuilderMirror.isPresent()){
       metadataBuilder.setOptionalABuilderAncestor(Optional.<ParameterizedType>absent());
       return;
