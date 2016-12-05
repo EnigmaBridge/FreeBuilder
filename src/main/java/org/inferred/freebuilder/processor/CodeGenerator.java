@@ -264,7 +264,7 @@ public class CodeGenerator {
         .addLine("protected %s getNewBuilder() {", metadata.getBuilder());
 
     if (builderFactory == null) {
-      code.addLine("  return %s();", metadata.getBuilder().constructor());
+      code.addLine("  throw new IllegalStateException(\"Abstract builder cannot be instantianted\");");
     } else {
       code.addLine("  return %s;", builderFactory.newBuilder(metadata.getBuilder(), EXPLICIT_TYPES));
     }

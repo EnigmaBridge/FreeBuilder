@@ -227,7 +227,7 @@ class Analyser {
           .addAllProperties(codeGenerators(properties, baseMetadata, builder.get()));
 
       // mergeFrom from super types
-      metadataBuilder.putAllSuperTypeProperties(processSuperTypeProperties(type, builder));
+      metadataBuilder.putAllSuperTypeProperties(processSuperTypeProperties(type, baseMetadata, builder));
     }
     //log(type, "metadata model: %s", metadataBuilder.buildPartial().toString());
     return metadataBuilder.build();
@@ -250,6 +250,7 @@ class Analyser {
 
   private ImmutableMap<ParameterizedType, ImmutableList<Property>> processSuperTypeProperties(
           TypeElement type,
+          Metadata baseMetadata,
           Optional<TypeElement> builder)
   {
     // For mergeFrom - iterate all super types, add properties from all supertypes.
@@ -268,10 +269,13 @@ class Analyser {
         // Code builder dance
         if (builder.isPresent()) {
           final Metadata metadataSuperType = analyse(superType);
+          final Metadata.Builder metadataBld = Metadata.Builder.from(metadataSuperType);
+          metadataBld.setBuilderFactory(Optional.<BuilderFactory>absent());
+
           for (Map.Entry<ExecutableElement, Property> entry : superPropertiesRet.entrySet()) {
             Config config = new ConfigImpl(
                     builder.get(),
-                    metadataSuperType,
+                    metadataBld.build(),
                     entry.getValue(),
                     entry.getKey(),
                     ImmutableSet.<String>of());
