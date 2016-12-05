@@ -132,7 +132,7 @@ class Analyser {
   }
 
   private void log(TypeElement type, String fmt, Object... args){
-    messager.printMessage(NOTE, String.format(fmt, args), type);
+    //messager.printMessage(NOTE, String.format(fmt, args), type);
   }
 
   /**
