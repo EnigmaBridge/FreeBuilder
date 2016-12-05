@@ -275,6 +275,7 @@ public class CodeGenerator {
         .addLine(" * Initializes the builder object with default values.")
         .addLine(" * Returns the builder type - usable in upper builder factory.")
         .addLine(" */")
+        .addLine("@SuppressWarnings(\"unchecked\")")
         .addLine("protected <BB extends %s> BB initBuilder() {", metadata.getGeneratedABuilder())
         .addLine("  defaultValues();")
         .addLine("  return (BB) this;")
