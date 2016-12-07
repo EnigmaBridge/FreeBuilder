@@ -39,6 +39,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
+import org.inferred.freebuilder.FreeBuilder;
 import org.inferred.freebuilder.processor.Metadata.Property;
 import org.inferred.freebuilder.processor.Metadata.StandardMethod;
 import org.inferred.freebuilder.processor.Metadata.UnderrideLevel;
@@ -108,7 +109,7 @@ class Analyser {
   private static final String USER_BUILDER_NAME = "Builder";
   private static final String USER_ABUILDER_NAME = "ABuilder";
   private static final String USER_DEFAULT_VALUES_NAME = "defaultValues";
-  private static final String BUILDER_ANNOTATION = "org.inferred.freebuilder.FreeBuilder";
+  private static final String BUILDER_ANNOTATION = FreeBuilder.class.getCanonicalName();
 
   private static final Pattern GETTER_PATTERN = Pattern.compile("^(get|is)(.+)");
   private static final String GET_PREFIX = "get";
