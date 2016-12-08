@@ -15,9 +15,6 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import static com.google.common.collect.Maps.immutableEntry;
-import static com.google.common.truth.Truth.THROW_ASSERTION_ERROR;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
@@ -29,6 +26,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+
+import static com.google.common.collect.Maps.immutableEntry;
+import static com.google.common.truth.Truth.THROW_ASSERTION_ERROR;
 
 /** Basic Truth {@link Subject} for {@link Multimap} instances. */
 public class MultimapSubject<K, V> extends Subject<MultimapSubject<K, V>, Multimap<K, V>> {

@@ -15,39 +15,38 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import static com.google.common.truth.Truth.assertThat;
-
-import com.enigmabridge.ebuilder.processor.util.feature.FunctionPackage;
-import com.enigmabridge.ebuilder.processor.util.feature.GuavaLibrary;
-import com.enigmabridge.ebuilder.processor.util.feature.SourceLevel;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-
-import com.enigmabridge.ebuilder.processor.util.ClassTypeImpl;
-import com.enigmabridge.ebuilder.processor.util.CompilationUnitBuilder;
-import com.enigmabridge.ebuilder.processor.util.QualifiedName;
-import com.enigmabridge.ebuilder.processor.util.SourceBuilder;
-import com.enigmabridge.ebuilder.processor.util.SourceStringBuilder;
+import com.enigmabridge.ebuilder.processor.GenericTypeElementImpl.GenericTypeMirrorImpl;
+import com.enigmabridge.ebuilder.processor.Metadata.Property;
+import com.enigmabridge.ebuilder.processor.util.*;
 import com.enigmabridge.ebuilder.processor.util.feature.Feature;
+import com.enigmabridge.ebuilder.processor.util.feature.GuavaLibrary;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import javax.lang.model.type.TypeMirror;
 
+import static com.google.common.truth.Truth.assertThat;
+import static com.enigmabridge.ebuilder.processor.GenericTypeElementImpl.newTopLevelGenericType;
+import static com.enigmabridge.ebuilder.processor.util.ClassTypeImpl.newTopLevelClass;
+import static com.enigmabridge.ebuilder.processor.util.feature.SourceLevel.JAVA_7;
+import static com.enigmabridge.ebuilder.processor.util.feature.SourceLevel.JAVA_8;
+
 @RunWith(JUnit4.class)
 public class SetSourceTest {
 
   @Test
   public void test_guava_j6() {
-    Metadata metadata = createMetadata();
+    Metadata metadata = createMetadata(true);
 
     assertThat(generateSource(metadata, GuavaLibrary.AVAILABLE)).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder {",
         "",
         "  /**",
@@ -267,15 +266,15 @@ public class SetSourceTest {
 
   @Test
   public void test_guava_j7() {
-    Metadata metadata = createMetadata();
+    Metadata metadata = createMetadata(true);
 
-    String source = generateSource(metadata, SourceLevel.JAVA_7, GuavaLibrary.AVAILABLE);
+    String source = generateSource(metadata, JAVA_7, GuavaLibrary.AVAILABLE);
     assertThat(source).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder {",
         "",
         "  /**",
@@ -489,19 +488,14 @@ public class SetSourceTest {
 
   @Test
   public void test_guava_j8() {
-    Metadata metadata = createMetadata();
+    Metadata metadata = createMetadata(true);
 
-    String source = generateSource(
-        metadata,
-        SourceLevel.JAVA_7,  // SourceLevel does not currently distinguish J7 and J8
-        FunctionPackage.AVAILABLE,
-        GuavaLibrary.AVAILABLE);
+    String source = generateSource(metadata, JAVA_8, GuavaLibrary.AVAILABLE);
     assertThat(source).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
         "abstract class Person_Builder {",
         "",
         "  /**",
@@ -732,14 +726,14 @@ public class SetSourceTest {
 
   @Test
   public void test_noGuava_j6() {
-    Metadata metadata = createMetadata();
+    Metadata metadata = createMetadata(true);
 
     assertThat(generateSource(metadata)).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder {",
         "",
         "  /**",
@@ -958,14 +952,14 @@ public class SetSourceTest {
 
   @Test
   public void test_noGuava_j7() {
-    Metadata metadata = createMetadata();
+    Metadata metadata = createMetadata(true);
 
-    assertThat(generateSource(metadata, SourceLevel.JAVA_7)).isEqualTo(Joiner.on('\n').join(
+    assertThat(generateSource(metadata, JAVA_7)).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder {",
         "",
         "  /**",
@@ -1170,30 +1164,258 @@ public class SetSourceTest {
         "}\n"));
   }
 
+  @Test
+  public void test_prefixless() {
+    Metadata metadata = createMetadata(false);
+
+    assertThat(generateSource(metadata, GuavaLibrary.AVAILABLE)).isEqualTo(Joiner.on('\n').join(
+        "/**",
+        " * Auto-generated superclass of {@link Person.Builder},",
+        " * derived from the API of {@link Person}.",
+        " */",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
+        "abstract class Person_Builder {",
+        "",
+        "  /**",
+        "   * Creates a new builder using {@code value} as a template.",
+        "   */",
+        "  public static Person.Builder from(Person value) {",
+        "    return new Person.Builder().mergeFrom(value);",
+        "  }",
+        "",
+        "  private Set<String> name = ImmutableSet.of();",
+        "",
+        "  /**",
+        "   * Adds {@code element} to the set to be returned from {@link Person#name()}.",
+        "   * If the set already contains {@code element}, then {@code addName}",
+        "   * has no effect (only the previously added element is retained).",
+        "   *",
+        "   * @return this {@code Builder} object",
+        "   * @throws NullPointerException if {@code element} is null",
+        "   */",
+        "  public Person.Builder addName(String element) {",
+        "    if (this.name instanceof ImmutableSet) {",
+        "      this.name = new LinkedHashSet<String>(this.name);",
+        "    }",
+        "    this.name.add(Preconditions.checkNotNull(element));",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Adds each element of {@code elements} to the set to be returned from",
+        "   * {@link Person#name()}, ignoring duplicate elements",
+        "   * (only the first duplicate element is added).",
+        "   *",
+        "   * @return this {@code Builder} object",
+        "   * @throws NullPointerException if {@code elements} is null or contains a",
+        "   *     null element",
+        "   */",
+        "  public Person.Builder addName(String... elements) {",
+        "    return addAllName(Arrays.asList(elements));",
+        "  }",
+        "",
+        "  /**",
+        "   * Adds each element of {@code elements} to the set to be returned from",
+        "   * {@link Person#name()}, ignoring duplicate elements",
+        "   * (only the first duplicate element is added).",
+        "   *",
+        "   * @return this {@code Builder} object",
+        "   * @throws NullPointerException if {@code elements} is null or contains a",
+        "   *     null element",
+        "   */",
+        "  public Person.Builder addAllName(Iterable<? extends String> elements) {",
+        "    for (String element : elements) {",
+        "      addName(element);",
+        "    }",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Removes {@code element} from the set to be returned from {@link Person#name()}.",
+        "   * Does nothing if {@code element} is not a member of the set.",
+        "   *",
+        "   * @return this {@code Builder} object",
+        "   * @throws NullPointerException if {@code element} is null",
+        "   */",
+        "  public Person.Builder removeName(String element) {",
+        "    if (this.name instanceof ImmutableSet) {",
+        "      this.name = new LinkedHashSet<String>(this.name);",
+        "    }",
+        "    this.name.remove(Preconditions.checkNotNull(element));",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Clears the set to be returned from {@link Person#name()}.",
+        "   *",
+        "   * @return this {@code Builder} object",
+        "   */",
+        "  public Person.Builder clearName() {",
+        "    if (name instanceof ImmutableSet) {",
+        "      name = ImmutableSet.of();",
+        "    } else {",
+        "      name.clear();",
+        "    }",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns an unmodifiable view of the set that will be returned by",
+        "   * {@link Person#name()}.",
+        "   * Changes to this builder will be reflected in the view.",
+        "   */",
+        "  public Set<String> name() {",
+        "    if (name instanceof ImmutableSet) {",
+        "      name = new LinkedHashSet<String>(name);",
+        "    }",
+        "    return Collections.unmodifiableSet(name);",
+        "  }",
+        "",
+        "  /**",
+        "   * Sets all property values using the given {@code Person} as a template.",
+        "   */",
+        "  public Person.Builder mergeFrom(Person value) {",
+        "    if (value instanceof Person_Builder.Value && name == ImmutableSet.<String>of()) {",
+        "      name = value.name();",
+        "    } else {",
+        "      addAllName(value.name());",
+        "    }",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Copies values from the given {@code Builder}.",
+        "   * Does not affect any properties not set on the input.",
+        "   */",
+        "  public Person.Builder mergeFrom(Person.Builder template) {",
+        "    addAllName(((Person_Builder) template).name);",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Resets the state of this builder.",
+        "   */",
+        "  public Person.Builder clear() {",
+        "    clearName();",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns a newly-created {@link Person} based on the contents of the {@code Builder}.",
+        "   */",
+        "  public Person build() {",
+        "    return new Person_Builder.Value(this);",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns a newly-created partial {@link Person}",
+        "   * based on the contents of the {@code Builder}.",
+        "   * State checking will not be performed.",
+        "   *",
+        "   * <p>Partials should only ever be used in tests.",
+        "   */",
+        "  @VisibleForTesting()",
+        "  public Person buildPartial() {",
+        "    return new Person_Builder.Partial(this);",
+        "  }",
+        "",
+        "  private static final class Value extends Person {",
+        "    private final Set<String> name;",
+        "",
+        "    private Value(Person_Builder builder) {",
+        "      this.name = ImmutableSet.copyOf(builder.name);",
+        "    }",
+        "",
+        "    @Override",
+        "    public Set<String> name() {",
+        "      return name;",
+        "    }",
+        "",
+        "    @Override",
+        "    public boolean equals(Object obj) {",
+        "      if (!(obj instanceof Person_Builder.Value)) {",
+        "        return false;",
+        "      }",
+        "      Person_Builder.Value other = (Person_Builder.Value) obj;",
+        "      if (!name.equals(other.name)) {",
+        "        return false;",
+        "      }",
+        "      return true;",
+        "    }",
+        "",
+        "    @Override",
+        "    public int hashCode() {",
+        "      return Arrays.hashCode(new Object[] {name});",
+        "    }",
+        "",
+        "    @Override",
+        "    public String toString() {",
+        "      return \"Person{name=\" + name + \"}\";",
+        "    }",
+        "  }",
+        "",
+        "  private static final class Partial extends Person {",
+        "    private final Set<String> name;",
+        "",
+        "    Partial(Person_Builder builder) {",
+        "      this.name = ImmutableSet.copyOf(builder.name);",
+        "    }",
+        "",
+        "    @Override",
+        "    public Set<String> name() {",
+        "      return name;",
+        "    }",
+        "",
+        "    @Override",
+        "    public boolean equals(Object obj) {",
+        "      if (!(obj instanceof Person_Builder.Partial)) {",
+        "        return false;",
+        "      }",
+        "      Person_Builder.Partial other = (Person_Builder.Partial) obj;",
+        "      if (!name.equals(other.name)) {",
+        "        return false;",
+        "      }",
+        "      return true;",
+        "    }",
+        "",
+        "    @Override",
+        "    public int hashCode() {",
+        "      return Arrays.hashCode(new Object[] {name});",
+        "    }",
+        "",
+        "    @Override",
+        "    public String toString() {",
+        "      return \"partial Person{name=\" + name + \"}\";",
+        "    }",
+        "  }",
+        "}\n"));
+  }
+
   private static String generateSource(Metadata metadata, Feature<?>... features) {
     SourceBuilder sourceBuilder = SourceStringBuilder.simple(features);
-    new CodeGenerator().writeABuilderSource(sourceBuilder, metadata);
+    new CodeGenerator().writeBuilderSource(sourceBuilder, metadata);
     return CompilationUnitBuilder.formatSource(sourceBuilder.toString());
   }
 
   /**
-   * Returns a {@link Metadata} instance for a EBuilder type with a single property, name, of
+   * Returns a {@link Metadata} instance for a FreeBuilder type with a single property, name, of
    * type {@code Set<String>}, with no override on the add method.
    */
-  private static Metadata createMetadata() {
-    GenericTypeElementImpl set = GenericTypeElementImpl.newTopLevelGenericType("java.util.Set");
-    ClassTypeImpl string = ClassTypeImpl.newTopLevelClass("java.lang.String");
-    GenericTypeElementImpl.GenericTypeMirrorImpl setString = set.newMirror(string);
+  private static Metadata createMetadata(boolean bean) {
+    GenericTypeElementImpl set = newTopLevelGenericType("java.util.Set");
+    ClassTypeImpl string = newTopLevelClass("java.lang.String");
+    GenericTypeMirrorImpl setString = set.newMirror(string);
     QualifiedName person = QualifiedName.of("com.example", "Person");
     QualifiedName generatedBuilder = QualifiedName.of("com.example", "Person_Builder");
-    Metadata.Property name = new Metadata.Property.Builder()
+    Property name = new Property.Builder()
         .setAllCapsName("NAME")
         .setBoxedType(setString)
         .setCapitalizedName("Name")
         .setFullyCheckedCast(true)
-        .setGetterName("getName")
+        .setGetterName(bean ? "getName" : "name")
         .setName("name")
         .setType(setString)
+        .setUsingBeanConvention(bean)
         .build();
     Metadata metadata = new Metadata.Builder()
         .setBuilder(person.nestedType("Builder").withParameters())

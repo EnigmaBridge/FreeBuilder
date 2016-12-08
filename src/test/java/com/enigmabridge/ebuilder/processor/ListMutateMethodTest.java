@@ -16,8 +16,7 @@
 package com.enigmabridge.ebuilder.processor;
 
 import com.google.common.base.Preconditions;
-
-import com.enigmabridge.ebuilder.EBuilder;
+import com.enigmabridge.ebuilder.FreeBuilder;
 import com.enigmabridge.ebuilder.processor.util.feature.FeatureSet;
 import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTester;
@@ -33,9 +32,8 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 
-import java.util.List;
-
 import javax.tools.JavaFileObject;
+import java.util.List;
 
 @RunWith(Parameterized.class)
 @UseParametersRunnerFactory(ParameterizedBehaviorTestFactory.class)
@@ -48,7 +46,7 @@ public class ListMutateMethodTest {
 
   private static final JavaFileObject UNCHECKED_LIST_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer> getProperties();", List.class)
       .addLine("")
@@ -58,7 +56,7 @@ public class ListMutateMethodTest {
 
   private static final JavaFileObject CHECKED_LIST_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer> getProperties();", List.class)
       .addLine("")
@@ -75,7 +73,7 @@ public class ListMutateMethodTest {
   /** Simple type that substitutes passed-in objects, in this case by interning strings. */
   private static final JavaFileObject INTERNED_STRINGS_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<String> getProperties();", List.class)
       .addLine("")
@@ -359,6 +357,56 @@ public class ListMutateMethodTest {
             .addLine("    .mutateProperties(map -> map.subList(1, 5).clear())")
             .addLine("    .build();")
             .addLine("assertThat(value.getProperties()).containsExactly(1, 6, 7).inOrder();")
+            .build())
+        .runTest();
+  }
+
+  @Test
+  public void mutateAndAddModifiesUnderlyingPropertyWhenUnchecked_prefixless() {
+    behaviorTester
+        .with(new Processor(features))
+        .with(new SourceBuilder()
+            .addLine("package com.example;")
+            .addLine("@%s", FreeBuilder.class)
+            .addLine("public interface DataType {")
+            .addLine("  %s<Integer> properties();", List.class)
+            .addLine("")
+            .addLine("  public static class Builder extends DataType_Builder {}")
+            .addLine("}")
+            .build())
+        .with(new TestBuilder()
+            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+            .addLine("    .mutateProperties(map -> map.add(11))")
+            .addLine("    .build();")
+            .addLine("assertThat(value.properties()).containsExactly(11);")
+            .build())
+        .runTest();
+  }
+
+  @Test
+  public void mutateAndAddModifiesUnderlyingPropertyWhenChecked_prefixless() {
+    behaviorTester
+        .with(new Processor(features))
+        .with(new SourceBuilder()
+            .addLine("package com.example;")
+            .addLine("@%s", FreeBuilder.class)
+            .addLine("public interface DataType {")
+            .addLine("  %s<Integer> properties();", List.class)
+            .addLine("")
+            .addLine("  public static class Builder extends DataType_Builder {")
+            .addLine("    @Override public Builder addProperties(int element) {")
+            .addLine("      %s.checkArgument(element >= 0, \"elements must be non-negative\");",
+                Preconditions.class)
+            .addLine("      return super.addProperties(element);")
+            .addLine("    }")
+            .addLine("  }")
+            .addLine("}")
+            .build())
+        .with(new TestBuilder()
+            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+            .addLine("    .mutateProperties(map -> map.add(11))")
+            .addLine("    .build();")
+            .addLine("assertThat(value.properties()).containsExactly(11);")
             .build())
         .runTest();
   }

@@ -15,25 +15,26 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import static com.google.common.collect.Iterables.getOnlyElement;
-import static com.google.common.truth.Truth.assertThat;
-
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.enigmabridge.ebuilder.processor.Analyser.CannotGenerateCodeException;
+import com.enigmabridge.ebuilder.processor.Metadata.Property;
 import com.enigmabridge.ebuilder.processor.util.Excerpt;
 import com.enigmabridge.ebuilder.processor.util.SourceStringBuilder;
 import com.enigmabridge.ebuilder.processor.util.testing.FakeMessager;
 import com.enigmabridge.ebuilder.processor.util.testing.ModelRule;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import javax.lang.model.element.TypeElement;
 import java.util.Map;
 
-import javax.lang.model.element.TypeElement;
+import static com.google.common.collect.Iterables.getOnlyElement;
+import static com.google.common.truth.Truth.assertThat;
 
 /** Unit tests for {@link Analyser}. */
 @RunWith(JUnit4.class)
@@ -54,7 +55,7 @@ public class JacksonSupportTest {
   }
 
   @Test
-  public void noAnnotationAddedIfJsonDeserializeMissing() throws Analyser.CannotGenerateCodeException {
+  public void noAnnotationAddedIfJsonDeserializeMissing() throws CannotGenerateCodeException {
     TypeElement dataType = model.newType(
         "package com.example;",
         "public interface DataType {",
@@ -64,12 +65,12 @@ public class JacksonSupportTest {
 
     Metadata metadata = analyser.analyse(dataType);
 
-    Metadata.Property property = getOnlyElement(metadata.getProperties());
+    Property property = getOnlyElement(metadata.getProperties());
     assertThat(property.getAccessorAnnotations()).named("property accessor annotations").isEmpty();
   }
 
   @Test
-  public void jacksonAnnotationAddedWithExplicitName() throws Analyser.CannotGenerateCodeException {
+  public void jacksonAnnotationAddedWithExplicitName() throws CannotGenerateCodeException {
     // See also https://github.com/google/FreeBuilder/issues/68
     TypeElement dataType = model.newType(
         "package com.example;",
@@ -82,12 +83,12 @@ public class JacksonSupportTest {
 
     Metadata metadata = analyser.analyse(dataType);
 
-    Metadata.Property property = getOnlyElement(metadata.getProperties());
+    Property property = getOnlyElement(metadata.getProperties());
     assertPropertyHasJsonPropertyAnnotation(property, "bob");
   }
 
   @Test
-  public void jacksonAnnotationAddedWithImplicitName() throws Analyser.CannotGenerateCodeException {
+  public void jacksonAnnotationAddedWithImplicitName() throws CannotGenerateCodeException {
     // See also https://github.com/google/FreeBuilder/issues/90
     TypeElement dataType = model.newType(
         "package com.example;",
@@ -99,12 +100,12 @@ public class JacksonSupportTest {
 
     Metadata metadata = analyser.analyse(dataType);
 
-    Metadata.Property property = getOnlyElement(metadata.getProperties());
+    Property property = getOnlyElement(metadata.getProperties());
     assertPropertyHasJsonPropertyAnnotation(property, "fooBar");
   }
 
   @Test
-  public void jsonAnyGetterAnnotationDisablesImplicitProperty() throws Analyser.CannotGenerateCodeException {
+  public void jsonAnyGetterAnnotationDisablesImplicitProperty() throws CannotGenerateCodeException {
     TypeElement dataType = model.newType(
         "package com.example;",
         "@" + JsonDeserialize.class.getName() + "(builder = DataType.Builder.class)",
@@ -116,12 +117,12 @@ public class JacksonSupportTest {
 
     Metadata metadata = analyser.analyse(dataType);
 
-    Metadata.Property property = getOnlyElement(metadata.getProperties());
+    Property property = getOnlyElement(metadata.getProperties());
     assertThat(property.getAccessorAnnotations()).named("property accessor annotations").isEmpty();
   }
 
   private static void assertPropertyHasJsonPropertyAnnotation(
-          Metadata.Property property, String propertyName) {
+      Property property, String propertyName) {
     assertThat(property.getAccessorAnnotations()).named("property accessor annotations").hasSize(1);
     Excerpt accessorAnnotation = getOnlyElement(property.getAccessorAnnotations());
     assertThat(asString(accessorAnnotation)).isEqualTo("@JsonProperty(\"" + propertyName + "\")\n");

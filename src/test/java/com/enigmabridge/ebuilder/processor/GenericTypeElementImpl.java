@@ -16,23 +16,9 @@
 package com.enigmabridge.ebuilder.processor;
 
 import com.google.common.collect.ImmutableList;
+import com.enigmabridge.ebuilder.processor.util.*;
 
-import com.enigmabridge.ebuilder.processor.util.NameImpl;
-import com.enigmabridge.ebuilder.processor.util.NoTypes;
-import com.enigmabridge.ebuilder.processor.util.PackageElementImpl;
-import com.enigmabridge.ebuilder.processor.util.Partial;
-import com.enigmabridge.ebuilder.processor.util.ValueType;
-
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ElementVisitor;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Name;
-import javax.lang.model.element.NestingKind;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -40,7 +26,7 @@ import javax.lang.model.type.TypeVisitor;
 import javax.lang.model.util.AbstractElementVisitor6;
 
 abstract class GenericTypeElementImpl extends ValueType
-    implements javax.lang.model.element.TypeElement {
+    implements TypeElement {
 
   public static GenericTypeElementImpl newTopLevelGenericType(String qualifiedName) {
     String pkg = qualifiedName.substring(0, qualifiedName.lastIndexOf('.'));

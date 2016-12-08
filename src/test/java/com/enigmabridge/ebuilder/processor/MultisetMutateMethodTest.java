@@ -15,18 +15,17 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import com.enigmabridge.ebuilder.EBuilder;
-import com.enigmabridge.ebuilder.processor.util.feature.FeatureSet;
-import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTester;
-import com.enigmabridge.ebuilder.processor.util.testing.ParameterizedBehaviorTestFactory;
-import com.enigmabridge.ebuilder.processor.util.testing.SourceBuilder;
-import com.enigmabridge.ebuilder.processor.util.testing.TestBuilder;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
-
+import com.enigmabridge.ebuilder.FreeBuilder;
+import com.enigmabridge.ebuilder.processor.util.feature.FeatureSet;
 import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTestRunner.Shared;
+import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTester;
+import com.enigmabridge.ebuilder.processor.util.testing.ParameterizedBehaviorTestFactory;
+import com.enigmabridge.ebuilder.processor.util.testing.SourceBuilder;
+import com.enigmabridge.ebuilder.processor.util.testing.TestBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -36,9 +35,8 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 
-import java.util.List;
-
 import javax.tools.JavaFileObject;
+import java.util.List;
 
 @RunWith(Parameterized.class)
 @UseParametersRunnerFactory(ParameterizedBehaviorTestFactory.class)
@@ -51,7 +49,7 @@ public class MultisetMutateMethodTest {
 
   private static final JavaFileObject UNCHECKED_PROPERTY = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer> getProperties();", Multiset.class)
       .addLine("")
@@ -61,7 +59,7 @@ public class MultisetMutateMethodTest {
 
   private static final JavaFileObject CHECKED_PROPERTY = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer> getProperties();", Multiset.class)
       .addLine("")
@@ -77,7 +75,7 @@ public class MultisetMutateMethodTest {
 
   private static final JavaFileObject INTERNED_PROPERTY = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<String> getProperties();", Multiset.class)
       .addLine("")
@@ -636,6 +634,58 @@ public class MultisetMutateMethodTest {
             .addLine("    .mutateProperties(set -> set.clear())")
             .addLine("    .build();")
             .addLine("assertThat(value.getProperties()).isEmpty();")
+            .build())
+        .runTest();
+  }
+
+  @Test
+  public void mutateAndAddModifiesUnderlyingProperty_whenUnchecked_prefixless() {
+    behaviorTester
+        .with(new Processor(features))
+        .with(new SourceBuilder()
+            .addLine("package com.example;")
+            .addLine("@%s", FreeBuilder.class)
+            .addLine("public interface DataType {")
+            .addLine("  %s<Integer> properties();", Multiset.class)
+            .addLine("")
+            .addLine("  public static class Builder extends DataType_Builder {}")
+            .addLine("}")
+            .build())
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
+            .addLine("    .addProperties(5)")
+            .addLine("    .mutateProperties(set -> set.add(11))")
+            .addLine("    .build();")
+            .addLine("assertThat(value.properties()).containsExactly(5, 11);")
+            .build())
+        .runTest();
+  }
+
+  @Test
+  public void mutateAndAddModifiesUnderlyingProperty_whenChecked_prefixless() {
+    behaviorTester
+        .with(new Processor(features))
+        .with(new SourceBuilder()
+            .addLine("package com.example;")
+            .addLine("@%s", FreeBuilder.class)
+            .addLine("public interface DataType {")
+            .addLine("  %s<Integer> properties();", Multiset.class)
+            .addLine("")
+            .addLine("  public static class Builder extends DataType_Builder {")
+            .addLine("    @Override public Builder setCountOfProperties(int element, int count) {")
+            .addLine("      %s.checkArgument(element >= 0, \"elements must be non-negative\");",
+                Preconditions.class)
+            .addLine("      return super.setCountOfProperties(element, count);")
+            .addLine("    }")
+            .addLine("  }")
+            .addLine("}")
+            .build())
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
+            .addLine("    .addProperties(5)")
+            .addLine("    .mutateProperties(set -> set.add(11))")
+            .addLine("    .build();")
+            .addLine("assertThat(value.properties()).containsExactly(5, 11);")
             .build())
         .runTest();
   }

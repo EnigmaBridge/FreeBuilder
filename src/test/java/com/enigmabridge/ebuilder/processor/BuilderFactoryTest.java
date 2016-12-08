@@ -15,28 +15,25 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import static com.google.common.truth.Truth.assertThat;
-import static com.enigmabridge.ebuilder.processor.BuilderFactory.BUILDER_METHOD;
-import static com.enigmabridge.ebuilder.processor.BuilderFactory.NEW_BUILDER_METHOD;
-import static com.enigmabridge.ebuilder.processor.BuilderFactory.NO_ARGS_CONSTRUCTOR;
-import static com.enigmabridge.ebuilder.processor.BuilderFactory.TypeInference.EXPLICIT_TYPES;
-import static com.enigmabridge.ebuilder.processor.BuilderFactory.TypeInference.INFERRED_TYPES;
-
-import com.enigmabridge.ebuilder.processor.util.Excerpt;
-import com.enigmabridge.ebuilder.processor.util.SourceStringBuilder;
-import com.enigmabridge.ebuilder.processor.util.feature.SourceLevel;
-import com.enigmabridge.ebuilder.processor.util.testing.ModelRule;
 import com.google.common.base.Optional;
-
-import com.google.common.truth.Truth;
+import com.enigmabridge.ebuilder.processor.util.Excerpt;
 import com.enigmabridge.ebuilder.processor.util.ParameterizedType;
 import com.enigmabridge.ebuilder.processor.util.QualifiedName;
+import com.enigmabridge.ebuilder.processor.util.SourceStringBuilder;
+import com.enigmabridge.ebuilder.processor.util.testing.ModelRule;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import javax.lang.model.element.TypeElement;
+
+import static com.google.common.truth.Truth.assertThat;
+import static com.enigmabridge.ebuilder.processor.BuilderFactory.*;
+import static com.enigmabridge.ebuilder.processor.BuilderFactory.TypeInference.EXPLICIT_TYPES;
+import static com.enigmabridge.ebuilder.processor.BuilderFactory.TypeInference.INFERRED_TYPES;
+import static com.enigmabridge.ebuilder.processor.util.feature.SourceLevel.JAVA_6;
+import static com.enigmabridge.ebuilder.processor.util.feature.SourceLevel.JAVA_7;
 
 @RunWith(JUnit4.class)
 public class BuilderFactoryTest {
@@ -51,7 +48,7 @@ public class BuilderFactoryTest {
         "  ---> class Builder {}",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).hasValue(NO_ARGS_CONSTRUCTOR);
+    assertThat(factory).hasValue(NO_ARGS_CONSTRUCTOR);
   }
 
   @Test
@@ -63,7 +60,7 @@ public class BuilderFactoryTest {
         "}");
 
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).isAbsent();
+    assertThat(factory).isAbsent();
   }
 
   @Test
@@ -76,7 +73,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).hasValue(NO_ARGS_CONSTRUCTOR);
+    assertThat(factory).hasValue(NO_ARGS_CONSTRUCTOR);
   }
 
   @Test
@@ -89,7 +86,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).isAbsent();
+    assertThat(factory).isAbsent();
   }
 
   @Test
@@ -102,7 +99,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).isAbsent();
+    assertThat(factory).isAbsent();
   }
 
   @Test
@@ -117,7 +114,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).hasValue(BUILDER_METHOD);
+    assertThat(factory).hasValue(BUILDER_METHOD);
   }
 
   @Test
@@ -134,7 +131,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).hasValue(BUILDER_METHOD);
+    assertThat(factory).hasValue(BUILDER_METHOD);
   }
 
   @Test
@@ -151,7 +148,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).hasValue(BUILDER_METHOD);
+    assertThat(factory).hasValue(BUILDER_METHOD);
   }
 
   @Test
@@ -168,7 +165,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).hasValue(NO_ARGS_CONSTRUCTOR);
+    assertThat(factory).hasValue(NO_ARGS_CONSTRUCTOR);
   }
 
   @Test
@@ -185,7 +182,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).isAbsent();
+    assertThat(factory).isAbsent();
   }
 
   @Test
@@ -202,7 +199,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).isAbsent();
+    assertThat(factory).isAbsent();
   }
 
   @Test
@@ -219,7 +216,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).isAbsent();
+    assertThat(factory).isAbsent();
   }
 
   @Test
@@ -234,7 +231,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).hasValue(NEW_BUILDER_METHOD);
+    assertThat(factory).hasValue(NEW_BUILDER_METHOD);
   }
 
   @Test
@@ -251,7 +248,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).hasValue(NEW_BUILDER_METHOD);
+    assertThat(factory).hasValue(NEW_BUILDER_METHOD);
   }
 
   @Test
@@ -268,7 +265,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).hasValue(NEW_BUILDER_METHOD);
+    assertThat(factory).hasValue(NEW_BUILDER_METHOD);
   }
 
   @Test
@@ -285,7 +282,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).hasValue(NO_ARGS_CONSTRUCTOR);
+    assertThat(factory).hasValue(NO_ARGS_CONSTRUCTOR);
   }
 
   @Test
@@ -302,7 +299,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).isAbsent();
+    assertThat(factory).isAbsent();
   }
 
   @Test
@@ -319,7 +316,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).isAbsent();
+    assertThat(factory).isAbsent();
   }
 
   @Test
@@ -336,7 +333,7 @@ public class BuilderFactoryTest {
         "  }",
         "}");
     Optional<BuilderFactory> factory = BuilderFactory.from(builderType);
-    Truth.assertThat(factory).isAbsent();
+    assertThat(factory).isAbsent();
   }
 
   @Test
@@ -344,7 +341,7 @@ public class BuilderFactoryTest {
     ParameterizedType fooBuilder =
         QualifiedName.of("com.example", "Foo", "Builder").withParameters("E");
     Excerpt newFooBuilder = NO_ARGS_CONSTRUCTOR.newBuilder(fooBuilder, INFERRED_TYPES);
-    String code = SourceStringBuilder.simple(SourceLevel.JAVA_6).add(newFooBuilder).toString();
+    String code = SourceStringBuilder.simple(JAVA_6).add(newFooBuilder).toString();
     assertThat(code).isEqualTo("new Foo.Builder<E>()");
   }
 
@@ -353,7 +350,7 @@ public class BuilderFactoryTest {
     ParameterizedType fooBuilder =
         QualifiedName.of("com.example", "Foo", "Builder").withParameters("E");
     Excerpt newFooBuilder = NO_ARGS_CONSTRUCTOR.newBuilder(fooBuilder, EXPLICIT_TYPES);
-    String code = SourceStringBuilder.simple(SourceLevel.JAVA_6).add(newFooBuilder).toString();
+    String code = SourceStringBuilder.simple(JAVA_6).add(newFooBuilder).toString();
     assertThat(code).isEqualTo("new Foo.Builder<E>()");
   }
 
@@ -362,7 +359,7 @@ public class BuilderFactoryTest {
     ParameterizedType fooBuilder =
         QualifiedName.of("com.example", "Foo", "Builder").withParameters("E");
     Excerpt newFooBuilder = NO_ARGS_CONSTRUCTOR.newBuilder(fooBuilder, INFERRED_TYPES);
-    String code = SourceStringBuilder.simple(SourceLevel.JAVA_7).add(newFooBuilder).toString();
+    String code = SourceStringBuilder.simple(JAVA_7).add(newFooBuilder).toString();
     assertThat(code).isEqualTo("new Foo.Builder<>()");
   }
 
@@ -371,7 +368,7 @@ public class BuilderFactoryTest {
     ParameterizedType fooBuilder =
         QualifiedName.of("com.example", "Foo", "Builder").withParameters("E");
     Excerpt newFooBuilder = NO_ARGS_CONSTRUCTOR.newBuilder(fooBuilder, EXPLICIT_TYPES);
-    String code = SourceStringBuilder.simple(SourceLevel.JAVA_7).add(newFooBuilder).toString();
+    String code = SourceStringBuilder.simple(JAVA_7).add(newFooBuilder).toString();
     assertThat(code).isEqualTo("new Foo.Builder<E>()");
   }
 
@@ -380,7 +377,7 @@ public class BuilderFactoryTest {
     ParameterizedType fooBuilder =
         QualifiedName.of("com.example", "Foo", "Builder").withParameters("E");
     Excerpt newFooBuilder = BUILDER_METHOD.newBuilder(fooBuilder, INFERRED_TYPES);
-    String code = SourceStringBuilder.simple(SourceLevel.JAVA_6).add(newFooBuilder).toString();
+    String code = SourceStringBuilder.simple(JAVA_6).add(newFooBuilder).toString();
     assertThat(code).isEqualTo("Foo.builder()");
   }
 
@@ -389,7 +386,7 @@ public class BuilderFactoryTest {
     ParameterizedType fooBuilder =
         QualifiedName.of("com.example", "Foo", "Builder").withParameters("E");
     Excerpt newFooBuilder = BUILDER_METHOD.newBuilder(fooBuilder, EXPLICIT_TYPES);
-    String code = SourceStringBuilder.simple(SourceLevel.JAVA_6).add(newFooBuilder).toString();
+    String code = SourceStringBuilder.simple(JAVA_6).add(newFooBuilder).toString();
     assertThat(code).isEqualTo("Foo.<E>builder()");
   }
 
@@ -398,7 +395,7 @@ public class BuilderFactoryTest {
     ParameterizedType fooBuilder =
         QualifiedName.of("com.example", "Foo", "Builder").withParameters("E");
     Excerpt newFooBuilder = BUILDER_METHOD.newBuilder(fooBuilder, INFERRED_TYPES);
-    String code = SourceStringBuilder.simple(SourceLevel.JAVA_7).add(newFooBuilder).toString();
+    String code = SourceStringBuilder.simple(JAVA_7).add(newFooBuilder).toString();
     assertThat(code).isEqualTo("Foo.builder()");
   }
 
@@ -407,7 +404,7 @@ public class BuilderFactoryTest {
     ParameterizedType fooBuilder =
         QualifiedName.of("com.example", "Foo", "Builder").withParameters("E");
     Excerpt newFooBuilder = BUILDER_METHOD.newBuilder(fooBuilder, EXPLICIT_TYPES);
-    String code = SourceStringBuilder.simple(SourceLevel.JAVA_7).add(newFooBuilder).toString();
+    String code = SourceStringBuilder.simple(JAVA_7).add(newFooBuilder).toString();
     assertThat(code).isEqualTo("Foo.<E>builder()");
   }
 
@@ -416,7 +413,7 @@ public class BuilderFactoryTest {
     ParameterizedType fooBuilder =
         QualifiedName.of("com.example", "Foo", "Builder").withParameters("E");
     Excerpt newFooBuilder = NEW_BUILDER_METHOD.newBuilder(fooBuilder, INFERRED_TYPES);
-    String code = SourceStringBuilder.simple(SourceLevel.JAVA_6).add(newFooBuilder).toString();
+    String code = SourceStringBuilder.simple(JAVA_6).add(newFooBuilder).toString();
     assertThat(code).isEqualTo("Foo.newBuilder()");
   }
 
@@ -425,7 +422,7 @@ public class BuilderFactoryTest {
     ParameterizedType fooBuilder =
         QualifiedName.of("com.example", "Foo", "Builder").withParameters("E");
     Excerpt newFooBuilder = NEW_BUILDER_METHOD.newBuilder(fooBuilder, EXPLICIT_TYPES);
-    String code = SourceStringBuilder.simple(SourceLevel.JAVA_6).add(newFooBuilder).toString();
+    String code = SourceStringBuilder.simple(JAVA_6).add(newFooBuilder).toString();
     assertThat(code).isEqualTo("Foo.<E>newBuilder()");
   }
 
@@ -434,7 +431,7 @@ public class BuilderFactoryTest {
     ParameterizedType fooBuilder =
         QualifiedName.of("com.example", "Foo", "Builder").withParameters("E");
     Excerpt newFooBuilder = NEW_BUILDER_METHOD.newBuilder(fooBuilder, INFERRED_TYPES);
-    String code = SourceStringBuilder.simple(SourceLevel.JAVA_7).add(newFooBuilder).toString();
+    String code = SourceStringBuilder.simple(JAVA_7).add(newFooBuilder).toString();
     assertThat(code).isEqualTo("Foo.newBuilder()");
   }
 
@@ -443,7 +440,7 @@ public class BuilderFactoryTest {
     ParameterizedType fooBuilder =
         QualifiedName.of("com.example", "Foo", "Builder").withParameters("E");
     Excerpt newFooBuilder = NEW_BUILDER_METHOD.newBuilder(fooBuilder, EXPLICIT_TYPES);
-    String code = SourceStringBuilder.simple(SourceLevel.JAVA_7).add(newFooBuilder).toString();
+    String code = SourceStringBuilder.simple(JAVA_7).add(newFooBuilder).toString();
     assertThat(code).isEqualTo("Foo.<E>newBuilder()");
   }
 }

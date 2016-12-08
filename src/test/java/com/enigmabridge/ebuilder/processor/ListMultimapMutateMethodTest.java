@@ -15,19 +15,18 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import com.enigmabridge.ebuilder.EBuilder;
-import com.enigmabridge.ebuilder.processor.util.feature.FeatureSet;
-import com.enigmabridge.ebuilder.processor.util.testing.SourceBuilder;
-import com.enigmabridge.ebuilder.processor.util.testing.TestBuilder;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
-
+import com.enigmabridge.ebuilder.FreeBuilder;
+import com.enigmabridge.ebuilder.processor.util.feature.FeatureSet;
 import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTester;
 import com.enigmabridge.ebuilder.processor.util.testing.ParameterizedBehaviorTestFactory;
+import com.enigmabridge.ebuilder.processor.util.testing.SourceBuilder;
+import com.enigmabridge.ebuilder.processor.util.testing.TestBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -37,10 +36,9 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 
+import javax.tools.JavaFileObject;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.tools.JavaFileObject;
 
 @RunWith(Parameterized.class)
 @UseParametersRunnerFactory(ParameterizedBehaviorTestFactory.class)
@@ -53,7 +51,7 @@ public class ListMultimapMutateMethodTest {
 
   private static final JavaFileObject UNCHECKED_PROPERTY = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<String, String> getItems();", ListMultimap.class)
       .addLine("")
@@ -63,7 +61,7 @@ public class ListMultimapMutateMethodTest {
 
   private static final JavaFileObject CHECKED_PROPERTY = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<String, String> getItems();", ListMultimap.class)
       .addLine("")
@@ -81,7 +79,7 @@ public class ListMultimapMutateMethodTest {
 
   private static final JavaFileObject INTERNED_PROPERTY = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<String, String> getItems();", ListMultimap.class)
       .addLine("")
@@ -482,6 +480,72 @@ public class ListMultimapMutateMethodTest {
                 Multimaps.class)
             .addLine("    .build();")
             .addLine("assertThat(value.getItems().get(\"one\").get(2)).isSameAs(i);")
+            .build())
+        .runTest();
+  }
+
+  @Test
+  public void mutateAndPutModifiesUnderlyingProperty_whenUnchecked_prefixless() {
+    behaviorTester
+        .with(new Processor(features))
+        .with(new SourceBuilder()
+            .addLine("package com.example;")
+            .addLine("@%s", FreeBuilder.class)
+            .addLine("public abstract class DataType {")
+            .addLine("  public abstract %s<String, String> items();", ListMultimap.class)
+            .addLine("")
+            .addLine("  public static class Builder extends DataType_Builder {}")
+            .addLine("}")
+            .build())
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
+            .addLine("    .mutateItems(items -> {")
+            .addLine("      items.put(\"one\", \"A\");")
+            .addLine("      items.put(\"two\", \"B\");")
+            .addLine("    })")
+            .addLine("    .build();")
+            .addLine("assertThat(value.items())")
+            .addLine("    .contains(\"one\", \"A\")")
+            .addLine("    .and(\"two\", \"B\")")
+            .addLine("    .andNothingElse()")
+            .addLine("    .inOrder();")
+            .build())
+        .runTest();
+  }
+
+  @Test
+  public void mutateAndPutModifiesUnderlyingProperty_whenChecked_prefixless() {
+    behaviorTester
+        .with(new Processor(features))
+        .with(new SourceBuilder()
+            .addLine("package com.example;")
+            .addLine("@%s", FreeBuilder.class)
+            .addLine("public abstract class DataType {")
+            .addLine("  public abstract %s<String, String> items();", ListMultimap.class)
+            .addLine("")
+            .addLine("  public static class Builder extends DataType_Builder {")
+            .addLine("    @Override public Builder putItems(String key, String value) {")
+            .addLine("      %s.checkArgument(!key.isEmpty(), \"key may not be empty\");",
+                Preconditions.class)
+            .addLine("      %s.checkArgument(!value.isEmpty(), \"value may not be empty\");",
+                Preconditions.class)
+            .addLine("      return super.putItems(key, value);")
+            .addLine("    }")
+            .addLine("  }")
+            .addLine("}")
+            .build())
+        .with(testBuilder()
+            .addLine("DataType value = new DataType.Builder()")
+            .addLine("    .mutateItems(items -> {")
+            .addLine("      items.put(\"one\", \"A\");")
+            .addLine("      items.put(\"two\", \"B\");")
+            .addLine("    })")
+            .addLine("    .build();")
+            .addLine("assertThat(value.items())")
+            .addLine("    .contains(\"one\", \"A\")")
+            .addLine("    .and(\"two\", \"B\")")
+            .addLine("    .andNothingElse()")
+            .addLine("    .inOrder();")
             .build())
         .runTest();
   }

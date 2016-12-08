@@ -15,16 +15,15 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import com.enigmabridge.ebuilder.EBuilder;
-import com.enigmabridge.ebuilder.processor.util.feature.FeatureSet;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.testing.EqualsTester;
 import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.server.rpc.RPC;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.enigmabridge.ebuilder.FreeBuilder;
+import com.enigmabridge.ebuilder.processor.util.feature.FeatureSet;
 import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTester;
 import com.enigmabridge.ebuilder.processor.util.testing.ParameterizedBehaviorTestFactory;
@@ -39,17 +38,10 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
-import java.io.Serializable;
+import javax.tools.JavaFileObject;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.util.List;
-
-import javax.tools.JavaFileObject;
 
 @RunWith(Parameterized.class)
 @UseParametersRunnerFactory(ParameterizedBehaviorTestFactory.class)
@@ -62,7 +54,7 @@ public class ProcessorTest {
 
   private static final JavaFileObject NO_BUILDER_CLASS = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract int getPropertyA();")
       .addLine("  public abstract boolean isPropertyB();")
@@ -72,7 +64,7 @@ public class ProcessorTest {
   private static final String PROPERTY_B_DESCRIPTION = "whether the object is property B.";
   private static final JavaFileObject TWO_PROPERTY_FREE_BUILDER_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  /** Returns %s */", PROPERTY_A_DESCRIPTION)
       .addLine("  public abstract int getPropertyA();")
@@ -88,7 +80,7 @@ public class ProcessorTest {
 
   private static final JavaFileObject TWO_PROPERTY_FREE_BUILDER_INTERFACE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  int getPropertyA();")
       .addLine("  boolean isPropertyB();")
@@ -99,7 +91,7 @@ public class ProcessorTest {
 
   private static final JavaFileObject STRING_PROPERTY_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract String getName();")
       .addLine("")
@@ -148,6 +140,31 @@ public class ProcessorTest {
   }
 
   @Test
+  public void testPrefixlessInterface() {
+    behaviorTester
+        .with(new Processor(features))
+        .with(new SourceBuilder()
+            .addLine("package com.example;")
+            .addLine("@%s", FreeBuilder.class)
+            .addLine("public interface DataType {")
+            .addLine("  int propertyA();")
+            .addLine("  boolean propertyB();")
+            .addLine("")
+            .addLine("  public static class Builder extends DataType_Builder {}")
+            .addLine("}")
+            .build())
+        .with(new TestBuilder()
+            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+            .addLine("    .propertyA(11)")
+            .addLine("    .propertyB(true)")
+            .addLine("    .build();")
+            .addLine("assertEquals(11, value.propertyA());")
+            .addLine("assertTrue(value.propertyB());")
+            .build())
+        .runTest();
+  }
+
+  @Test
   public void test_nullPointerException() {
     behaviorTester
         .with(new Processor(features))
@@ -179,7 +196,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract int getPropertyA();")
             .addLine("  public abstract boolean isPropertyB();")
@@ -227,7 +244,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  /** Returns %s */", PROPERTY_A_DESCRIPTION)
             .addLine("  public abstract int getPropertyA();")
@@ -255,7 +272,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  /** Returns %s */", PROPERTY_A_DESCRIPTION)
             .addLine("  public abstract int getPropertyA();")
@@ -285,7 +302,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  /** Returns %s */", PROPERTY_A_DESCRIPTION)
             .addLine("  public abstract int getPropertyA();")
@@ -318,7 +335,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  /** Returns %s */", PROPERTY_A_DESCRIPTION)
             .addLine("  public abstract int getPropertyA();")
@@ -349,7 +366,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract int getPropertyA();")
             .addLine("  public abstract boolean isPropertyB();")
@@ -378,7 +395,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract String getTemplate();")
             .addLine("")
@@ -471,7 +488,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract double getValue();")
             .addLine("")
@@ -524,7 +541,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public static class Builder extends DataType_Builder {}")
             .addLine("  public static Builder builder() {")
@@ -574,7 +591,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("@%s(serializable = true)", GwtCompatible.class)
             .addLine("public interface DataType {")
             .addLine("  String getPropertyA();")
@@ -600,7 +617,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("@%s(serializable = true)", GwtCompatible.class)
             .addLine("public interface DataType {")
             .addLine("  int getPropertyA();")
@@ -626,7 +643,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("@%s(serializable = true)", GwtCompatible.class)
             .addLine("public interface DataType {")
             .addLine("  %s<%s> getNames();", List.class, String.class)
@@ -690,7 +707,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class Person {")
             .addLine("  public abstract String getName();")
             .addLine("  public abstract int getAge();")
@@ -746,7 +763,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class Person {")
             .addLine("  public abstract String getName();")
             .addLine("  public abstract int getAge();")
@@ -779,7 +796,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class Person {")
             .addLine("  public abstract String getName();")
             .addLine("  public abstract int getAge();")
@@ -807,7 +824,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class Person {")
             .addLine("  public abstract String getName();")
             .addLine("  public abstract int getAge();")
@@ -845,7 +862,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class Person {")
             .addLine("  public abstract String getName();")
             .addLine("  public abstract int getAge();")
@@ -884,7 +901,7 @@ public class ProcessorTest {
             .build())
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public interface DataType {")
             .addLine("  java.lang.String getProperty();")
             .addLine("")
@@ -906,12 +923,12 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("/** Clashes with the inner type generated by EBuilder. */")
+            .addLine("/** Clashes with the inner type generated by FreeBuilder. */")
             .addLine("public class Value {}")
             .build())
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public interface DataType {")
             .addLine("  Value getProperty();")
             .addLine("")
@@ -948,7 +965,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract int getPropertyA();")
             .addLine("  public abstract boolean isPropertyB();")
@@ -975,7 +992,7 @@ public class ProcessorTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("@%s(builder = DataType.Builder.class)", JsonDeserialize.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract int getPropertyA();", JsonProperty.class)

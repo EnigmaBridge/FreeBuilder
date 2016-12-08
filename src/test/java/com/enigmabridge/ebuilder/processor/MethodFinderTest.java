@@ -15,16 +15,12 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import static com.google.common.truth.Truth.assertThat;
-
-import com.enigmabridge.ebuilder.processor.util.testing.ModelRule;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-
+import com.enigmabridge.ebuilder.processor.Analyser.CannotGenerateCodeException;
+import com.enigmabridge.ebuilder.processor.util.testing.ModelRule;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import java.io.IOException;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Name;
@@ -32,6 +28,9 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.SimpleTypeVisitor6;
+import java.io.IOException;
+
+import static com.google.common.truth.Truth.assertThat;
 
 public class MethodFinderTest {
 
@@ -171,7 +170,7 @@ public class MethodFinderTest {
   private static ImmutableList<String> methodsOn(Class<?> cls) {
     try {
       return toStrings(MethodFinder.methodsOn(model.typeElement(cls), model.elementUtils()));
-    } catch (Analyser.CannotGenerateCodeException e) {
+    } catch (CannotGenerateCodeException e) {
       throw new AssertionError(e);
     }
   }

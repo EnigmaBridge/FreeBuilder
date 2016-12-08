@@ -504,6 +504,7 @@ public class CodeGenerator {
     for (Metadata.Property property : metadata.getProperties()) {
       code.addLine("")
           .addLine("  @%s", Override.class);
+      property.getCodeGenerator().addAccessorAnnotations(code);
       property.getCodeGenerator().addGetterAnnotations(code);
       code.addLine("  public %s %s() {", property.getType(), property.getGetterName());
       code.add("    return ");
@@ -698,6 +699,7 @@ public class CodeGenerator {
     for (Metadata.Property property : metadata.getProperties()) {
       code.addLine("")
           .addLine("  @%s", Override.class);
+      property.getCodeGenerator().addAccessorAnnotations(code);
       property.getCodeGenerator().addGetterAnnotations(code);
       code.addLine("  public %s %s() {", property.getType(), property.getGetterName());
       if (property.getCodeGenerator().getType() == Type.REQUIRED) {

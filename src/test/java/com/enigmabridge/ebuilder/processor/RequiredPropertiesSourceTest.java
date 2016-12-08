@@ -15,19 +15,13 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import static com.google.common.truth.Truth.assertThat;
-import static com.enigmabridge.ebuilder.processor.util.PrimitiveTypeImpl.INT;
-
-import com.enigmabridge.ebuilder.processor.util.ClassTypeImpl;
-import com.enigmabridge.ebuilder.processor.util.SourceBuilder;
-import com.enigmabridge.ebuilder.processor.util.SourceStringBuilder;
-import com.enigmabridge.ebuilder.processor.util.feature.FunctionPackage;
-import com.enigmabridge.ebuilder.processor.util.feature.SourceLevel;
 import com.google.common.base.Joiner;
 import com.google.googlejavaformat.java.Formatter;
 import com.google.googlejavaformat.java.FormatterException;
-
+import com.enigmabridge.ebuilder.processor.Metadata.Property;
 import com.enigmabridge.ebuilder.processor.util.QualifiedName;
+import com.enigmabridge.ebuilder.processor.util.SourceBuilder;
+import com.enigmabridge.ebuilder.processor.util.SourceStringBuilder;
 import com.enigmabridge.ebuilder.processor.util.feature.Feature;
 import com.enigmabridge.ebuilder.processor.util.feature.GuavaLibrary;
 import org.junit.Test;
@@ -36,19 +30,25 @@ import org.junit.runners.JUnit4;
 
 import javax.lang.model.type.TypeMirror;
 
+import static com.google.common.truth.Truth.assertThat;
+import static com.enigmabridge.ebuilder.processor.util.ClassTypeImpl.newTopLevelClass;
+import static com.enigmabridge.ebuilder.processor.util.PrimitiveTypeImpl.INT;
+import static com.enigmabridge.ebuilder.processor.util.feature.SourceLevel.JAVA_7;
+import static com.enigmabridge.ebuilder.processor.util.feature.SourceLevel.JAVA_8;
+
 @RunWith(JUnit4.class)
 public class RequiredPropertiesSourceTest {
 
   @Test
   public void testJ6() {
-    Metadata metadata = createMetadata();
+    Metadata metadata = createMetadata(true);
 
     assertThat(generateSource(metadata, GuavaLibrary.AVAILABLE)).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder {",
         "",
         "  /**",
@@ -174,6 +174,22 @@ public class RequiredPropertiesSourceTest {
         "    _unsetProperties.clear();",
         "    _unsetProperties.addAll(_defaults._unsetProperties);",
         "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getName()} is set.",
+        "   */",
+        "  public boolean isPropertyNameSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.NAME);",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getAge()} is set.",
+        "   */",
+        "  public boolean isPropertyAgeSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.AGE);",
         "  }",
         "",
         "  /**",
@@ -309,15 +325,15 @@ public class RequiredPropertiesSourceTest {
 
   @Test
   public void testJ7() {
-    Metadata metadata = createMetadata();
+    Metadata metadata = createMetadata(true);
 
-    String source = generateSource(metadata, SourceLevel.JAVA_7, GuavaLibrary.AVAILABLE);
+    String source = generateSource(metadata, JAVA_7, GuavaLibrary.AVAILABLE);
     assertThat(source).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder {",
         "",
         "  /**",
@@ -446,6 +462,22 @@ public class RequiredPropertiesSourceTest {
         "  }",
         "",
         "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getName()} is set.",
+        "   */",
+        "  public boolean isPropertyNameSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.NAME);",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getAge()} is set.",
+        "   */",
+        "  public boolean isPropertyAgeSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.AGE);",
+        "  }",
+        "",
+        "  /**",
         "   * Returns a newly-created {@link Person} based on the contents of the {@code Builder}.",
         "   *",
         "   * @throws IllegalStateException if any field has not been set",
@@ -568,14 +600,14 @@ public class RequiredPropertiesSourceTest {
 
   @Test
   public void testJ6_noGuava() {
-    Metadata metadata = createMetadata();
+    Metadata metadata = createMetadata(true);
 
     assertThat(generateSource(metadata)).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder {",
         "",
         "  /**",
@@ -704,6 +736,22 @@ public class RequiredPropertiesSourceTest {
         "    _unsetProperties.clear();",
         "    _unsetProperties.addAll(_defaults._unsetProperties);",
         "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getName()} is set.",
+        "   */",
+        "  public boolean isPropertyNameSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.NAME);",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getAge()} is set.",
+        "   */",
+        "  public boolean isPropertyAgeSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.AGE);",
         "  }",
         "",
         "  /**",
@@ -844,14 +892,14 @@ public class RequiredPropertiesSourceTest {
 
   @Test
   public void testJ7_noGuava() {
-    Metadata metadata = createMetadata();
+    Metadata metadata = createMetadata(true);
 
-    assertThat(generateSource(metadata, SourceLevel.JAVA_7)).isEqualTo(Joiner.on('\n').join(
+    assertThat(generateSource(metadata, JAVA_7)).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder {",
         "",
         "  /**",
@@ -977,6 +1025,22 @@ public class RequiredPropertiesSourceTest {
         "    _unsetProperties.clear();",
         "    _unsetProperties.addAll(_defaults._unsetProperties);",
         "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getName()} is set.",
+        "   */",
+        "  public boolean isPropertyNameSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.NAME);",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getAge()} is set.",
+        "   */",
+        "  public boolean isPropertyAgeSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.AGE);",
         "  }",
         "",
         "  /**",
@@ -1107,19 +1171,14 @@ public class RequiredPropertiesSourceTest {
 
   @Test
   public void testJ8() {
-    Metadata metadata = createMetadata();
+    Metadata metadata = createMetadata(true);
 
-    String source = generateSource(
-        metadata,
-        SourceLevel.JAVA_7,  // SourceLevel does not currently distinguish J7 and J8
-        FunctionPackage.AVAILABLE,
-        GuavaLibrary.AVAILABLE);
+    String source = generateSource(metadata, JAVA_8, GuavaLibrary.AVAILABLE);
     assertThat(source).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
         "abstract class Person_Builder {",
         "",
         "  /**",
@@ -1274,6 +1333,22 @@ public class RequiredPropertiesSourceTest {
         "  }",
         "",
         "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getName()} is set.",
+        "   */",
+        "  public boolean isPropertyNameSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.NAME);",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getAge()} is set.",
+        "   */",
+        "  public boolean isPropertyAgeSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.AGE);",
+        "  }",
+        "",
+        "  /**",
         "   * Returns a newly-created {@link Person} based on the contents of the {@code Builder}.",
         "   *",
         "   * @throws IllegalStateException if any field has not been set",
@@ -1394,9 +1469,293 @@ public class RequiredPropertiesSourceTest {
         "}\n"));
   }
 
+  @Test
+  public void testPrefixless() {
+    Metadata metadata = createMetadata(false);
+
+    assertThat(generateSource(metadata, GuavaLibrary.AVAILABLE)).isEqualTo(Joiner.on('\n').join(
+        "/**",
+        " * Auto-generated superclass of {@link Person.Builder},",
+        " * derived from the API of {@link Person}.",
+        " */",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
+        "abstract class Person_Builder {",
+        "",
+        "  /**",
+        "   * Creates a new builder using {@code value} as a template.",
+        "   */",
+        "  public static Person.Builder from(Person value) {",
+        "    return new Person.Builder().mergeFrom(value);",
+        "  }",
+        "",
+        "  private static final Joiner COMMA_JOINER = Joiner.on(\", \").skipNulls();",
+        "",
+        "  private enum Property {",
+        "    NAME(\"name\"),",
+        "    AGE(\"age\"),",
+        "    ;",
+        "",
+        "    private final String name;",
+        "",
+        "    private Property(String name) {",
+        "      this.name = name;",
+        "    }",
+        "",
+        "    @Override",
+        "    public String toString() {",
+        "      return name;",
+        "    }",
+        "  }",
+        "",
+        "  private String name;",
+        "  private int age;",
+        "  private final EnumSet<Person_Builder.Property> _unsetProperties =",
+        "      EnumSet.allOf(Person_Builder.Property.class);",
+        "",
+        "  /**",
+        "   * Sets the value to be returned by {@link Person#name()}.",
+        "   *",
+        "   * @return this {@code Builder} object",
+        "   * @throws NullPointerException if {@code name} is null",
+        "   */",
+        "  public Person.Builder name(String name) {",
+        "    this.name = Preconditions.checkNotNull(name);",
+        "    _unsetProperties.remove(Person_Builder.Property.NAME);",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns the value that will be returned by {@link Person#name()}.",
+        "   *",
+        "   * @throws IllegalStateException if the field has not been set",
+        "   */",
+        "  public String name() {",
+        "    Preconditions.checkState(",
+        "        !_unsetProperties.contains(Person_Builder.Property.NAME), \"name not set\");",
+        "    return name;",
+        "  }",
+        "",
+        "  /**",
+        "   * Sets the value to be returned by {@link Person#age()}.",
+        "   *",
+        "   * @return this {@code Builder} object",
+        "   */",
+        "  public Person.Builder age(int age) {",
+        "    this.age = age;",
+        "    _unsetProperties.remove(Person_Builder.Property.AGE);",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns the value that will be returned by {@link Person#age()}.",
+        "   *",
+        "   * @throws IllegalStateException if the field has not been set",
+        "   */",
+        "  public int age() {",
+        "    Preconditions.checkState(",
+        "        !_unsetProperties.contains(Person_Builder.Property.AGE), \"age not set\");",
+        "    return age;",
+        "  }",
+        "",
+        "  /**",
+        "   * Sets all property values using the given {@code Person} as a template.",
+        "   */",
+        "  public Person.Builder mergeFrom(Person value) {",
+        "    Person_Builder _defaults = new Person.Builder();",
+        "    if (_defaults._unsetProperties.contains(Person_Builder.Property.NAME)",
+        "        || !value.name().equals(_defaults.name())) {",
+        "      name(value.name());",
+        "    }",
+        "    if (_defaults._unsetProperties.contains(Person_Builder.Property.AGE)",
+        "        || value.age() != _defaults.age()) {",
+        "      age(value.age());",
+        "    }",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Copies values from the given {@code Builder}.",
+        "   * Does not affect any properties not set on the input.",
+        "   */",
+        "  public Person.Builder mergeFrom(Person.Builder template) {",
+        "    // Upcast to access private fields; otherwise, oddly, we get an access violation.",
+        "    Person_Builder base = (Person_Builder) template;",
+        "    Person_Builder _defaults = new Person.Builder();",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.NAME)",
+        "        && (_defaults._unsetProperties.contains(Person_Builder.Property.NAME)",
+        "            || !template.name().equals(_defaults.name()))) {",
+        "      name(template.name());",
+        "    }",
+        "    if (!base._unsetProperties.contains(Person_Builder.Property.AGE)",
+        "        && (_defaults._unsetProperties.contains(Person_Builder.Property.AGE)",
+        "            || template.age() != _defaults.age())) {",
+        "      age(template.age());",
+        "    }",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Resets the state of this builder.",
+        "   */",
+        "  public Person.Builder clear() {",
+        "    Person_Builder _defaults = new Person.Builder();",
+        "    name = _defaults.name;",
+        "    age = _defaults.age;",
+        "    _unsetProperties.clear();",
+        "    _unsetProperties.addAll(_defaults._unsetProperties);",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#name()} is set.",
+        "   */",
+        "  public boolean isPropertyNameSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.NAME);",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#age()} is set.",
+        "   */",
+        "  public boolean isPropertyAgeSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.AGE);",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns a newly-created {@link Person} based on the contents of the {@code Builder}.",
+        "   *",
+        "   * @throws IllegalStateException if any field has not been set",
+        "   */",
+        "  public Person build() {",
+        "    Preconditions.checkState(_unsetProperties.isEmpty(),"
+            + " \"Not set: %s\", _unsetProperties);",
+        "    return new Person_Builder.Value(this);",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns a newly-created partial {@link Person}",
+        "   * based on the contents of the {@code Builder}.",
+        "   * State checking will not be performed.",
+        "   * Unset properties will throw an {@link UnsupportedOperationException}",
+        "   * when accessed via the partial object.",
+        "   *",
+        "   * <p>Partials should only ever be used in tests.",
+        "   */",
+        "  @VisibleForTesting()",
+        "  public Person buildPartial() {",
+        "    return new Person_Builder.Partial(this);",
+        "  }",
+        "",
+        "  private static final class Value extends Person {",
+        "    private final String name;",
+        "    private final int age;",
+        "",
+        "    private Value(Person_Builder builder) {",
+        "      this.name = builder.name;",
+        "      this.age = builder.age;",
+        "    }",
+        "",
+        "    @Override",
+        "    public String name() {",
+        "      return name;",
+        "    }",
+        "",
+        "    @Override",
+        "    public int age() {",
+        "      return age;",
+        "    }",
+        "",
+        "    @Override",
+        "    public boolean equals(Object obj) {",
+        "      if (!(obj instanceof Person_Builder.Value)) {",
+        "        return false;",
+        "      }",
+        "      Person_Builder.Value other = (Person_Builder.Value) obj;",
+        "      if (!name.equals(other.name)) {",
+        "        return false;",
+        "      }",
+        "      if (age != other.age) {",
+        "        return false;",
+        "      }",
+        "      return true;",
+        "    }",
+        "",
+        "    @Override",
+        "    public int hashCode() {",
+        "      return Arrays.hashCode(new Object[] {name, age});",
+        "    }",
+        "",
+        "    @Override",
+        "    public String toString() {",
+        "      return \"Person{\" + \"name=\" + name + \", \" + \"age=\" + age + \"}\";",
+        "    }",
+        "  }",
+        "",
+        "  private static final class Partial extends Person {",
+        "    private final String name;",
+        "    private final int age;",
+        "    private final EnumSet<Person_Builder.Property> _unsetProperties;",
+        "",
+        "    Partial(Person_Builder builder) {",
+        "      this.name = builder.name;",
+        "      this.age = builder.age;",
+        "      this._unsetProperties = builder._unsetProperties.clone();",
+        "    }",
+        "",
+        "    @Override",
+        "    public String name() {",
+        "      if (_unsetProperties.contains(Person_Builder.Property.NAME)) {",
+        "        throw new UnsupportedOperationException(\"name not set\");",
+        "      }",
+        "      return name;",
+        "    }",
+        "",
+        "    @Override",
+        "    public int age() {",
+        "      if (_unsetProperties.contains(Person_Builder.Property.AGE)) {",
+        "        throw new UnsupportedOperationException(\"age not set\");",
+        "      }",
+        "      return age;",
+        "    }",
+        "",
+        "    @Override",
+        "    public boolean equals(Object obj) {",
+        "      if (!(obj instanceof Person_Builder.Partial)) {",
+        "        return false;",
+        "      }",
+        "      Person_Builder.Partial other = (Person_Builder.Partial) obj;",
+        "      if (name != other.name && (name == null || !name.equals(other.name))) {",
+        "        return false;",
+        "      }",
+        "      if (age != other.age) {",
+        "        return false;",
+        "      }",
+        "      return _unsetProperties.equals(other._unsetProperties);",
+        "    }",
+        "",
+        "    @Override",
+        "    public int hashCode() {",
+        "      return Arrays.hashCode(new Object[] {name, age, _unsetProperties});",
+        "    }",
+        "",
+        "    @Override",
+        "    public String toString() {",
+        "      return \"partial Person{\"",
+        "          + COMMA_JOINER.join(",
+        "              (!_unsetProperties.contains(Person_Builder.Property.NAME) "
+            + "? \"name=\" + name : null),",
+        "              (!_unsetProperties.contains(Person_Builder.Property.AGE) "
+            + "? \"age=\" + age : null))",
+        "          + \"}\";",
+        "    }",
+        "  }",
+        "}\n"));
+  }
+
   private static String generateSource(Metadata metadata, Feature<?>... features) {
     SourceBuilder sourceBuilder = SourceStringBuilder.simple(features);
-    new CodeGenerator().writeABuilderSource(sourceBuilder, metadata);
+    new CodeGenerator().writeBuilderSource(sourceBuilder, metadata);
     try {
       return new Formatter().formatSource(sourceBuilder.toString());
     } catch (FormatterException e) {
@@ -1404,27 +1763,29 @@ public class RequiredPropertiesSourceTest {
     }
   }
 
-  private static Metadata createMetadata() {
+  private static Metadata createMetadata(boolean bean) {
     QualifiedName person = QualifiedName.of("com.example", "Person");
-    TypeMirror string = ClassTypeImpl.newTopLevelClass("java.lang.String");
+    TypeMirror string = newTopLevelClass("java.lang.String");
     QualifiedName generatedBuilder = QualifiedName.of("com.example", "Person_Builder");
-    Metadata.Property name = new Metadata.Property.Builder()
+    Property name = new Property.Builder()
         .setAllCapsName("NAME")
         .setBoxedType(string)
         .setCapitalizedName("Name")
         .setFullyCheckedCast(true)
-        .setGetterName("getName")
+        .setGetterName(bean ? "getName" : "name")
         .setName("name")
         .setType(string)
+        .setUsingBeanConvention(bean)
         .build();
-    Metadata.Property age = new Metadata.Property.Builder()
+    Property age = new Property.Builder()
         .setAllCapsName("AGE")
-        .setBoxedType(ClassTypeImpl.newTopLevelClass("java.lang.Integer"))
+        .setBoxedType(newTopLevelClass("java.lang.Integer"))
         .setCapitalizedName("Age")
         .setFullyCheckedCast(true)
-        .setGetterName("getAge")
+        .setGetterName(bean ? "getAge" : "age")
         .setName("age")
         .setType(INT)
+        .setUsingBeanConvention(bean)
         .build();
     Metadata metadata = new Metadata.Builder()
         .setBuilder(person.nestedType("Builder").withParameters())

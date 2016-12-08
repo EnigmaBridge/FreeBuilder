@@ -15,15 +15,14 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import com.enigmabridge.ebuilder.EBuilder;
-import com.enigmabridge.ebuilder.processor.util.feature.FeatureSet;
-import com.enigmabridge.ebuilder.processor.util.testing.SourceBuilder;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-
+import com.enigmabridge.ebuilder.FreeBuilder;
+import com.enigmabridge.ebuilder.processor.util.feature.FeatureSet;
 import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTester;
 import com.enigmabridge.ebuilder.processor.util.testing.ParameterizedBehaviorTestFactory;
+import com.enigmabridge.ebuilder.processor.util.testing.SourceBuilder;
 import com.enigmabridge.ebuilder.processor.util.testing.TestBuilder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,9 +33,8 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 
-import java.util.List;
-
 import javax.tools.JavaFileObject;
+import java.util.List;
 
 @RunWith(Parameterized.class)
 @UseParametersRunnerFactory(ParameterizedBehaviorTestFactory.class)
@@ -63,7 +61,7 @@ public class OptionalMapperMethodTest {
   private static JavaFileObject optionalIntegerType(Class<?> optionalType) {
     return new SourceBuilder()
         .addLine("package com.example;")
-        .addLine("@%s", EBuilder.class)
+        .addLine("@%s", FreeBuilder.class)
         .addLine("public interface DataType {")
         .addLine("  %s<Integer> getProperty();", optionalType)
         .addLine("")
@@ -100,7 +98,7 @@ public class OptionalMapperMethodTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public interface DataType {")
             .addLine("  %s<Integer> getProperty();", optionalType)
             .addLine("")
@@ -173,6 +171,29 @@ public class OptionalMapperMethodTest {
             .addLine("    .mapProperty(a -> { fail(\"mapper called\"); return null; })")
             .addLine("    .build();")
             .addLine("assertFalse(value.getProperty().isPresent());")
+            .build())
+        .runTest();
+  }
+
+  @Test
+  public void mapReplacesValueToBeReturnedFromPrefixlessGetter() {
+    behaviorTester
+        .with(new Processor(features))
+        .with(new SourceBuilder()
+            .addLine("package com.example;")
+            .addLine("@%s", FreeBuilder.class)
+            .addLine("public interface DataType {")
+            .addLine("  %s<Integer> property();", optionalType)
+            .addLine("")
+            .addLine("  public static class Builder extends DataType_Builder {}")
+            .addLine("}")
+            .build())
+        .with(new TestBuilder()
+            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+            .addLine("    .property(11)")
+            .addLine("    .mapProperty(a -> a + 3)")
+            .addLine("    .build();")
+            .addLine("assertEquals(14, (int) value.property().get());")
             .build())
         .runTest();
   }

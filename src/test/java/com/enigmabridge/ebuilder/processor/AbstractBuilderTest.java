@@ -15,9 +15,9 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import com.enigmabridge.ebuilder.EBuilder;
-import com.enigmabridge.ebuilder.processor.util.testing.SourceBuilder;
+import com.enigmabridge.ebuilder.FreeBuilder;
 import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTester;
+import com.enigmabridge.ebuilder.processor.util.testing.SourceBuilder;
 import org.junit.Test;
 
 import javax.tools.JavaFileObject;
@@ -27,7 +27,7 @@ public class AbstractBuilderTest {
 
   private static final JavaFileObject TYPE_WITH_ABSTRACT_BUILDER = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public abstract class TypeWithAbstractBuilder {")
       .addLine("  public abstract int getItem();")
       .addLine("")

@@ -15,19 +15,11 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Answers.RETURNS_SMART_NULLS;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
-
-import com.enigmabridge.ebuilder.processor.util.testing.ModelRule;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
-
-import com.google.common.truth.Truth;
 import com.enigmabridge.ebuilder.processor.Metadata.Property;
-import com.enigmabridge.ebuilder.processor.NullablePropertyFactory.CodeGenerator;
 import com.enigmabridge.ebuilder.processor.PropertyCodeGenerator.Config;
+import com.enigmabridge.ebuilder.processor.util.testing.ModelRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,6 +29,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.ExecutableElement;
+
+import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Answers.RETURNS_SMART_NULLS;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 /** Unit tests for {@link Analyser}. */
 @RunWith(MockitoJUnitRunner.class)
@@ -68,7 +65,7 @@ public class NullablePropertyFactoryTest {
 
     Optional<CodeGenerator> codeGenerator = factory.create(config);
 
-    Truth.assertThat(codeGenerator).isAbsent();
+    assertThat(codeGenerator).isAbsent();
   }
 
   @Test
@@ -87,7 +84,7 @@ public class NullablePropertyFactoryTest {
 
     Optional<CodeGenerator> codeGenerator = factory.create(config);
 
-    Truth.assertThat(codeGenerator).hasValue(new NullablePropertyFactory.CodeGenerator(
+    assertThat(codeGenerator).hasValue(new NullablePropertyFactory.CodeGenerator(
         metadata, property, ImmutableSet.of(model.typeElement(Nullable.class))));
   }
 
@@ -110,7 +107,7 @@ public class NullablePropertyFactoryTest {
 
     Optional<CodeGenerator> codeGenerator = factory.create(config);
 
-    Truth.assertThat(codeGenerator).hasValue(new NullablePropertyFactory.CodeGenerator(
+    assertThat(codeGenerator).hasValue(new NullablePropertyFactory.CodeGenerator(
         metadata, property, ImmutableSet.of(model.typeElement("foo.bar.Nullable"))));
   }
 
@@ -136,7 +133,7 @@ public class NullablePropertyFactoryTest {
 
     Optional<CodeGenerator> codeGenerator = factory.create(config);
 
-    Truth.assertThat(codeGenerator).hasValue(new NullablePropertyFactory.CodeGenerator(
+    assertThat(codeGenerator).hasValue(new NullablePropertyFactory.CodeGenerator(
         metadata, property, ImmutableSet.of(
             model.typeElement(Nullable.class), model.typeElement("foo.bar.Nullable"))));
   }
@@ -157,6 +154,6 @@ public class NullablePropertyFactoryTest {
 
     Optional<CodeGenerator> codeGenerator = factory.create(config);
 
-    Truth.assertThat(codeGenerator).isAbsent();
+    assertThat(codeGenerator).isAbsent();
   }
 }

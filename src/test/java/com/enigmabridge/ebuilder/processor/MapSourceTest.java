@@ -15,39 +15,38 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import static com.google.common.truth.Truth.assertThat;
-import static com.enigmabridge.ebuilder.processor.util.PrimitiveTypeImpl.INT;
-
-import com.enigmabridge.ebuilder.processor.util.ClassTypeImpl;
-import com.enigmabridge.ebuilder.processor.util.SourceBuilder;
-import com.enigmabridge.ebuilder.processor.util.SourceStringBuilder;
-import com.enigmabridge.ebuilder.processor.util.feature.GuavaLibrary;
-import com.enigmabridge.ebuilder.processor.util.feature.SourceLevel;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-
-import com.enigmabridge.ebuilder.processor.util.CompilationUnitBuilder;
-import com.enigmabridge.ebuilder.processor.util.QualifiedName;
+import com.enigmabridge.ebuilder.processor.GenericTypeElementImpl.GenericTypeMirrorImpl;
+import com.enigmabridge.ebuilder.processor.Metadata.Property;
+import com.enigmabridge.ebuilder.processor.util.*;
 import com.enigmabridge.ebuilder.processor.util.feature.Feature;
+import com.enigmabridge.ebuilder.processor.util.feature.GuavaLibrary;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import javax.lang.model.type.TypeMirror;
 
+import static com.google.common.truth.Truth.assertThat;
+import static com.enigmabridge.ebuilder.processor.GenericTypeElementImpl.newTopLevelGenericType;
+import static com.enigmabridge.ebuilder.processor.util.ClassTypeImpl.newTopLevelClass;
+import static com.enigmabridge.ebuilder.processor.util.PrimitiveTypeImpl.INT;
+import static com.enigmabridge.ebuilder.processor.util.feature.SourceLevel.JAVA_7;
+
 @RunWith(JUnit4.class)
 public class MapSourceTest {
 
   @Test
   public void test_guava_j6() {
-    Metadata metadata = createMetadata();
+    Metadata metadata = createMetadata(true);
 
     assertThat(generateSource(metadata, GuavaLibrary.AVAILABLE)).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder {",
         "",
         "  /**",
@@ -239,15 +238,15 @@ public class MapSourceTest {
 
   @Test
   public void test_guava_j7() {
-    Metadata metadata = createMetadata();
+    Metadata metadata = createMetadata(true);
 
-    String source = generateSource(metadata, SourceLevel.JAVA_7, GuavaLibrary.AVAILABLE);
+    String source = generateSource(metadata, JAVA_7, GuavaLibrary.AVAILABLE);
     assertThat(source).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder {",
         "",
         "  /**",
@@ -432,14 +431,14 @@ public class MapSourceTest {
 
   @Test
   public void test_noGuava_j6() {
-    Metadata metadata = createMetadata();
+    Metadata metadata = createMetadata(true);
 
     assertThat(generateSource(metadata)).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder {",
         "",
         "  /**",
@@ -644,14 +643,14 @@ public class MapSourceTest {
 
   @Test
   public void test_noGuava_j7() {
-    Metadata metadata = createMetadata();
+    Metadata metadata = createMetadata(true);
 
-    assertThat(generateSource(metadata, SourceLevel.JAVA_7)).isEqualTo(Joiner.on('\n').join(
+    assertThat(generateSource(metadata, JAVA_7)).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder {",
         "",
         "  /**",
@@ -845,31 +844,232 @@ public class MapSourceTest {
         "}\n"));
   }
 
+  @Test
+  public void test_prefixless() {
+    Metadata metadata = createMetadata(false);
+
+    assertThat(generateSource(metadata, GuavaLibrary.AVAILABLE)).isEqualTo(Joiner.on('\n').join(
+        "/**",
+        " * Auto-generated superclass of {@link Person.Builder},",
+        " * derived from the API of {@link Person}.",
+        " */",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
+        "abstract class Person_Builder {",
+        "",
+        "  /**",
+        "   * Creates a new builder using {@code value} as a template.",
+        "   */",
+        "  public static Person.Builder from(Person value) {",
+        "    return new Person.Builder().mergeFrom(value);",
+        "  }",
+        "",
+        "  private final LinkedHashMap<Integer, String> name = "
+            + "new LinkedHashMap<Integer, String>();",
+        "",
+        "  /**",
+        "   * Associates {@code key} with {@code value} in the map to be returned from",
+        "   * {@link Person#name()}.",
+        "   * If the map previously contained a mapping for the key,",
+        "   * the old value is replaced by the specified value.",
+        "   *",
+        "   * @return this {@code Builder} object",
+        "   * @throws NullPointerException if {@code value} is null",
+        "   */",
+        "  public Person.Builder putName(int key, String value) {",
+        "    Preconditions.checkNotNull(value);",
+        "    name.put(key, value);",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Copies all of the mappings from {@code map} to the map to be returned from",
+        "   * {@link Person#name()}.",
+        "   *",
+        "   * @return this {@code Builder} object",
+        "   * @throws NullPointerException if {@code map} is null or contains a",
+        "   *     null key or value",
+        "   */",
+        "  public Person.Builder putAllName(Map<? extends Integer, ? extends String> map) {",
+        "    for (Map.Entry<? extends Integer, ? extends String> entry : map.entrySet()) {",
+        "      putName(entry.getKey(), entry.getValue());",
+        "    }",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Removes the mapping for {@code key} from the map to be returned from",
+        "   * {@link Person#name()}, if one is present.",
+        "   *",
+        "   * @return this {@code Builder} object",
+        "   */",
+        "  public Person.Builder removeName(int key) {",
+        "    name.remove(key);",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Removes all of the mappings from the map to be returned from",
+        "   * {@link Person#name()}.",
+        "   *",
+        "   * @return this {@code Builder} object",
+        "   */",
+        "  public Person.Builder clearName() {",
+        "    name.clear();",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns an unmodifiable view of the map that will be returned by",
+        "   * {@link Person#name()}.",
+        "   * Changes to this builder will be reflected in the view.",
+        "   */",
+        "  public Map<Integer, String> name() {",
+        "    return Collections.unmodifiableMap(name);",
+        "  }",
+        "",
+        "  /**",
+        "   * Sets all property values using the given {@code Person} as a template.",
+        "   */",
+        "  public Person.Builder mergeFrom(Person value) {",
+        "    putAllName(value.name());",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Copies values from the given {@code Builder}.",
+        "   * Does not affect any properties not set on the input.",
+        "   */",
+        "  public Person.Builder mergeFrom(Person.Builder template) {",
+        "    putAllName(((Person_Builder) template).name);",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Resets the state of this builder.",
+        "   */",
+        "  public Person.Builder clear() {",
+        "    name.clear();",
+        "    return (Person.Builder) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns a newly-created {@link Person} based on the contents of the {@code Builder}.",
+        "   */",
+        "  public Person build() {",
+        "    return new Person_Builder.Value(this);",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns a newly-created partial {@link Person}",
+        "   * based on the contents of the {@code Builder}.",
+        "   * State checking will not be performed.",
+        "   *",
+        "   * <p>Partials should only ever be used in tests.",
+        "   */",
+        "  @VisibleForTesting()",
+        "  public Person buildPartial() {",
+        "    return new Person_Builder.Partial(this);",
+        "  }",
+        "",
+        "  private static final class Value extends Person {",
+        "    private final Map<Integer, String> name;",
+        "",
+        "    private Value(Person_Builder builder) {",
+        "      this.name = ImmutableMap.copyOf(builder.name);",
+        "    }",
+        "",
+        "    @Override",
+        "    public Map<Integer, String> name() {",
+        "      return name;",
+        "    }",
+        "",
+        "    @Override",
+        "    public boolean equals(Object obj) {",
+        "      if (!(obj instanceof Person_Builder.Value)) {",
+        "        return false;",
+        "      }",
+        "      Person_Builder.Value other = (Person_Builder.Value) obj;",
+        "      if (!name.equals(other.name)) {",
+        "        return false;",
+        "      }",
+        "      return true;",
+        "    }",
+        "",
+        "    @Override",
+        "    public int hashCode() {",
+        "      return Arrays.hashCode(new Object[] {name});",
+        "    }",
+        "",
+        "    @Override",
+        "    public String toString() {",
+        "      return \"Person{name=\" + name + \"}\";",
+        "    }",
+        "  }",
+        "",
+        "  private static final class Partial extends Person {",
+        "    private final Map<Integer, String> name;",
+        "",
+        "    Partial(Person_Builder builder) {",
+        "      this.name = ImmutableMap.copyOf(builder.name);",
+        "    }",
+        "",
+        "    @Override",
+        "    public Map<Integer, String> name() {",
+        "      return name;",
+        "    }",
+        "",
+        "    @Override",
+        "    public boolean equals(Object obj) {",
+        "      if (!(obj instanceof Person_Builder.Partial)) {",
+        "        return false;",
+        "      }",
+        "      Person_Builder.Partial other = (Person_Builder.Partial) obj;",
+        "      if (!name.equals(other.name)) {",
+        "        return false;",
+        "      }",
+        "      return true;",
+        "    }",
+        "",
+        "    @Override",
+        "    public int hashCode() {",
+        "      return Arrays.hashCode(new Object[] {name});",
+        "    }",
+        "",
+        "    @Override",
+        "    public String toString() {",
+        "      return \"partial Person{name=\" + name + \"}\";",
+        "    }",
+        "  }",
+        "}\n"));
+  }
+
   private static String generateSource(Metadata metadata, Feature<?>... features) {
     SourceBuilder sourceBuilder = SourceStringBuilder.simple(features);
-    new CodeGenerator().writeABuilderSource(sourceBuilder, metadata);
+    new CodeGenerator().writeBuilderSource(sourceBuilder, metadata);
     return CompilationUnitBuilder.formatSource(sourceBuilder.toString());
   }
 
   /**
-   * Returns a {@link Metadata} instance for a EBuilder type with a single property, name, of
+   * Returns a {@link Metadata} instance for a FreeBuilder type with a single property, name, of
    * type {@code Map<Integer, String>}, and which does not override any methods.
+   * @param bean TODO
    */
-  private static Metadata createMetadata() {
-    GenericTypeElementImpl map = GenericTypeElementImpl.newTopLevelGenericType("java.util.Map");
-    ClassTypeImpl integer = ClassTypeImpl.newTopLevelClass("java.lang.Integer");
-    ClassTypeImpl string = ClassTypeImpl.newTopLevelClass("java.lang.String");
-    GenericTypeElementImpl.GenericTypeMirrorImpl mapIntString = map.newMirror(integer, string);
+  private static Metadata createMetadata(boolean bean) {
+    GenericTypeElementImpl map = newTopLevelGenericType("java.util.Map");
+    ClassTypeImpl integer = newTopLevelClass("java.lang.Integer");
+    ClassTypeImpl string = newTopLevelClass("java.lang.String");
+    GenericTypeMirrorImpl mapIntString = map.newMirror(integer, string);
     QualifiedName person = QualifiedName.of("com.example", "Person");
     QualifiedName generatedBuilder = QualifiedName.of("com.example", "Person_Builder");
-    Metadata.Property name = new Metadata.Property.Builder()
+    Property name = new Property.Builder()
         .setAllCapsName("NAME")
         .setBoxedType(mapIntString)
         .setCapitalizedName("Name")
         .setFullyCheckedCast(true)
-        .setGetterName("getName")
+        .setGetterName(bean ? "getName" : "name")
         .setName("name")
         .setType(mapIntString)
+        .setUsingBeanConvention(bean)
         .build();
     Metadata metadata = new Metadata.Builder()
         .setBuilder(person.nestedType("Builder").withParameters())

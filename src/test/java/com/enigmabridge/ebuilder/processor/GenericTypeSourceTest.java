@@ -15,25 +15,25 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import static com.google.common.truth.Truth.assertThat;
-
-import com.enigmabridge.ebuilder.processor.util.QualifiedName;
-import com.enigmabridge.ebuilder.processor.util.SourceBuilder;
-import com.enigmabridge.ebuilder.processor.util.SourceStringBuilder;
-import com.enigmabridge.ebuilder.processor.util.TypeVariableImpl;
-import com.enigmabridge.ebuilder.processor.util.feature.FunctionPackage;
-import com.enigmabridge.ebuilder.processor.util.feature.GuavaLibrary;
-import com.enigmabridge.ebuilder.processor.util.feature.SourceLevel;
 import com.google.common.base.Joiner;
 import com.google.googlejavaformat.java.Formatter;
 import com.google.googlejavaformat.java.FormatterException;
-
+import com.enigmabridge.ebuilder.processor.Metadata.Property;
+import com.enigmabridge.ebuilder.processor.util.QualifiedName;
+import com.enigmabridge.ebuilder.processor.util.SourceBuilder;
+import com.enigmabridge.ebuilder.processor.util.SourceStringBuilder;
 import com.enigmabridge.ebuilder.processor.util.feature.Feature;
+import com.enigmabridge.ebuilder.processor.util.feature.GuavaLibrary;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import javax.lang.model.type.TypeVariable;
+
+import static com.google.common.truth.Truth.assertThat;
+import static com.enigmabridge.ebuilder.processor.util.TypeVariableImpl.newTypeVariable;
+import static com.enigmabridge.ebuilder.processor.util.feature.SourceLevel.JAVA_7;
+import static com.enigmabridge.ebuilder.processor.util.feature.SourceLevel.JAVA_8;
 
 @RunWith(JUnit4.class)
 public class GenericTypeSourceTest {
@@ -47,7 +47,7 @@ public class GenericTypeSourceTest {
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder<A, B> {",
         "",
         "  /**",
@@ -174,6 +174,22 @@ public class GenericTypeSourceTest {
         "    _unsetProperties.clear();",
         "    _unsetProperties.addAll(_defaults._unsetProperties);",
         "    return (Person.Builder<A, B>) this;",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getName()} is set.",
+        "   */",
+        "  public boolean isPropertyNameSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.NAME);",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getAge()} is set.",
+        "   */",
+        "  public boolean isPropertyAgeSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.AGE);",
         "  }",
         "",
         "  /**",
@@ -311,13 +327,13 @@ public class GenericTypeSourceTest {
   public void testJ7() {
     Metadata metadata = createMetadata();
 
-    String source = generateSource(metadata, SourceLevel.JAVA_7, GuavaLibrary.AVAILABLE);
+    String source = generateSource(metadata, JAVA_7, GuavaLibrary.AVAILABLE);
     assertThat(source).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
+        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder<A, B> {",
         "",
         "  /**",
@@ -447,6 +463,22 @@ public class GenericTypeSourceTest {
         "  }",
         "",
         "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getName()} is set.",
+        "   */",
+        "  public boolean isPropertyNameSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.NAME);",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getAge()} is set.",
+        "   */",
+        "  public boolean isPropertyAgeSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.AGE);",
+        "  }",
+        "",
+        "  /**",
         "   * Returns a newly-created {@link Person} based on the contents of the {@code Builder}.",
         "   *",
         "   * @throws IllegalStateException if any field has not been set",
@@ -571,17 +603,12 @@ public class GenericTypeSourceTest {
   public void testJ8() {
     Metadata metadata = createMetadata();
 
-    String source = generateSource(
-        metadata,
-        SourceLevel.JAVA_7,  // SourceLevel does not currently distinguish J7 and J8
-        FunctionPackage.AVAILABLE,
-        GuavaLibrary.AVAILABLE);
+    String source = generateSource(metadata, JAVA_8, GuavaLibrary.AVAILABLE);
     assertThat(source).isEqualTo(Joiner.on('\n').join(
         "/**",
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"CodeGenerator\")",
         "abstract class Person_Builder<A, B> {",
         "",
         "  /**",
@@ -737,6 +764,22 @@ public class GenericTypeSourceTest {
         "  }",
         "",
         "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getName()} is set.",
+        "   */",
+        "  public boolean isPropertyNameSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.NAME);",
+        "  }",
+        "",
+        "  /**",
+        "   * Returns true if the required property corresponding to",
+        "   * {@link Person#getAge()} is set.",
+        "   */",
+        "  public boolean isPropertyAgeSet() {",
+        "    return _unsetProperties.contains(Person_Builder.Property.AGE);",
+        "  }",
+        "",
+        "  /**",
         "   * Returns a newly-created {@link Person} based on the contents of the {@code Builder}.",
         "   *",
         "   * @throws IllegalStateException if any field has not been set",
@@ -859,7 +902,7 @@ public class GenericTypeSourceTest {
 
   private static String generateSource(Metadata metadata, Feature<?>... features) {
     SourceBuilder sourceBuilder = SourceStringBuilder.simple(features);
-    new CodeGenerator().writeABuilderSource(sourceBuilder, metadata);
+    new CodeGenerator().writeBuilderSource(sourceBuilder, metadata);
     try {
       return new Formatter().formatSource(sourceBuilder.toString());
     } catch (FormatterException e) {
@@ -870,23 +913,25 @@ public class GenericTypeSourceTest {
   private static Metadata createMetadata() {
     QualifiedName person = QualifiedName.of("com.example", "Person");
     QualifiedName generatedBuilder = QualifiedName.of("com.example", "Person_Builder");
-    TypeVariable typeVariableA = TypeVariableImpl.newTypeVariable("A");
-    Metadata.Property name = new Metadata.Property.Builder()
+    TypeVariable typeVariableA = newTypeVariable("A");
+    Property name = new Property.Builder()
         .setAllCapsName("NAME")
         .setCapitalizedName("Name")
         .setFullyCheckedCast(true)
         .setGetterName("getName")
         .setName("name")
         .setType(typeVariableA)
+        .setUsingBeanConvention(true)
         .build();
-    TypeVariable typeVariableB = TypeVariableImpl.newTypeVariable("B");
-    Metadata.Property age = new Metadata.Property.Builder()
+    TypeVariable typeVariableB = newTypeVariable("B");
+    Property age = new Property.Builder()
         .setAllCapsName("AGE")
         .setCapitalizedName("Age")
         .setFullyCheckedCast(true)
         .setGetterName("getAge")
         .setName("age")
         .setType(typeVariableB)
+        .setUsingBeanConvention(true)
         .build();
     Metadata metadata = new Metadata.Builder()
         .setBuilder(person.nestedType("Builder").withParameters("A", "B"))

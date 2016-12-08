@@ -15,16 +15,15 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import com.enigmabridge.ebuilder.EBuilder;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
+import com.enigmabridge.ebuilder.FreeBuilder;
 import com.enigmabridge.ebuilder.processor.util.feature.FeatureSet;
+import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTester;
 import com.enigmabridge.ebuilder.processor.util.testing.ParameterizedBehaviorTestFactory;
 import com.enigmabridge.ebuilder.processor.util.testing.SourceBuilder;
 import com.enigmabridge.ebuilder.processor.util.testing.TestBuilder;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-
-import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -34,11 +33,10 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 
+import javax.tools.JavaFileObject;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.tools.JavaFileObject;
 
 @RunWith(Parameterized.class)
 @UseParametersRunnerFactory(ParameterizedBehaviorTestFactory.class)
@@ -51,7 +49,7 @@ public class MapMutateMethodTest {
 
   private static final JavaFileObject UNCHECKED_SET_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer, String> getProperties();", Map.class)
       .addLine("")
@@ -62,7 +60,7 @@ public class MapMutateMethodTest {
   private static final JavaFileObject CHECKED_SET_TYPE = new SourceBuilder()
       .addLine("package com.example;")
       .addLine("import static %s.checkArgument;", Preconditions.class)
-      .addLine("@%s", EBuilder.class)
+      .addLine("@%s", FreeBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer, String> getProperties();", Map.class)
       .addLine("")
@@ -333,6 +331,62 @@ public class MapMutateMethodTest {
             .addLine("    .mutateProperties(%s::clear)", Map.class)
             .addLine("    .build();")
             .addLine("assertThat(value.getProperties()).isEmpty();")
+            .build())
+        .runTest();
+  }
+
+  @Test
+  public void putModifiesUnderlyingPropertyWhenUnchecked_prefixless() {
+    behaviorTester
+        .with(new Processor(features))
+        .with(new SourceBuilder()
+            .addLine("package com.example;")
+            .addLine("@%s", FreeBuilder.class)
+            .addLine("public interface DataType {")
+            .addLine("  %s<Integer, String> properties();", Map.class)
+            .addLine("")
+            .addLine("  public static class Builder extends DataType_Builder {}")
+            .addLine("}")
+            .build())
+        .with(new TestBuilder()
+            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+            .addLine("    .putProperties(5, \"five\")")
+            .addLine("    .mutateProperties(map -> map.put(11, \"eleven\"))")
+            .addLine("    .build();")
+            .addLine("assertThat(value.properties()).isEqualTo(%s.of(", ImmutableMap.class)
+            .addLine("    5, \"five\", 11, \"eleven\"));")
+            .build())
+        .runTest();
+  }
+
+  @Test
+  public void putModifiesUnderlyingPropertyWhenChecked_prefixless() {
+    behaviorTester
+        .with(new Processor(features))
+        .with(new SourceBuilder()
+            .addLine("package com.example;")
+            .addLine("import static %s.checkArgument;", Preconditions.class)
+            .addLine("@%s", FreeBuilder.class)
+            .addLine("public interface DataType {")
+            .addLine("  %s<Integer, String> properties();", Map.class)
+            .addLine("")
+            .addLine("  public static class Builder extends DataType_Builder {")
+            .addLine("    @Override public Builder putProperties(int key, String value) {")
+            .addLine("      checkArgument(key >= 0, \"key must be non-negative\");")
+            .addLine("      checkArgument(!value.startsWith(\"-\"), "
+                + "\"value must not start with '-'\");")
+            .addLine("      return super.putProperties(key, value);")
+            .addLine("    }")
+            .addLine("  }")
+            .addLine("}")
+            .build())
+        .with(new TestBuilder()
+            .addLine("com.example.DataType value = new com.example.DataType.Builder()")
+            .addLine("    .putProperties(5, \"five\")")
+            .addLine("    .mutateProperties(map -> map.put(11, \"eleven\"))")
+            .addLine("    .build();")
+            .addLine("assertThat(value.properties()).isEqualTo(%s.of(", ImmutableMap.class)
+            .addLine("    5, \"five\", 11, \"eleven\"));")
             .build())
         .runTest();
   }

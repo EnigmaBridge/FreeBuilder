@@ -15,7 +15,7 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
-import com.enigmabridge.ebuilder.EBuilder;
+import com.enigmabridge.ebuilder.FreeBuilder;
 import com.enigmabridge.ebuilder.processor.util.feature.FeatureSet;
 import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import com.enigmabridge.ebuilder.processor.util.testing.BehaviorTester;
@@ -50,7 +50,7 @@ public class GenericTypeTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public interface DataType<A, B> {")
             .addLine("  A getPropertyA();")
             .addLine("  B getPropertyB();")
@@ -76,7 +76,7 @@ public class GenericTypeTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public interface DataType<A, B> {")
             .addLine("  A getPropertyA();")
             .addLine("  B getPropertyB();")
@@ -94,7 +94,7 @@ public class GenericTypeTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", EBuilder.class)
+            .addLine("@%s", FreeBuilder.class)
             .addLine("public interface DataType<A extends Number, B extends Number> {")
             .addLine("  A getPropertyA();")
             .addLine("  B getPropertyB();")
