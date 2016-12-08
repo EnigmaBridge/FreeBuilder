@@ -529,8 +529,8 @@ task("lambdaTest", type: Test) {
 }
 
 //// Publication /////////////////////////////////////////////////
-group = 'org.inferred'
-archivesBaseName = 'freebuilder'
+group = 'com.enigmabridge'
+archivesBaseName = 'ebuilder'
 
 if (System.env.TRAVIS_TAG != null && !System.env.TRAVIS_TAG.isEmpty()) {
   version = System.env.TRAVIS_TAG.replaceAll('^v','')
@@ -546,16 +546,16 @@ artifacts {
 
 modifyPom {
   project {
-    name '@FreeBuilder'
+    name '@EBuilder'
     packaging 'jar'
-    artifactId 'freebuilder'
+    artifactId 'ebuilder'
     description 'Automatic generation of the Builder pattern for Java 1.6+'
-    url 'http://freebuilder.inferred.org/'
+    url 'http://www.enigmabridge.com/'
 
     scm {
-      url 'https://github.com/google/freebuilder'
-      connection 'scm:git:git://github.com/google/freebuilder.git'
-      developerConnection 'scm:git:git@github.com:google/freebuilder.git'
+      url 'https://github.com/EnigmaBridge/FreeBuilder'
+      connection 'scm:git:git://github.com/EnigmaBridge/freebuilder.git'
+      developerConnection 'scm:git:git@github.com:EnigmaBridge/freebuilder.git'
     }
 
     licenses {
@@ -571,6 +571,12 @@ modifyPom {
         name 'Chris Purcell'
         email 'Chris.Purcell.39@gmail.com'
         timezone 'Europe/London'
+      }
+      developer {
+        id 'ph4r05'
+        name 'Dusan Klinec'
+        email 'dusan.klinec@gmail.com'
+        timezone 'Europe/Prague'
       }
     }
   }
