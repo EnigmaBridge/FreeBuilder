@@ -536,6 +536,8 @@ if (System.env.TRAVIS_TAG != null && !System.env.TRAVIS_TAG.isEmpty()) {
   version = System.env.TRAVIS_TAG.replaceAll('^v','')
 } else if (System.env.TRAVIS_BRANCH != null && !System.env.TRAVIS_BRANCH.isEmpty()) {
   version = System.env.TRAVIS_BRANCH + '-alpha.' + System.env.TRAVIS_BUILD_NUMBER
+} else if (System.env.EBUILDER_VERSION != null && System.env.EBUILDER_VERSION) {
+  version = System.env.EBUILDER_VERSION
 } else {
   version = 'UNKNOWN-SNAPSHOT'
 }
