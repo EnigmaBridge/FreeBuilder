@@ -63,5 +63,9 @@ public class BuilderMethods {
     return "clear" + property.getCapitalizedName();
   }
 
+  public static String isPropertySetMethod(Metadata.Property property) {
+    return "isProperty" + property.getCapitalizedName() + "Set";
+  }
+
   private BuilderMethods() {}
 }

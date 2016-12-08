@@ -15,6 +15,7 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
+import static com.enigmabridge.ebuilder.processor.BuilderMethods.isPropertySetMethod;
 import static com.google.common.collect.Iterables.any;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.collect.Iterables.getOnlyElement;
@@ -24,6 +25,7 @@ import com.enigmabridge.ebuilder.EBuilder;
 import com.enigmabridge.ebuilder.processor.util.*;
 import com.enigmabridge.ebuilder.processor.util.feature.GuavaLibrary;
 import com.enigmabridge.ebuilder.processor.util.feature.SourceLevel;
+import com.enigmabridge.ebuilder.processor.Metadata.Property;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -66,6 +68,7 @@ public class CodeGenerator {
     addMergeFromBuilderMethod(code, metadata);
     addMergeFromSuperTypes(code, metadata);
     addClearMethod(code, metadata);
+    addPropertiesSetMethods(code, metadata);
 
     code.addLine("}");
   }
@@ -402,6 +405,30 @@ public class CodeGenerator {
     code.addLine("  return getThisBuilder();")
       //.addLine("  return (%s) this;", metadata.getBuilder())
         .addLine("}");
+  }
+
+  private static void addPropertiesSetMethods(SourceBuilder code, Metadata metadata) {
+    if (!any(metadata.getProperties(), IS_REQUIRED)) {
+      return;
+
+    }
+
+    for (Property property : metadata.getProperties()) {
+      if (!IS_REQUIRED.apply(property)) {
+        continue;
+      }
+
+      code.addLine("")
+              .addLine("/**")
+              .addLine(" * Returns true if the required property corresponding to")
+              .addLine(" * %s is set. ", metadata.getType().javadocNoArgMethodLink(
+                      property.getGetterName()))
+              .addLine(" */")
+              .addLine("public boolean %s() {", isPropertySetMethod(property))
+              .addLine("  return _unsetProperties.contains(%s.%s);",
+                      metadata.getPropertyEnum(), property.getAllCapsName())
+              .addLine("}");
+    }
   }
 
   private static void addBuildPartialMethod(SourceBuilder code, Metadata metadata) {
