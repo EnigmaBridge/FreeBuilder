@@ -192,7 +192,7 @@ public class CodeGenerator {
     }
     // Unset properties
     if (any(metadata.getProperties(), IS_REQUIRED)) {
-      code.addLine("final %s<%s> _unsetProperties =",
+      code.addLine("final private %s<%s> _unsetProperties =",
               EnumSet.class, metadata.getPropertyEnum())
           .addLine("    %s.allOf(%s.class);", EnumSet.class, metadata.getPropertyEnum());
     }

@@ -116,13 +116,13 @@ public class ListPropertyFactory implements PropertyCodeGenerator.Factory {
     @Override
     public void addBuilderFieldDeclaration(SourceBuilder code) {
       if (code.feature(GUAVA).isAvailable()) {
-        code.addLine("private %s<%s> %s = %s.of();",
+        code.addLine("%s<%s> %s = %s.of();",
             List.class,
             elementType,
             property.getName(),
             ImmutableList.class);
       } else {
-        code.addLine("private final %1$s<%2$s> %3$s = new %1$s%4$s();",
+        code.addLine("final %1$s<%2$s> %3$s = new %1$s%4$s();",
             ArrayList.class,
             elementType,
             property.getName(),

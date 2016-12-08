@@ -164,7 +164,7 @@ public class BuildablePropertyFactory implements PropertyCodeGenerator.Factory {
 
     @Override
     public void addBuilderFieldDeclaration(SourceBuilder code) {
-      code.addLine("private final %s %s = %s;",
+      code.addLine("final %s %s = %s;",
           builderType, property.getName(), builderFactory.newBuilder(builderType, INFERRED_TYPES));
     }
 

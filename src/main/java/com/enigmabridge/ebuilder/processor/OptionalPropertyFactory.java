@@ -171,7 +171,7 @@ public class OptionalPropertyFactory implements PropertyCodeGenerator.Factory {
       code.addLine("// Store a nullable object instead of an Optional. Escape analysis then")
           .addLine("// allows the JVM to optimize away the Optional objects created by our")
           .addLine("// getter method.")
-          .addLine("private final %s %s;", elementType, finalField);
+          .addLine("final %s %s;", elementType, finalField);
     }
 
     @Override
@@ -179,7 +179,7 @@ public class OptionalPropertyFactory implements PropertyCodeGenerator.Factory {
       code.addLine("// Store a nullable object instead of an Optional. Escape analysis then")
           .addLine("// allows the JVM to optimize away the Optional objects created by and")
           .addLine("// passed to our API.")
-          .addLine("private %s %s = null;", elementType, property.getName());
+          .addLine("%s %s = null;", elementType, property.getName());
     }
 
     @Override

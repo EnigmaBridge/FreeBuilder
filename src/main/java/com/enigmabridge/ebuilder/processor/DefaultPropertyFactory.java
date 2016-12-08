@@ -65,7 +65,7 @@ public class DefaultPropertyFactory implements PropertyCodeGenerator.Factory {
 
     @Override
     public void addBuilderFieldDeclaration(SourceBuilder code) {
-      code.addLine("private %s %s;", property.getType(), property.getName());
+      code.addLine("%s %s;", property.getType(), property.getName());
     }
 
     @Override

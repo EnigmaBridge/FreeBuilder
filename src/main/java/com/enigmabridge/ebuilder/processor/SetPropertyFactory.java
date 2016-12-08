@@ -102,10 +102,10 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
     @Override
     public void addBuilderFieldDeclaration(SourceBuilder code) {
       if (code.feature(GUAVA).isAvailable()) {
-        code.addLine("private %s<%s> %s = %s.of();",
+        code.addLine("%s<%s> %s = %s.of();",
             Set.class, elementType, property.getName(), ImmutableSet.class);
       } else {
-        code.addLine("private final %1$s<%2$s> %3$s = new %1$s%4$s();",
+        code.addLine("final %1$s<%2$s> %3$s = new %1$s%4$s();",
             LinkedHashSet.class, elementType, property.getName(), diamondOperator(elementType));
       }
     }
