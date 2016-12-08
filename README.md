@@ -95,7 +95,7 @@ you must subclass. For instance:
 
 
 ```java
-import org.inferred.freebuilder.EBuilder;
+import EBuilder;
 
 @FreeBuilder
 public interface Person {
@@ -566,7 +566,7 @@ Processors** and ensure **Enable annotation processing** is selected, and
 **Store generated sources relative to** is set to *Module content root*.
 (If you have specified a processor path, ensure you add the new JAR to it.
 Similarly, if you choose to specify processors explicitly, add
-`org.inferred.freebuilder.processor.Processor` to the list.)
+`Processor` to the list.)
 
 Run **Build > Rebuild Project**, then right-click the new `generated` folder
 (this may have a different name if you have changed the **Production sources
