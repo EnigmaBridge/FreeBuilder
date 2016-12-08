@@ -33,51 +33,51 @@ public class BuilderMethods {
     }
   }
 
-  public static String addMethod(Metadata.Property property) {
+  public static String addMethod(Property property) {
     return "add" + property.getCapitalizedName();
   }
 
-  public static String addAllMethod(Metadata.Property property) {
+  public static String addAllMethod(Property property) {
     return "addAll" + property.getCapitalizedName();
   }
 
-  public static String addCopiesMethod(Metadata.Property property) {
+  public static String addCopiesMethod(Property property) {
     return "addCopiesTo" + property.getCapitalizedName();
   }
 
-  public static String putMethod(Metadata.Property property) {
+  public static String putMethod(Property property) {
     return "put" + property.getCapitalizedName();
   }
 
-  public static String putAllMethod(Metadata.Property property) {
+  public static String putAllMethod(Property property) {
     return "putAll" + property.getCapitalizedName();
   }
 
-  public static String removeMethod(Metadata.Property property) {
+  public static String removeMethod(Property property) {
     return "remove" + property.getCapitalizedName();
   }
 
-  public static String removeAllMethod(Metadata.Property property) {
+  public static String removeAllMethod(Property property) {
     return "removeAll" + property.getCapitalizedName();
   }
 
-  public static String setCountMethod(Metadata.Property property) {
+  public static String setCountMethod(Property property) {
     return "setCountOf" + property.getCapitalizedName();
   }
 
-  public static String mapper(Metadata.Property property) {
+  public static String mapper(Property property) {
     return "map" + property.getCapitalizedName();
   }
 
-  public static String mutator(Metadata.Property property) {
+  public static String mutator(Property property) {
     return "mutate" + property.getCapitalizedName();
   }
 
-  public static String clearMethod(Metadata.Property property) {
+  public static String clearMethod(Property property) {
     return "clear" + property.getCapitalizedName();
   }
 
-  public static String isPropertySetMethod(Metadata.Property property) {
+  public static String isPropertySetMethod(Property property) {
     return "isProperty" + property.getCapitalizedName() + "Set";
   }
 

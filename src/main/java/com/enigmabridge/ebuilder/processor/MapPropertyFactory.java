@@ -15,6 +15,9 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
+import static com.enigmabridge.ebuilder.processor.BuilderMethods.addAllMethod;
+import static com.enigmabridge.ebuilder.processor.BuilderMethods.getter;
+import static com.enigmabridge.ebuilder.processor.BuilderMethods.putAllMethod;
 import static com.enigmabridge.ebuilder.processor.Util.erasesToAnyOf;
 
 import com.enigmabridge.ebuilder.processor.excerpt.CheckedMap;
@@ -181,7 +184,7 @@ public class MapPropertyFactory implements PropertyCodeGenerator.Factory {
       addAccessorAnnotations(code);
       code.addLine("public %s %s(%s<? extends %s, ? extends %s> map) {",
               metadata.getBuildGen(),
-              BuilderMethods.putAllMethod(property),
+              putAllMethod(property),
               Map.class,
               keyType,
               valueType)
@@ -279,7 +282,7 @@ public class MapPropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" * %s.", metadata.getType().javadocNoArgMethodLink(property.getGetterName()))
           .addLine(" * Changes to this builder will be reflected in the view.")
           .addLine(" */")
-          .addLine("public %s<%s, %s> %s() {", Map.class, keyType, valueType, BuilderMethods.getter(property))
+          .addLine("public %s<%s, %s> %s() {", Map.class, keyType, valueType, getter(property))
           .addLine("  return %s.unmodifiableMap(%s);", Collections.class, property.getName())
           .addLine("}");
     }
@@ -297,21 +300,32 @@ public class MapPropertyFactory implements PropertyCodeGenerator.Factory {
 
     @Override
     public void addMergeFromValue(Block code, String value) {
-      code.addLine("%s(%s.%s());", BuilderMethods.putAllMethod(property), value, property.getGetterName());
+      code.addLine("%s(%s.%s());", putAllMethod(property), value, property.getGetterName());
+    }
+
+    @Override
+    public void addMergeFromSuperValue(Block code, String value) {
+      addMergeFromValue(code, value);
     }
 
     @Override
     public void addMergeFromBuilder(Block code, String builder) {
       code.addLine("%s(((%s) %s).%s);",
-          BuilderMethods.putAllMethod(property),
+          putAllMethod(property),
           metadata.getGeneratedABuilder(),
           builder,
           property.getName());
     }
 
     @Override
+    public void addMergeFromSuperBuilder(Block code, String builder) {
+      Excerpt base = new Block(code).add(builder);
+      code.addLine("%s(%s.%s());", addAllMethod(property), base, getter(property));
+    }
+
+    @Override
     public void addSetFromResult(SourceBuilder code, String builder, String variable) {
-      code.addLine("%s.%s(%s);", builder, BuilderMethods.putAllMethod(property), variable);
+      code.addLine("%s.%s(%s);", builder, putAllMethod(property), variable);
     }
 
     @Override

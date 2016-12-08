@@ -33,6 +33,12 @@ import static javax.tools.Diagnostic.Kind.NOTE;
 import static com.enigmabridge.ebuilder.processor.BuilderFactory.NO_ARGS_CONSTRUCTOR;
 import static com.enigmabridge.ebuilder.processor.GwtSupport.gwtMetadata;
 import static com.enigmabridge.ebuilder.processor.MethodFinder.methodsOn;
+import static com.enigmabridge.ebuilder.processor.naming.NamingConventions.determineNamingConvention;
+import static com.enigmabridge.ebuilder.processor.util.ModelUtils.asElement;
+import static com.enigmabridge.ebuilder.processor.util.ModelUtils.getReturnType;
+import static com.enigmabridge.ebuilder.processor.util.ModelUtils.maybeAsTypeElement;
+import static com.enigmabridge.ebuilder.processor.util.ModelUtils.maybeType;
+import static com.enigmabridge.ebuilder.processor.util.ModelUtils.findAnnotationMirror;
 
 import com.enigmabridge.ebuilder.EBuilder;
 import com.enigmabridge.ebuilder.processor.naming.NamingConvention;
@@ -50,6 +56,14 @@ import com.enigmabridge.ebuilder.processor.PropertyCodeGenerator.Config;
 import com.enigmabridge.ebuilder.processor.util.ParameterizedType;
 import com.enigmabridge.ebuilder.processor.util.QualifiedName;
 
+import com.enigmabridge.ebuilder.processor.Metadata.Property;
+import com.enigmabridge.ebuilder.processor.Metadata.StandardMethod;
+import com.enigmabridge.ebuilder.processor.Metadata.UnderrideLevel;
+import com.enigmabridge.ebuilder.processor.PropertyCodeGenerator.Config;
+import com.enigmabridge.ebuilder.processor.naming.NamingConvention;
+import com.enigmabridge.ebuilder.processor.util.ParameterizedType;
+import com.enigmabridge.ebuilder.processor.util.QualifiedName;
+
 import java.beans.Introspector;
 import java.io.Serializable;
 import java.util.*;
@@ -58,6 +72,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import java.util.LinkedHashMap;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -208,6 +224,7 @@ class Analyser {
         .setBuilderSerializable(shouldBuilderBeSerializable(builder))
         .addAllProperties(properties.values())
         .addAllOwnProperties(findProperties(type, ownMethods).values())
+        .setValueTypeVisibility(Metadata.Visibility.PROTECTED)
         .setTypeGen("T")
         .setBuildGen("B");
 
@@ -225,7 +242,8 @@ class Analyser {
           .addAllProperties(codeGenerators(properties, baseMetadata, builder.get()));
 
       // mergeFrom from super types
-      metadataBuilder.putAllSuperTypeProperties(processSuperTypeProperties(type, baseMetadata, builder));
+      metadataBuilder.putAllSuperTypeProperties(
+              processSuperTypeProperties(type, baseMetadata, builder));
     }
     return metadataBuilder.build();
   }

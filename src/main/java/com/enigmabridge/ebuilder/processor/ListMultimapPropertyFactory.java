@@ -162,7 +162,7 @@ public class ListMultimapPropertyFactory implements PropertyCodeGenerator.Factor
       }
       code.addLine(" */")
           .addLine("public %s %s(%s key, %s value) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               putMethod(property),
               unboxedKeyType.or(keyType),
               unboxedValueType.or(valueType));
@@ -173,7 +173,8 @@ public class ListMultimapPropertyFactory implements PropertyCodeGenerator.Factor
         code.addLine("  %s.checkNotNull(value);", Preconditions.class);
       }
       code.addLine("  this.%s.put(key, value);", property.getName())
-          .addLine("  return (%s) this;", metadata.getBuilder())
+          .addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -194,7 +195,7 @@ public class ListMultimapPropertyFactory implements PropertyCodeGenerator.Factor
       }
       code.addLine(" */")
           .addLine("public %s %s(%s key, %s<? extends %s> values) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               putAllMethod(property),
               unboxedKeyType.or(keyType),
               Iterable.class,
@@ -202,7 +203,8 @@ public class ListMultimapPropertyFactory implements PropertyCodeGenerator.Factor
           .addLine("  for (%s value : values) {", unboxedValueType.or(valueType))
           .addLine("    %s(key, value);", putMethod(property))
           .addLine("  }")
-          .addLine("  return (%s) this;", metadata.getBuilder())
+          .addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -218,7 +220,7 @@ public class ListMultimapPropertyFactory implements PropertyCodeGenerator.Factor
           .addLine(" */");
       addAccessorAnnotations(code);
       code.addLine("public %s %s(%s<? extends %s, ? extends %s> multimap) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               putAllMethod(property),
               Multimap.class,
               keyType,
@@ -228,7 +230,8 @@ public class ListMultimapPropertyFactory implements PropertyCodeGenerator.Factor
           .addLine("      : multimap.asMap().entrySet()) {")
           .addLine("    %s(entry.getKey(), entry.getValue());", putAllMethod(property))
           .addLine("  }")
-          .addLine("  return (%s) this;", metadata.getBuilder())
+          .addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -256,7 +259,7 @@ public class ListMultimapPropertyFactory implements PropertyCodeGenerator.Factor
       }
       code.addLine(" */")
           .addLine("public %s %s(%s key, %s value) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               removeMethod(property),
               unboxedKeyType.or(keyType),
               unboxedValueType.or(valueType));
@@ -267,7 +270,8 @@ public class ListMultimapPropertyFactory implements PropertyCodeGenerator.Factor
         code.addLine("  %s.checkNotNull(value);", Preconditions.class);
       }
       code.addLine("  this.%s.remove(key, value);", property.getName())
-          .addLine("  return (%s) this;", metadata.getBuilder())
+          .addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -284,14 +288,15 @@ public class ListMultimapPropertyFactory implements PropertyCodeGenerator.Factor
       }
       code.addLine(" */")
           .addLine("public %s %s(%s key) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               removeAllMethod(property),
               unboxedKeyType.or(keyType));
       if (!unboxedKeyType.isPresent()) {
         code.addLine("  %s.checkNotNull(key);", Preconditions.class);
       }
       code.addLine("  this.%s.removeAll(key);", property.getName())
-          .addLine("  return (%s) this;", metadata.getBuilder())
+          .addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -312,7 +317,7 @@ public class ListMultimapPropertyFactory implements PropertyCodeGenerator.Factor
           .addLine(" * @throws NullPointerException if {@code mutator} is null")
           .addLine(" */")
           .addLine("public %s %s(%s<%s<%s, %s>> mutator) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               mutator(property),
               consumer.getQualifiedName(),
               ListMultimap.class,
@@ -326,7 +331,8 @@ public class ListMultimapPropertyFactory implements PropertyCodeGenerator.Factor
                 putMethod(property))
             .addLine("  mutator.accept(%s);", property.getName());
       }
-      code.addLine("  return (%s) this;", metadata.getBuilder())
+      code.addLine("  return getThisBuilder();")
+        //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -338,9 +344,10 @@ public class ListMultimapPropertyFactory implements PropertyCodeGenerator.Factor
           .addLine(" *")
           .addLine(" * @return this {@code %s} object", metadata.getBuilder().getSimpleName())
           .addLine(" */")
-          .addLine("public %s %s() {", metadata.getBuilder(), clearMethod(property))
+          .addLine("public %s %s() {", metadata.getBuildGen(), clearMethod(property))
           .addLine("  %s.clear();", property.getName())
-          .addLine("  return (%s) this;", metadata.getBuilder())
+          .addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -373,12 +380,25 @@ public class ListMultimapPropertyFactory implements PropertyCodeGenerator.Factor
     }
 
     @Override
+    public void addMergeFromSuperValue(Block code, String value) {
+      addMergeFromValue(code, value);
+    }
+
+    @Override
     public void addMergeFromBuilder(Block code, String builder) {
       code.addLine("%s(((%s) %s).%s);",
           putAllMethod(property),
           metadata.getGeneratedABuilder(),
           builder,
           property.getName());
+    }
+
+    @Override
+    public void addMergeFromSuperBuilder(Block code, String builder) {
+      code.addLine("%s(%s.%s());",
+          putAllMethod(property),
+          builder,
+          getter(property));
     }
 
     @Override

@@ -20,6 +20,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+<<<<<<< HEAD:src/test/java/com/enigmabridge/ebuilder/processor/AnalyserTest.java
 import com.enigmabridge.ebuilder.EBuilder;
 import com.enigmabridge.ebuilder.processor.Analyser.CannotGenerateCodeException;
 import com.enigmabridge.ebuilder.processor.Metadata.Property;
@@ -32,6 +33,21 @@ import com.enigmabridge.ebuilder.processor.util.QualifiedName;
 import com.enigmabridge.ebuilder.processor.util.SourceStringBuilder;
 import com.enigmabridge.ebuilder.processor.util.testing.FakeMessager;
 import com.enigmabridge.ebuilder.processor.util.testing.ModelRule;
+=======
+
+import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.processor.Analyser.CannotGenerateCodeException;
+import org.inferred.freebuilder.processor.Metadata.Property;
+import org.inferred.freebuilder.processor.Metadata.StandardMethod;
+import org.inferred.freebuilder.processor.Metadata.UnderrideLevel;
+import org.inferred.freebuilder.processor.PropertyCodeGenerator.Type;
+import org.inferred.freebuilder.processor.util.Excerpt;
+import org.inferred.freebuilder.processor.util.ParameterizedType;
+import org.inferred.freebuilder.processor.util.QualifiedName;
+import org.inferred.freebuilder.processor.util.SourceStringBuilder;
+import org.inferred.freebuilder.processor.util.testing.FakeMessager;
+import org.inferred.freebuilder.processor.util.testing.ModelRule;
+>>>>>>> b1c924e15b143fa7b70eddf4c54b680b6c34047f:src/test/java/org/inferred/freebuilder/processor/AnalyserTest.java
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -1402,14 +1418,22 @@ public class AnalyserTest {
       throws CannotGenerateCodeException {
     model.newType(
         "package com.example;",
+<<<<<<< HEAD:src/test/java/com/enigmabridge/ebuilder/processor/AnalyserTest.java
         "@" + EBuilder.class.getCanonicalName(),
+=======
+        "@" + FreeBuilder.class.getCanonicalName(),
+>>>>>>> b1c924e15b143fa7b70eddf4c54b680b6c34047f:src/test/java/org/inferred/freebuilder/processor/AnalyserTest.java
         "public abstract class SuperType {",
         "  public abstract String getAlpha();",
         "  public static class Builder extends SuperType_Builder {}",
         "}");
     TypeElement dataType = model.newType(
         "package com.example;",
+<<<<<<< HEAD:src/test/java/com/enigmabridge/ebuilder/processor/AnalyserTest.java
         "@" + EBuilder.class.getCanonicalName(),
+=======
+        "@" + FreeBuilder.class.getCanonicalName(),
+>>>>>>> b1c924e15b143fa7b70eddf4c54b680b6c34047f:src/test/java/org/inferred/freebuilder/processor/AnalyserTest.java
         "public abstract class DataType extends SuperType {",
         "  public abstract String getBeta();",
         "  public static class Builder extends DataType_Builder {}",

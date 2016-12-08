@@ -15,12 +15,12 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
+import static com.enigmabridge.ebuilder.processor.BuilderMethods.*;
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static com.enigmabridge.ebuilder.processor.BuilderMethods.getter;
-import static com.enigmabridge.ebuilder.processor.BuilderMethods.mapper;
-import static com.enigmabridge.ebuilder.processor.BuilderMethods.setter;
+
 import static com.enigmabridge.ebuilder.processor.util.PreconditionExcerpts.checkNotNullInline;
 import static com.enigmabridge.ebuilder.processor.util.PreconditionExcerpts.checkNotNullPreamble;
+import static com.enigmabridge.ebuilder.processor.util.feature.FunctionPackage.FUNCTION_PACKAGE;
 
 import com.enigmabridge.ebuilder.processor.util.Excerpt;
 import com.enigmabridge.ebuilder.processor.util.feature.FunctionPackage;
@@ -65,7 +65,7 @@ public class DefaultPropertyFactory implements PropertyCodeGenerator.Factory {
 
     @Override
     public void addBuilderFieldDeclaration(SourceBuilder code) {
-      code.addLine("%s %s;", property.getType(), property.getName());
+      code.addLine("private %s %s;", property.getType(), property.getName());
     }
 
     @Override
@@ -193,17 +193,41 @@ public class DefaultPropertyFactory implements PropertyCodeGenerator.Factory {
     }
 
     @Override
+    public void addMergeFromSuperValue(Block code, String value) {
+      addMergeFromValue(code, value);
+    }
+
+    @Override
     public void addMergeFromBuilder(Block code, String builder) {
-      Excerpt base =
-          hasDefault ? null : Declarations.upcastToGeneratedBuilder(code, metadata, builder);
+      addMergeFromBuilder(code, builder, false);
+    }
+
+    @Override
+    public void addMergeFromSuperBuilder(Block code, String builder) {
+      addMergeFromBuilder(code, builder, true);
+    }
+
+    public void addMergeFromBuilder(Block code, String builder, boolean fromSuper) {
+      Excerpt base = hasDefault || fromSuper ? null : Declarations.upcastToGeneratedBuilder(
+              code, metadata, builder);
       Excerpt defaults = Declarations.freshBuilder(code, metadata).orNull();
+      Block unsetContains = new Block(code);
+      String isPropertySetPositive = fromSuper ? ""  : "!";
+      String isPropertySetNegative = fromSuper ? "!" : "";
+      if (fromSuper) {
+        unsetContains.add("%s()", isPropertySetMethod(property));
+        base = new Block(code).add(builder);
+      } else {
+        unsetContains.add("_unsetProperties.contains(%s.%s)",
+                metadata.getPropertyEnum(), property.getAllCapsName());
+      }
       if (defaults != null) {
         code.add("if (");
         if (!hasDefault) {
-          code.add("!%s._unsetProperties.contains(%s.%s) && ",
-                  base, metadata.getPropertyEnum(), property.getAllCapsName())
-              .add("(%s._unsetProperties.contains(%s.%s) ||",
-                  defaults, metadata.getPropertyEnum(), property.getAllCapsName());
+          code.add("%s%s.%s && ",
+                  isPropertySetPositive, base, unsetContains)
+              .add("(%s%s.%s ||",
+                  isPropertySetNegative, defaults, unsetContains);
         }
         if (isPrimitive) {
           code.add("%1$s.%2$s() != %3$s.%2$s()", builder, getter(property), defaults);
@@ -215,8 +239,8 @@ public class DefaultPropertyFactory implements PropertyCodeGenerator.Factory {
         }
         code.add(") {%n");
       } else if (!hasDefault) {
-        code.addLine("if (!%s._unsetProperties.contains(%s.%s)) {",
-            base, metadata.getPropertyEnum(), property.getAllCapsName());
+        code.addLine("if (%s%s.%s) {",
+                isPropertySetPositive, base, unsetContains);
       }
       code.addLine("  %s(%s.%s());", setter(property), builder, getter(property));
       if (defaults != null || !hasDefault) {

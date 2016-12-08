@@ -234,7 +234,7 @@ public class BuildablePropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" * @throws NullPointerException if {@code mutator} is null")
           .addLine(" */")
           .addLine("public %s %s(%s<%s> mutator) {",
-              metadata.getBuilder(),
+              metadata.getBuildGen(),
               mutator(property),
               consumer.getQualifiedName(),
               builderType)
@@ -275,6 +275,11 @@ public class BuildablePropertyFactory implements PropertyCodeGenerator.Factory {
     }
 
     @Override
+    public void addMergeFromSuperValue(Block code, String value) {
+      addMergeFromValue(code, value);
+    }
+
+    @Override
     public void addMergeFromBuilder(Block code, String builder) {
       String propertyName = property.getName();
       if (propertyName.equals(builder)) {
@@ -285,6 +290,11 @@ public class BuildablePropertyFactory implements PropertyCodeGenerator.Factory {
         code.add(".buildPartial()");
       }
       code.add(");\n");
+    }
+
+    @Override
+    public void addMergeFromSuperBuilder(Block code, String builder) {
+      addMergeFromBuilder(code, builder);
     }
 
     @Override

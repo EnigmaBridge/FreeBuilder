@@ -38,7 +38,21 @@ import com.google.common.collect.Lists;
 import com.enigmabridge.ebuilder.processor.PropertyCodeGenerator.Type;
 
 import java.io.Serializable;
-import java.util.*;
+
+import com.enigmabridge.ebuilder.processor.util.Block;
+import com.enigmabridge.ebuilder.processor.util.Excerpt;
+import com.enigmabridge.ebuilder.processor.util.Excerpts;
+import com.enigmabridge.ebuilder.processor.util.PreconditionExcerpts;
+import com.enigmabridge.ebuilder.processor.util.SourceBuilder;
+import com.enigmabridge.ebuilder.processor.util.ParameterizedType;
+import com.enigmabridge.ebuilder.processor.util.QualifiedName;
+
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Code generation for the &#64;{@link EBuilder} annotation.
@@ -353,7 +367,7 @@ public class CodeGenerator {
           .addLine("public %s mergeFromSuper(%s value) {", metadata.getBuildGen(), type.getQualifiedName());
       Block body = new Block(code);
       for (Metadata.Property property : properties) {
-        property.getCodeGenerator().addMergeFromValue(body, "value");
+        property.getCodeGenerator().addMergeFromSuperValue(body, "value");
       }
       code.add(body)
           .addLine("  return getThisBuilder();")
@@ -374,7 +388,7 @@ public class CodeGenerator {
           .addLine("public %s mergeFromSuper(%s template) {", metadata.getBuildGen(), builder);
       Block fromBuilderBody = new Block(code);
       for (Metadata.Property property : properties) {
-        property.getCodeGenerator().addMergeFromBuilder(fromBuilderBody, "template");
+        property.getCodeGenerator().addMergeFromSuperBuilder(fromBuilderBody, "template");
       }
       code.add(fromBuilderBody)
           .addLine("  return getThisBuilder();")
@@ -419,15 +433,15 @@ public class CodeGenerator {
       }
 
       code.addLine("")
-              .addLine("/**")
-              .addLine(" * Returns true if the required property corresponding to")
-              .addLine(" * %s is set. ", metadata.getType().javadocNoArgMethodLink(
-                      property.getGetterName()))
-              .addLine(" */")
-              .addLine("public boolean %s() {", isPropertySetMethod(property))
-              .addLine("  return _unsetProperties.contains(%s.%s);",
-                      metadata.getPropertyEnum(), property.getAllCapsName())
-              .addLine("}");
+          .addLine("/**")
+          .addLine(" * Returns true if the required property corresponding to")
+          .addLine(" * %s is set. ", metadata.getType().javadocNoArgMethodLink(
+                  property.getGetterName()))
+          .addLine(" */")
+          .addLine("public boolean %s() {", isPropertySetMethod(property))
+          .addLine("  return _unsetProperties.contains(%s.%s);",
+                  metadata.getPropertyEnum(), property.getAllCapsName())
+          .addLine("}");
     }
   }
 

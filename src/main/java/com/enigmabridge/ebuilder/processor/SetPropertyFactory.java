@@ -15,29 +15,32 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
+import static com.enigmabridge.ebuilder.processor.BuilderMethods.addAllMethod;
+import static com.enigmabridge.ebuilder.processor.BuilderMethods.addMethod;
+import static com.enigmabridge.ebuilder.processor.BuilderMethods.clearMethod;
+import static com.enigmabridge.ebuilder.processor.BuilderMethods.getter;
+import static com.enigmabridge.ebuilder.processor.BuilderMethods.mutator;
+import static com.enigmabridge.ebuilder.processor.BuilderMethods.removeMethod;
 import static com.enigmabridge.ebuilder.processor.Util.erasesToAnyOf;
 import static com.enigmabridge.ebuilder.processor.Util.upperBound;
 import static com.enigmabridge.ebuilder.processor.util.ModelUtils.maybeDeclared;
 import static com.enigmabridge.ebuilder.processor.util.ModelUtils.maybeUnbox;
 import static com.enigmabridge.ebuilder.processor.util.ModelUtils.overrides;
+import static com.enigmabridge.ebuilder.processor.util.PreconditionExcerpts.checkNotNullInline;
+import static com.enigmabridge.ebuilder.processor.util.PreconditionExcerpts.checkNotNullPreamble;
 import static com.enigmabridge.ebuilder.processor.util.StaticExcerpt.Type.METHOD;
+import static com.enigmabridge.ebuilder.processor.util.feature.FunctionPackage.FUNCTION_PACKAGE;
+import static com.enigmabridge.ebuilder.processor.util.feature.GuavaLibrary.GUAVA;
+import static com.enigmabridge.ebuilder.processor.util.feature.SourceLevel.diamondOperator;
 
 import com.enigmabridge.ebuilder.processor.util.*;
-import com.enigmabridge.ebuilder.processor.util.feature.FunctionPackage;
-import com.enigmabridge.ebuilder.processor.util.feature.GuavaLibrary;
-import com.enigmabridge.ebuilder.processor.util.feature.SourceLevel;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
+import com.enigmabridge.ebuilder.processor.Metadata.Property;
 import com.enigmabridge.ebuilder.processor.PropertyCodeGenerator.Config;
 import com.enigmabridge.ebuilder.processor.excerpt.CheckedSet;
-import com.enigmabridge.ebuilder.processor.util.Block;
-import com.enigmabridge.ebuilder.processor.util.Excerpts;
-import com.enigmabridge.ebuilder.processor.util.ParameterizedType;
-import com.enigmabridge.ebuilder.processor.util.QualifiedName;
-import com.enigmabridge.ebuilder.processor.util.SourceBuilder;
-import com.enigmabridge.ebuilder.processor.util.StaticExcerpt;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -71,7 +74,7 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
     return overrides(
         config.getBuilder(),
         config.getTypes(),
-        BuilderMethods.addMethod(config.getProperty()),
+        addMethod(config.getProperty()),
         elementType);
   }
 
@@ -86,7 +89,7 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
 
     CodeGenerator(
         Metadata metadata,
-        Metadata.Property property,
+        Property property,
         TypeMirror elementType,
         Optional<TypeMirror> unboxedType,
         boolean overridesAddMethod) {
@@ -98,12 +101,12 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
 
     @Override
     public void addBuilderFieldDeclaration(SourceBuilder code) {
-      if (code.feature(GuavaLibrary.GUAVA).isAvailable()) {
+      if (code.feature(GUAVA).isAvailable()) {
         code.addLine("private %s<%s> %s = %s.of();",
             Set.class, elementType, property.getName(), ImmutableSet.class);
       } else {
         code.addLine("private final %1$s<%2$s> %3$s = new %1$s%4$s();",
-            LinkedHashSet.class, elementType, property.getName(), SourceLevel.diamondOperator(elementType));
+            LinkedHashSet.class, elementType, property.getName(), diamondOperator(elementType));
       }
     }
 
@@ -124,7 +127,7 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" * Adds {@code element} to the set to be returned from %s.",
               metadata.getType().javadocNoArgMethodLink(property.getGetterName()))
           .addLine(" * If the set already contains {@code element}, then {@code %s}",
-              BuilderMethods.addMethod(property))
+              addMethod(property))
           .addLine(" * has no effect (only the previously added element is retained).")
           .addLine(" *")
           .addLine(" * @return this {@code %s} object", metadata.getBuilder().getSimpleName());
@@ -133,22 +136,23 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
       }
       code.addLine(" */")
           .addLine("public %s %s(%s element) {",
-              metadata.getBuilder(),
-              BuilderMethods.addMethod(property),
+              metadata.getBuildGen(),
+              addMethod(property),
               unboxedType.or(elementType));
-      if (code.feature(GuavaLibrary.GUAVA).isAvailable()) {
+      if (code.feature(GUAVA).isAvailable()) {
         code.addLine("  if (this.%s instanceof %s) {", property.getName(), ImmutableSet.class)
             .addLine("    this.%1$s = new %2$s%3$s(this.%1$s);",
-                property.getName(), LinkedHashSet.class, SourceLevel.diamondOperator(elementType))
+                property.getName(), LinkedHashSet.class, diamondOperator(elementType))
             .addLine("  }");
       }
       if (unboxedType.isPresent()) {
         code.addLine("  this.%s.add(element);", property.getName());
       } else {
-        code.add(PreconditionExcerpts.checkNotNullPreamble("element"))
-            .addLine("  this.%s.add(%s);", property.getName(), PreconditionExcerpts.checkNotNullInline("element"));
+        code.add(checkNotNullPreamble("element"))
+            .addLine("  this.%s.add(%s);", property.getName(), checkNotNullInline("element"));
       }
-      code.addLine("  return (%s) this;", metadata.getBuilder())
+      code.addLine("  return getThisBuilder();")
+        //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -167,18 +171,19 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
       }
       code.addLine(" */")
           .addLine("public %s %s(%s... elements) {",
-              metadata.getBuilder(),
-              BuilderMethods.addMethod(property),
+              metadata.getBuildGen(),
+              addMethod(property),
               unboxedType.or(elementType));
-      Optional<Class<?>> arrayUtils = code.feature(GuavaLibrary.GUAVA).arrayUtils(unboxedType.or(elementType));
+      Optional<Class<?>> arrayUtils = code.feature(GUAVA).arrayUtils(unboxedType.or(elementType));
       if (arrayUtils.isPresent()) {
-        code.addLine("  return %s(%s.asList(elements));", BuilderMethods.addAllMethod(property), arrayUtils.get());
+        code.addLine("  return %s(%s.asList(elements));", addAllMethod(property), arrayUtils.get());
       } else {
         // Primitive type, Guava not available
         code.addLine("  for (%s element : elements) {", elementType)
-            .addLine("    %s(element);", BuilderMethods.addMethod(property))
+            .addLine("    %s(element);", addMethod(property))
             .addLine("  }")
-            .addLine("  return (%s) this;", metadata.getBuilder());
+            .addLine("  return getThisBuilder();");
+          //.addLine("  return (%s) this;", metadata.getBuilder());
       }
       code.addLine("}");
     }
@@ -197,12 +202,13 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" */");
       addAccessorAnnotations(code);
       code.addLine("public %s %s(%s<? extends %s> elements) {",
-              metadata.getBuilder(),
-              BuilderMethods.addAllMethod(property),
+              metadata.getBuildGen(),
+              addAllMethod(property),
               Iterable.class,
               elementType)
-          .add(Excerpts.forEach(unboxedType.or(elementType), "elements", BuilderMethods.addMethod(property)))
-          .addLine("  return (%s) this;", metadata.getBuilder())
+          .add(Excerpts.forEach(unboxedType.or(elementType), "elements", addMethod(property)))
+          .addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -219,27 +225,28 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
       }
       code.addLine(" */")
           .addLine("public %s %s(%s element) {",
-              metadata.getBuilder(),
-              BuilderMethods.removeMethod(property),
+              metadata.getBuildGen(),
+              removeMethod(property),
               unboxedType.or(elementType));
-      if (code.feature(GuavaLibrary.GUAVA).isAvailable()) {
+      if (code.feature(GUAVA).isAvailable()) {
         code.addLine("  if (this.%s instanceof %s) {", property.getName(), ImmutableSet.class)
             .addLine("    this.%1$s = new %2$s%3$s(this.%1$s);",
-                property.getName(), LinkedHashSet.class, SourceLevel.diamondOperator(elementType))
+                property.getName(), LinkedHashSet.class, diamondOperator(elementType))
             .addLine("  }");
       }
       if (unboxedType.isPresent()) {
         code.addLine("  this.%s.remove(element);", property.getName());
       } else {
-        code.add(PreconditionExcerpts.checkNotNullPreamble("element"))
-            .addLine("  this.%s.remove(%s);", property.getName(), PreconditionExcerpts.checkNotNullInline("element"));
+        code.add(checkNotNullPreamble("element"))
+            .addLine("  this.%s.remove(%s);", property.getName(), checkNotNullInline("element"));
       }
-      code.addLine("  return (%s) this;", metadata.getBuilder())
+      code.addLine("  return getThisBuilder();")
+        //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
     private void addMutator(SourceBuilder code, Metadata metadata) {
-      Optional<ParameterizedType> consumer = code.feature(FunctionPackage.FUNCTION_PACKAGE).consumer();
+      Optional<ParameterizedType> consumer = code.feature(FUNCTION_PACKAGE).consumer();
       if (consumer.isPresent()) {
         code.addLine("")
             .addLine("/**")
@@ -255,26 +262,27 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
             .addLine(" * @throws NullPointerException if {@code mutator} is null")
             .addLine(" */")
             .addLine("public %s %s(%s<? super %s<%s>> mutator) {",
-                metadata.getBuilder(),
-                BuilderMethods.mutator(property),
+                metadata.getBuildGen(),
+                mutator(property),
                 consumer.get().getQualifiedName(),
                 Set.class,
                 elementType);
-        if (code.feature(GuavaLibrary.GUAVA).isAvailable()) {
+        if (code.feature(GUAVA).isAvailable()) {
           code.addLine("  if (%s instanceof %s) {", property.getName(), ImmutableSet.class)
               .addLine("    %1$s = new %2$s%3$s(%1$s);",
-                  property.getName(), LinkedHashSet.class, SourceLevel.diamondOperator(elementType))
+                  property.getName(), LinkedHashSet.class, diamondOperator(elementType))
               .addLine("  }");
         }
         if (overridesAddMethod) {
           code.addLine("  mutator.accept(new CheckedSet<%s>(%s, this::%s));",
-                  elementType, property.getName(), BuilderMethods.addMethod(property));
+                  elementType, property.getName(), addMethod(property));
         } else {
           code.addLine("  // If %s is overridden, this method will be updated to delegate to it",
-                  BuilderMethods.addMethod(property))
+                  addMethod(property))
               .addLine("  mutator.accept(%s);", property.getName());
         }
-        code.addLine("  return (%s) this;", metadata.getBuilder())
+        code.addLine("  return getThisBuilder();")
+          //.addLine("  return (%s) this;", metadata.getBuilder())
             .addLine("}");
       }
     }
@@ -287,17 +295,18 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" *")
           .addLine(" * @return this {@code %s} object", metadata.getBuilder().getSimpleName())
           .addLine(" */")
-          .addLine("public %s %s() {", metadata.getBuilder(), BuilderMethods.clearMethod(property));
-      if (code.feature(GuavaLibrary.GUAVA).isAvailable()) {
+          .addLine("public %s %s() {", metadata.getBuildGen(), clearMethod(property));
+      if (code.feature(GUAVA).isAvailable()) {
         code.addLine("if (%s instanceof %s) {", property.getName(), ImmutableSet.class)
             .addLine("  %s = %s.of();", property.getName(), ImmutableSet.class)
             .addLine("} else {");
       }
       code.addLine("%s.clear();", property.getName());
-      if (code.feature(GuavaLibrary.GUAVA).isAvailable()) {
+      if (code.feature(GUAVA).isAvailable()) {
         code.addLine("}");
       }
-      code.addLine("  return (%s) this;", metadata.getBuilder())
+      code.addLine("  return getThisBuilder();")
+        //.addLine("  return (%s) this;", metadata.getBuilder())
           .addLine("}");
     }
 
@@ -308,11 +317,11 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
           .addLine(" * %s.", metadata.getType().javadocNoArgMethodLink(property.getGetterName()))
           .addLine(" * Changes to this builder will be reflected in the view.")
           .addLine(" */")
-          .addLine("public %s<%s> %s() {", Set.class, elementType, BuilderMethods.getter(property));
-      if (code.feature(GuavaLibrary.GUAVA).isAvailable()) {
+          .addLine("public %s<%s> %s() {", Set.class, elementType, getter(property));
+      if (code.feature(GUAVA).isAvailable()) {
         code.addLine("  if (%s instanceof %s) {", property.getName(), ImmutableSet.class)
             .addLine("    %1$s = new %2$s%3$s(%1$s);",
-                property.getName(), LinkedHashSet.class, SourceLevel.diamondOperator(elementType))
+                property.getName(), LinkedHashSet.class, diamondOperator(elementType))
             .addLine("  }");
       }
       code.addLine("  return %s.unmodifiableSet(%s);", Collections.class, property.getName())
@@ -322,7 +331,7 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
     @Override
     public void addFinalFieldAssignment(SourceBuilder code, String finalField, String builder) {
       code.add("%s = ", finalField);
-      if (code.feature(GuavaLibrary.GUAVA).isAvailable()) {
+      if (code.feature(GUAVA).isAvailable()) {
         code.add("%s.copyOf", ImmutableSet.class);
       } else {
         code.add("immutableSet");
@@ -330,37 +339,54 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
       code.add("(%s.%s);\n", builder, property.getName());
     }
 
-    @Override
-    public void addMergeFromValue(Block code, String value) {
-      if (code.feature(GuavaLibrary.GUAVA).isAvailable()) {
+    private void addMergeFromValue(Block code, String value, boolean guavaMerge) {
+      if (guavaMerge) {
         code.addLine("if (%s instanceof %s && %s == %s.<%s>of()) {",
                 value, metadata.getValueType(), property.getName(), ImmutableSet.class, elementType)
             .addLine("  %s = %s.%s();", property.getName(), value, property.getGetterName())
             .addLine("} else {");
       }
-      code.addLine("%s(%s.%s());", BuilderMethods.addAllMethod(property), value, property.getGetterName());
-      if (code.feature(GuavaLibrary.GUAVA).isAvailable()) {
+      code.addLine("%s(%s.%s());", addAllMethod(property), value, property.getGetterName());
+      if (guavaMerge) {
         code.addLine("}");
       }
     }
 
     @Override
+    public void addMergeFromValue(Block code, String value) {
+      addMergeFromValue(code, value, code.feature(GUAVA).isAvailable());
+    }
+
+    @Override
+    public void addMergeFromSuperValue(Block code, String value) {
+      addMergeFromValue(code, value, false);
+    }
+
+    @Override
     public void addMergeFromBuilder(Block code, String builder) {
       code.addLine("%s(((%s) %s).%s);",
-          BuilderMethods.addAllMethod(property),
-          metadata.getGeneratedABuilder(),
+          addAllMethod(property),
+          metadata.getGeneratedBuilder(),
           builder,
           property.getName());
     }
 
     @Override
+    public void addMergeFromSuperBuilder(Block code, String builder) {
+      code.addLine("%s(%s.%s());",
+          addAllMethod(property),
+          builder,
+          getter(property));
+    }
+
+    @Override
     public void addSetFromResult(SourceBuilder code, String builder, String variable) {
-      code.addLine("%s.%s(%s);", builder, BuilderMethods.addAllMethod(property), variable);
+      code.addLine("%s.%s(%s);", builder, addAllMethod(property), variable);
     }
 
     @Override
     public void addClearField(Block code) {
-      code.addLine("%s();", BuilderMethods.clearMethod(property));
+      code.addLine("%s();", clearMethod(property));
     }
 
     @Override
@@ -377,7 +403,7 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
   private static final StaticExcerpt IMMUTABLE_SET = new StaticExcerpt(METHOD, "immutableSet") {
     @Override
     public void addTo(SourceBuilder code) {
-      if (!code.feature(GuavaLibrary.GUAVA).isAvailable()) {
+      if (!code.feature(GUAVA).isAvailable()) {
         code.addLine("")
             .addLine("private static <E> %1$s<E> immutableSet(%1$s<E> elements) {",
                 Set.class, Class.class)
@@ -388,7 +414,7 @@ public class SetPropertyFactory implements PropertyCodeGenerator.Factory {
             .addLine("    return %s.singleton(elements.iterator().next());", Collections.class)
             .addLine("  default:")
             .addLine("    return %s.unmodifiableSet(new %s%s(elements));",
-                Collections.class, LinkedHashSet.class, SourceLevel.diamondOperator("E"))
+                Collections.class, LinkedHashSet.class, diamondOperator("E"))
             .addLine("  }")
             .addLine("}");
       }
