@@ -26,7 +26,7 @@ import com.google.common.testing.EqualsTester;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -61,7 +61,7 @@ public class SetPropertyFactoryTest {
 
   private static final JavaFileObject SET_PROPERTY_AUTO_BUILT_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<%s> getItems();", Set.class, String.class)
       .addLine("")
@@ -74,7 +74,7 @@ public class SetPropertyFactoryTest {
 
   private static final JavaFileObject SET_PRIMITIVES_AUTO_BUILT_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<Integer> getItems();", Set.class)
       .addLine("")
@@ -89,7 +89,7 @@ public class SetPropertyFactoryTest {
 
   private static final JavaFileObject VALIDATED_STRINGS = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<%s> getItems();", Set.class, String.class)
       .addLine("")
@@ -110,7 +110,7 @@ public class SetPropertyFactoryTest {
 
   private static final JavaFileObject VALIDATED_INTS = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<Integer> getItems();", Set.class)
       .addLine("")
@@ -632,7 +632,7 @@ public class SetPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<%s> getItems();", Set.class, String.class)
             .addLine("")
@@ -660,7 +660,7 @@ public class SetPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<%s> getItems();", ImmutableSet.class, String.class)
             .addLine("")
@@ -771,7 +771,7 @@ public class SetPropertyFactoryTest {
         .with(new SourceBuilder()
             .addLine("package com.example;")
             .addLine("import " + JsonProperty.class.getName() + ";")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("@%s(builder = DataType.Builder.class)", JsonDeserialize.class)
             .addLine("public interface DataType {")
             .addLine("  @JsonProperty(\"stuff\") %s<%s> getItems();", Set.class, String.class)

@@ -2,7 +2,7 @@ package org.inferred.freebuilder;
 
 import com.google.common.collect.ListMultimap;
 
-@FreeBuilder
+@EBuilder
 public interface ListMultimapPropertyType {
   ListMultimap<Integer, String> getNumbers();
 

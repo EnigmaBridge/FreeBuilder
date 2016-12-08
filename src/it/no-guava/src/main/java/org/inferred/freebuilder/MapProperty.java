@@ -18,7 +18,7 @@ package org.inferred.freebuilder;
 import java.io.Serializable;
 import java.util.Map;
 
-@FreeBuilder
+@EBuilder
 public interface MapProperty extends Serializable {
   Map<String, Double> getDistances();
 

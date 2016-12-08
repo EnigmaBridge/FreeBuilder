@@ -24,7 +24,7 @@ import com.google.common.testing.EqualsTester;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -58,7 +58,7 @@ public class MapPropertyFactoryTest {
 
   private static final JavaFileObject MAP_PROPERTY_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<String, Object> getItems();", Map.class)
       .addLine("")
@@ -68,7 +68,7 @@ public class MapPropertyFactoryTest {
 
   private static final JavaFileObject PRIMITIVE_KEY_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer, String> getItems();", Map.class)
       .addLine("")
@@ -78,7 +78,7 @@ public class MapPropertyFactoryTest {
 
   private static final JavaFileObject PRIMITIVE_VALUE_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<String, Double> getItems();", Map.class)
       .addLine("")
@@ -88,7 +88,7 @@ public class MapPropertyFactoryTest {
 
   private static final JavaFileObject PRIMITIVE_KEY_VALUE_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer, Double> getItems();", Map.class)
       .addLine("")
@@ -525,7 +525,7 @@ public class MapPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public interface DataType {")
             .addLine("  %s<String, Object> getItems();", Map.class)
             .addLine("")
@@ -558,7 +558,7 @@ public class MapPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public interface DataType {")
             .addLine("  %s<String, Object> getItems();", ImmutableMap.class)
             .addLine("")
@@ -583,7 +583,7 @@ public class MapPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public interface DataType {")
             .addLine("  %s<String, Object> getItems();", Map.class)
             .addLine("")
@@ -612,7 +612,7 @@ public class MapPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public interface DataType {")
             .addLine("  %s<Integer, Object> getItems();", Map.class)
             .addLine("")
@@ -641,7 +641,7 @@ public class MapPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public interface DataType {")
             .addLine("  %s<String, Double> getItems();", Map.class)
             .addLine("")
@@ -670,7 +670,7 @@ public class MapPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public interface DataType {")
             .addLine("  %s<Integer, Double> getItems();", Map.class)
             .addLine("")
@@ -732,7 +732,7 @@ public class MapPropertyFactoryTest {
         .with(new SourceBuilder()
             .addLine("package com.example;")
             .addLine("import " + JsonProperty.class.getName() + ";")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("@%s(builder = DataType.Builder.class)", JsonDeserialize.class)
             .addLine("public interface DataType {")
             .addLine("  @JsonProperty(\"stuff\") %s<String, Object> getItems();", Map.class)

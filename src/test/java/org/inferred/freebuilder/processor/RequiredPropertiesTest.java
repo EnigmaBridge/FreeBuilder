@@ -15,7 +15,7 @@
  */
 package org.inferred.freebuilder.processor;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -47,7 +47,7 @@ public class RequiredPropertiesTest {
 
   private static final JavaFileObject REQUIRED_PROPERTIES_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract int getPropertyA();")
       .addLine("  public abstract boolean isPropertyB();")
@@ -59,7 +59,7 @@ public class RequiredPropertiesTest {
   private static final JavaFileObject REQUIRED_PROPERTIES_TYPE_NO_TEMPLATE = new SourceBuilder()
       .addLine("package com.example;")
       .addLine("import %s;", Optional.class)
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract int getPropertyA();")
       .addLine("  public abstract boolean isPropertyB();")
@@ -101,7 +101,7 @@ public class RequiredPropertiesTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract int getPropertyA();")
             .addLine("  public abstract boolean isPropertyB();")

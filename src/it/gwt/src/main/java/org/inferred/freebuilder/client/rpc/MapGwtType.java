@@ -18,12 +18,12 @@ package org.inferred.freebuilder.client.rpc;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 
 import com.google.common.annotations.GwtCompatible;
 
-/** Simple GWT-compatible FreeBuilder type with a map of strings to doubles.  */
-@FreeBuilder
+/** Simple GWT-compatible EBuilder type with a map of strings to doubles.  */
+@EBuilder
 @GwtCompatible(serializable = true)
 public interface MapGwtType extends Serializable {
   Map<String, Double> getDistances();

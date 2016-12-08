@@ -2,7 +2,7 @@ package org.inferred.freebuilder;
 
 import java.util.Set;
 
-@FreeBuilder
+@EBuilder
 public interface SetPropertyType {
   Set<String> getNames();
 

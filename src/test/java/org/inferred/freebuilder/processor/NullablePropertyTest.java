@@ -17,7 +17,7 @@ package org.inferred.freebuilder.processor;
 
 import com.google.common.testing.EqualsTester;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -49,7 +49,7 @@ public class NullablePropertyTest {
 
   private static final JavaFileObject TWO_NULLABLE_PROPERTIES_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  @%s public abstract %s getItem1();", Nullable.class, String.class)
       .addLine("  @%s public abstract %s getItem2();", Nullable.class, String.class)
@@ -63,7 +63,7 @@ public class NullablePropertyTest {
 
   private static final JavaFileObject NULLABLE_PROPERTY_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  @%s public abstract %s getItem();", Nullable.class, String.class)
       .addLine("")
@@ -76,7 +76,7 @@ public class NullablePropertyTest {
 
   private static final JavaFileObject NULLABLE_INTEGER_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  @%s public abstract Integer getItem();", Nullable.class)
       .addLine("")
@@ -249,7 +249,7 @@ public class NullablePropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  @%s public abstract %s getItem();", Nullable.class, String.class)
             .addLine("")
@@ -275,7 +275,7 @@ public class NullablePropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  @%s public abstract %s getItem();", Nullable.class, String.class)
             .addLine("")

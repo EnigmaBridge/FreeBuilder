@@ -21,7 +21,7 @@ import static org.junit.Assume.assumeTrue;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -54,7 +54,7 @@ public class SetMutateMethodTest {
 
   private static final JavaFileObject UNCHECKED_SET_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer> getProperties();", Set.class)
       .addLine("")
@@ -64,7 +64,7 @@ public class SetMutateMethodTest {
 
   private static final JavaFileObject CHECKED_SET_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer> getProperties();", Set.class)
       .addLine("")

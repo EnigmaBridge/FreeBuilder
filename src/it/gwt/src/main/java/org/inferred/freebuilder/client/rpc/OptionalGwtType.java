@@ -17,13 +17,13 @@ package org.inferred.freebuilder.client.rpc;
 
 import java.io.Serializable;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.base.Optional;
 
-/** Simple GWT-compatible FreeBuilder type with a single optional String property.  */
-@FreeBuilder
+/** Simple GWT-compatible EBuilder type with a single optional String property.  */
+@EBuilder
 @GwtCompatible(serializable = true)
 public interface OptionalGwtType extends Serializable {
   Optional<String> getName();

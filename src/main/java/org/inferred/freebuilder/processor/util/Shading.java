@@ -16,7 +16,7 @@
 package org.inferred.freebuilder.processor.util;
 
 /**
- * Utility methods related to &#64;FreeBuilder dependencies being relocated as part of shading.
+ * Utility methods related to &#64;EBuilder dependencies being relocated as part of shading.
  */
 public class Shading {
 

@@ -27,11 +27,11 @@ import java.lang.annotation.Target;
  *
  * <p>Create your value type (e.g. {@code Person}) as an interface or abstract class, containing
  * an abstract accessor method for each desired field. This accessor must be non-void,
- * parameterless, and start with 'get' or 'is'. Add the {@code @FreeBuilder} annotation to your
+ * parameterless, and start with 'get' or 'is'. Add the {@code @EBuilder} annotation to your
  * class, and it will automatically generate an implementing class and a package-visible builder API
  * ({@code Person_Builder}), which you must subclass. For instance:
  *
- * <blockquote><pre>&#64;FreeBuilder
+ * <blockquote><pre>&#64;EBuilder
  * public interface Person {
  *   /** Returns the person's full (English) name. *&#47;
  *   String getName();
@@ -54,5 +54,5 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface FreeBuilder {}
+public @interface EBuilder {}
 

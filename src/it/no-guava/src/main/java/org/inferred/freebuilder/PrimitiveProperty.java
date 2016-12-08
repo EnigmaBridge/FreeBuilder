@@ -15,7 +15,7 @@
  */
 package org.inferred.freebuilder;
 
-@FreeBuilder
+@EBuilder
 public interface PrimitiveProperty {
   int getProperty();
 

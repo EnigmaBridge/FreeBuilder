@@ -26,7 +26,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.CompilationUnitBuilder;
 import org.inferred.freebuilder.processor.util.FilerUtils;
 import org.inferred.freebuilder.processor.util.feature.EnvironmentFeatureSet;
@@ -44,7 +44,7 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic.Kind;
 
 /**
- * Processor for the &#64;{@link FreeBuilder} annotation.
+ * Processor for the &#64;{@link EBuilder} annotation.
  *
  * <p>Processing is split into analysis (owned by the {@link Analyser}) and code generation (owned
  * by the {@link CodeGenerator}), communicating through the metadata object ({@link Metadata}), for
@@ -70,7 +70,7 @@ public class Processor extends AbstractProcessor {
 
   @Override
   public Set<String> getSupportedAnnotationTypes() {
-    return ImmutableSet.of(FreeBuilder.class.getName());
+    return ImmutableSet.of(EBuilder.class.getName());
   }
 
   @Override
@@ -93,7 +93,7 @@ public class Processor extends AbstractProcessor {
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    for (TypeElement type : typesIn(annotatedElementsIn(roundEnv, FreeBuilder.class))) {
+    for (TypeElement type : typesIn(annotatedElementsIn(roundEnv, EBuilder.class))) {
       try {
         Metadata metadata = analyser.analyse(type);
         CompilationUnitBuilder code = new CompilationUnitBuilder(
@@ -131,19 +131,19 @@ public class Processor extends AbstractProcessor {
             Kind.WARNING,
             "Error producing Builder: " + e.getMessage(),
             type,
-            findAnnotationMirror(type, "org.inferred.freebuilder.FreeBuilder").get());
+            findAnnotationMirror(type, "org.inferred.freebuilder.EBuilder").get());
       } catch (IOException e) {
         processingEnv.getMessager().printMessage(
             Kind.ERROR,
             "I/O error: " + Throwables.getStackTraceAsString(e),
             type,
-            findAnnotationMirror(type, "org.inferred.freebuilder.FreeBuilder").get());
+            findAnnotationMirror(type, "org.inferred.freebuilder.EBuilder").get());
       } catch (RuntimeException e) {
         processingEnv.getMessager().printMessage(
             Kind.ERROR,
             "Internal error: " + Throwables.getStackTraceAsString(e),
             type,
-            findAnnotationMirror(type, "org.inferred.freebuilder.FreeBuilder").get());
+            findAnnotationMirror(type, "org.inferred.freebuilder.EBuilder").get());
       }
     }
     return false;

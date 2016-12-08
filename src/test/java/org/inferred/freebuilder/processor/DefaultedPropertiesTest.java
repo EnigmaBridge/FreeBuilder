@@ -18,7 +18,7 @@ package org.inferred.freebuilder.processor;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -58,7 +58,7 @@ public class DefaultedPropertiesTest {
   private static final JavaFileObject OPTIMIZED_BUILDER = new SourceBuilder()
       .named("Optimized")
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  int getPropertyA();")
       .addLine("  boolean isPropertyB();")
@@ -78,7 +78,7 @@ public class DefaultedPropertiesTest {
   private static final JavaFileObject SLOW_BUILDER = new SourceBuilder()
       .named("Slow")
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  int getPropertyA();")
       .addLine("  boolean isPropertyB();")

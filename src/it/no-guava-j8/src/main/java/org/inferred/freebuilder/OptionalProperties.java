@@ -16,7 +16,7 @@ package org.inferred.freebuilder;
 import java.io.Serializable;
 import java.util.Optional;
 
-@FreeBuilder
+@EBuilder
 public interface OptionalProperties extends Serializable {
   Optional<String> getFirstName();
   Optional<String> getMiddleName();

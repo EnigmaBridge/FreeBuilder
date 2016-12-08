@@ -28,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -60,7 +60,7 @@ public class SetMultimapPropertyFactoryTest {
 
   private static final JavaFileObject MULTIMAP_PROPERTY = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<String, String> getItems();", SetMultimap.class)
       .addLine("")
@@ -73,7 +73,7 @@ public class SetMultimapPropertyFactoryTest {
 
   private static final JavaFileObject MULTIMAP_PRIMITIVE_KEY = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<Integer, String> getItems();", SetMultimap.class)
       .addLine("")
@@ -86,7 +86,7 @@ public class SetMultimapPropertyFactoryTest {
 
   private static final JavaFileObject MULTIMAP_PRIMITIVE_VALUE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<String, Character> getItems();", SetMultimap.class)
       .addLine("")
@@ -99,7 +99,7 @@ public class SetMultimapPropertyFactoryTest {
 
   private static final JavaFileObject MULTIMAP_PRIMITIVES = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<Integer, Character> getItems();", SetMultimap.class)
       .addLine("")
@@ -932,7 +932,7 @@ public class SetMultimapPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<String, String> getItems();", ImmutableSetMultimap.class)
             .addLine("")
@@ -962,7 +962,7 @@ public class SetMultimapPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<String, String> getItems();", SetMultimap.class)
             .addLine("")
@@ -993,7 +993,7 @@ public class SetMultimapPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<Integer, String> getItems();", SetMultimap.class)
             .addLine("")
@@ -1024,7 +1024,7 @@ public class SetMultimapPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<Integer, Character> getItems();", SetMultimap.class)
             .addLine("")
@@ -1055,7 +1055,7 @@ public class SetMultimapPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<Integer, Character> getItems();", SetMultimap.class)
             .addLine("")
@@ -1121,7 +1121,7 @@ public class SetMultimapPropertyFactoryTest {
         .with(new SourceBuilder()
             .addLine("package com.example;")
             .addLine("import " + JsonProperty.class.getName() + ";")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("@%s(builder = DataType.Builder.class)", JsonDeserialize.class)
             .addLine("public interface DataType {")
             .addLine("  @JsonProperty(\"stuff\") %s<String, String> getItems();", SetMultimap.class)

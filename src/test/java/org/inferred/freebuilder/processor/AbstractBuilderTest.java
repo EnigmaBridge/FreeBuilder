@@ -15,7 +15,7 @@
  */
 package org.inferred.freebuilder.processor;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
 import org.inferred.freebuilder.processor.util.testing.SourceBuilder;
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class AbstractBuilderTest {
 
   private static final JavaFileObject TYPE_WITH_ABSTRACT_BUILDER = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class TypeWithAbstractBuilder {")
       .addLine("  public abstract int getItem();")
       .addLine("")

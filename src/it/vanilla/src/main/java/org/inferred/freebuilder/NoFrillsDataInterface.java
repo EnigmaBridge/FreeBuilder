@@ -15,8 +15,8 @@
  */
 package org.inferred.freebuilder;
 
-/** A trivial {@link FreeBuilder @FreeBuilder} interface with no customization. */
-@FreeBuilder
+/** A trivial {@link EBuilder @EBuilder} interface with no customization. */
+@EBuilder
 public interface NoFrillsDataInterface {
   int getPropertyA();
   boolean isPropertyB();

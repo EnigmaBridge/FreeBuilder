@@ -2,7 +2,7 @@ package org.inferred.freebuilder;
 
 import java.util.Map;
 
-@FreeBuilder
+@EBuilder
 public interface MapPropertyType {
   Map<Integer, String> getNumbers();
 

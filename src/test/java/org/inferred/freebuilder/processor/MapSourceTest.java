@@ -856,7 +856,7 @@ public class MapSourceTest {
   }
 
   /**
-   * Returns a {@link Metadata} instance for a FreeBuilder type with a single property, name, of
+   * Returns a {@link Metadata} instance for a EBuilder type with a single property, name, of
    * type {@code Map<Integer, String>}, and which does not override any methods.
    */
   private static Metadata createMetadata() {

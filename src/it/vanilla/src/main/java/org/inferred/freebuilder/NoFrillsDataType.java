@@ -15,8 +15,8 @@
  */
 package org.inferred.freebuilder;
 
-/** A trivial {@link FreeBuilder @FreeBuilder} type with no customization. */
-@FreeBuilder
+/** A trivial {@link EBuilder @EBuilder} type with no customization. */
+@EBuilder
 public abstract class NoFrillsDataType {
   public abstract int getPropertyA();
   public abstract boolean isPropertyB();

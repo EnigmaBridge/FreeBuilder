@@ -18,7 +18,7 @@ package org.inferred.freebuilder.processor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -63,7 +63,7 @@ public class OptionalMapperMethodTest {
   private static JavaFileObject optionalIntegerType(Class<?> optionalType) {
     return new SourceBuilder()
         .addLine("package com.example;")
-        .addLine("@%s", FreeBuilder.class)
+        .addLine("@%s", EBuilder.class)
         .addLine("public interface DataType {")
         .addLine("  %s<Integer> getProperty();", optionalType)
         .addLine("")
@@ -100,7 +100,7 @@ public class OptionalMapperMethodTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public interface DataType {")
             .addLine("  %s<Integer> getProperty();", optionalType)
             .addLine("")

@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -56,7 +56,7 @@ public class JavaUtilOptionalPropertyTest {
 
   private static final JavaFileObject TWO_OPTIONAL_PROPERTIES_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<String> getItem1();", Optional.class)
       .addLine("  public abstract %s<String> getItem2();", Optional.class)
@@ -70,7 +70,7 @@ public class JavaUtilOptionalPropertyTest {
 
   private static final JavaFileObject OPTIONAL_PROPERTY_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<String> getItem();", Optional.class)
       .addLine("")
@@ -83,7 +83,7 @@ public class JavaUtilOptionalPropertyTest {
 
   private static final JavaFileObject OPTIONAL_INTEGER_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<Integer> getItem();", Optional.class)
       .addLine("")
@@ -451,7 +451,7 @@ public class JavaUtilOptionalPropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<%s> getItem();", Optional.class, String.class)
             .addLine("")
@@ -477,7 +477,7 @@ public class JavaUtilOptionalPropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<%s> getItem();", Optional.class, String.class)
             .addLine("")
@@ -505,7 +505,7 @@ public class JavaUtilOptionalPropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<%s> getItem();", Optional.class, String.class)
             .addLine("")
@@ -537,7 +537,7 @@ public class JavaUtilOptionalPropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<%s> getItem();", Optional.class, String.class)
             .addLine("")
@@ -568,7 +568,7 @@ public class JavaUtilOptionalPropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<%s> getItem();", Optional.class, String.class)
             .addLine("")
@@ -597,7 +597,7 @@ public class JavaUtilOptionalPropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<%s> getItem();", Optional.class, String.class)
             .addLine("")
@@ -627,7 +627,7 @@ public class JavaUtilOptionalPropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<Integer> getItem();", Optional.class)
             .addLine("")
@@ -658,7 +658,7 @@ public class JavaUtilOptionalPropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<Integer> getItem();", Optional.class)
             .addLine("")
@@ -688,7 +688,7 @@ public class JavaUtilOptionalPropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<Integer> getItem();", Optional.class)
             .addLine("")
@@ -717,7 +717,7 @@ public class JavaUtilOptionalPropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<Integer> getItem();", Optional.class)
             .addLine("")
@@ -858,7 +858,7 @@ public class JavaUtilOptionalPropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
               .addLine("package com.example;")
-              .addLine("@%s", FreeBuilder.class)
+              .addLine("@%s", EBuilder.class)
               .addLine("public abstract class DataType {")
               .addLine("  public abstract %s<%s<%s>> getItems();",
                       Optional.class, ImmutableList.class, Number.class)
@@ -880,7 +880,7 @@ public class JavaUtilOptionalPropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
               .addLine("package com.example;")
-              .addLine("@%s", FreeBuilder.class)
+              .addLine("@%s", EBuilder.class)
               .addLine("public abstract class DataType {")
               .addLine("  public abstract %s<%s<?>> getItems();",
                       Optional.class, ImmutableList.class)
@@ -902,7 +902,7 @@ public class JavaUtilOptionalPropertyTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
               .addLine("package com.example;")
-              .addLine("@%s", FreeBuilder.class)
+              .addLine("@%s", EBuilder.class)
               .addLine("public abstract class DataType {")
               .addLine("  public abstract %s<%s<? extends %s>> getItems();",
                       Optional.class, ImmutableList.class, Number.class)
@@ -926,7 +926,7 @@ public class JavaUtilOptionalPropertyTest {
         .with(new SourceBuilder()
             .addLine("package com.example;")
             .addLine("import " + JsonProperty.class.getName() + ";")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("@%s(builder = DataType.Builder.class)", JsonDeserialize.class)
             .addLine("public interface DataType {")
             .addLine("  @JsonProperty(\"stuff\") %s<%s> getItem();", Optional.class, String.class)

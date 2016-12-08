@@ -53,7 +53,7 @@ import javax.lang.model.util.Types;
 
 /**
  * {@link PropertyCodeGenerator.Factory} for <b>buildable</b> types: that is, types with a Builder
- * class providing a similar API to proto or &#64;FreeBuilder:<ul>
+ * class providing a similar API to proto or &#64;EBuilder:<ul>
  * <li> a public constructor, or static builder()/newBuilder() method;
  * <li> build(), buildPartial() and clear() methods; and
  * <li> a mergeWith(Value) method.
@@ -88,16 +88,16 @@ public class BuildablePropertyFactory implements PropertyCodeGenerator.Factory {
     }
 
     MergeBuilderMethod mergeFromBuilderMethod;
-    if (findAnnotationMirror(element, "org.inferred.freebuilder.FreeBuilder").isPresent()) {
+    if (findAnnotationMirror(element, "org.inferred.freebuilder.EBuilder").isPresent()) {
       /*
-       * If the element is annotated @FreeBuilder, assume the necessary methods will be added. We
+       * If the element is annotated @EBuilder, assume the necessary methods will be added. We
        * can't check directly as the builder superclass may not have been generated yet. To be
        * strictly correct, we should delay a round if an error type leaves us unsure about this kind
        * of API-changing decision, and then we would work with _any_ Builder-generating API. We
        * would need to drop out part of our own builder superclass, to prevent chains of dependent
        * buildable types leading to quadratic compilation times (not to mention cycles), and leave a
        * dangling super-superclass to pick up next round. As an optimization, though, we would
-       * probably skip this for @FreeBuilder-types anyway, to avoid extra types whenever possible,
+       * probably skip this for @EBuilder-types anyway, to avoid extra types whenever possible,
        * which leaves a lot of complicated code supporting a currently non-existent edge case.
        */
       mergeFromBuilderMethod = MergeBuilderMethod.MERGE_DIRECTLY;

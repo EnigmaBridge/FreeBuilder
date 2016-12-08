@@ -18,7 +18,7 @@ package org.inferred.freebuilder;
 import java.io.Serializable;
 import java.util.List;
 
-@FreeBuilder
+@EBuilder
 public interface ListProperty extends Serializable {
   List<String> getNames();
 

@@ -17,7 +17,7 @@ package org.inferred.freebuilder.processor;
 
 import com.google.common.base.Preconditions;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -48,7 +48,7 @@ public class ListMutateMethodTest {
 
   private static final JavaFileObject UNCHECKED_LIST_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer> getProperties();", List.class)
       .addLine("")
@@ -58,7 +58,7 @@ public class ListMutateMethodTest {
 
   private static final JavaFileObject CHECKED_LIST_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer> getProperties();", List.class)
       .addLine("")
@@ -75,7 +75,7 @@ public class ListMutateMethodTest {
   /** Simple type that substitutes passed-in objects, in this case by interning strings. */
   private static final JavaFileObject INTERNED_STRINGS_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<String> getProperties();", List.class)
       .addLine("")

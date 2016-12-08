@@ -2,7 +2,7 @@ package org.inferred.freebuilder;
 
 import java.util.List;
 
-@FreeBuilder
+@EBuilder
 public interface ListPropertyType {
   List<String> getNames();
 

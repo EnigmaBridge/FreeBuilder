@@ -39,12 +39,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.Metadata.Property;
 import org.inferred.freebuilder.processor.Metadata.StandardMethod;
 import org.inferred.freebuilder.processor.Metadata.UnderrideLevel;
 import org.inferred.freebuilder.processor.PropertyCodeGenerator.Config;
-import org.inferred.freebuilder.processor.util.Excerpts;
 import org.inferred.freebuilder.processor.util.IsInvalidTypeVisitor;
 import org.inferred.freebuilder.processor.util.ParameterizedType;
 import org.inferred.freebuilder.processor.util.QualifiedName;
@@ -71,10 +70,10 @@ import javax.lang.model.util.SimpleTypeVisitor6;
 import javax.lang.model.util.Types;
 
 /**
- * Analyses a {@link org.inferred.freebuilder.FreeBuilder FreeBuilder}
+ * Analyses a {@link EBuilder EBuilder}
  * type, returning metadata about it in a format amenable to code generation.
  *
- * <p>Any deviations from the FreeBuilder spec in the user's class will result in errors being
+ * <p>Any deviations from the EBuilder spec in the user's class will result in errors being
  * issued, but unless code generation is totally impossible, metadata will still be returned.
  * This allows the user to extend an existing type without worrying that a mistake will cause
  * compiler errors in all dependent code&mdash;which would make it very hard to find the real
@@ -83,7 +82,7 @@ import javax.lang.model.util.Types;
 class Analyser {
 
   /**
-   * Thrown when a @FreeBuilder type cannot have a Builder type generated, for instance if
+   * Thrown when a @EBuilder type cannot have a Builder type generated, for instance if
    * it is private.
    */
   public static class CannotGenerateCodeException extends Exception { }
@@ -109,7 +108,7 @@ class Analyser {
   private static final String USER_BUILDER_NAME = "Builder";
   private static final String USER_ABUILDER_NAME = "ABuilder";
   private static final String USER_DEFAULT_VALUES_NAME = "defaultValues";
-  private static final String BUILDER_ANNOTATION = FreeBuilder.class.getCanonicalName();
+  private static final String BUILDER_ANNOTATION = EBuilder.class.getCanonicalName();
 
   private static final Pattern GETTER_PATTERN = Pattern.compile("^(get|is)(.+)");
   private static final String GET_PREFIX = "get";
@@ -214,7 +213,7 @@ class Analyser {
         .setTypeGen("T")
         .setBuildGen("B");
 
-    // Super class has FreeBuilder also?
+    // Super class has EBuilder also?
     analyseSuperclass(type, metadataBuilder, methods, properties);
 
     // All super types implementing builder
@@ -380,10 +379,10 @@ class Analyser {
     }
   }
 
-  /** Basic sanity-checking to ensure we can fulfil the &#64;FreeBuilder contract for this type. */
+  /** Basic sanity-checking to ensure we can fulfil the &#64;EBuilder contract for this type. */
   private void verifyType(TypeElement type, PackageElement pkg) throws CannotGenerateCodeException {
     if (pkg.isUnnamed()) {
-      messager.printMessage(ERROR, "@FreeBuilder does not support types in unnamed packages", type);
+      messager.printMessage(ERROR, "@EBuilder does not support types in unnamed packages", type);
       throw new CannotGenerateCodeException();
     }
     switch (type.getNestingKind()) {
@@ -394,13 +393,13 @@ class Analyser {
         if (!type.getModifiers().contains(Modifier.STATIC)) {
           messager.printMessage(
               ERROR,
-              "Inner classes cannot be @FreeBuilder types (did you forget the static keyword?)",
+              "Inner classes cannot be @EBuilder types (did you forget the static keyword?)",
               type);
           throw new CannotGenerateCodeException();
         }
 
         if (type.getModifiers().contains(Modifier.PRIVATE)) {
-          messager.printMessage(ERROR, "@FreeBuilder types cannot be private", type);
+          messager.printMessage(ERROR, "@EBuilder types cannot be private", type);
           throw new CannotGenerateCodeException();
         }
 
@@ -408,7 +407,7 @@ class Analyser {
           if (e.getModifiers().contains(Modifier.PRIVATE)) {
             messager.printMessage(
                 ERROR,
-                "@FreeBuilder types cannot be private, but enclosing type "
+                "@EBuilder types cannot be private, but enclosing type "
                     + e.getSimpleName() + " is inaccessible",
                 type);
             throw new CannotGenerateCodeException();
@@ -418,12 +417,12 @@ class Analyser {
 
       default:
         messager.printMessage(
-            ERROR, "Only top-level or static nested types can be @FreeBuilder types", type);
+            ERROR, "Only top-level or static nested types can be @EBuilder types", type);
         throw new CannotGenerateCodeException();
     }
     switch (type.getKind()) {
       case ANNOTATION_TYPE:
-        messager.printMessage(ERROR, "@FreeBuilder does not support annotation types", type);
+        messager.printMessage(ERROR, "@EBuilder does not support annotation types", type);
         throw new CannotGenerateCodeException();
 
       case CLASS:
@@ -431,7 +430,7 @@ class Analyser {
         break;
 
       case ENUM:
-        messager.printMessage(ERROR, "@FreeBuilder does not support enum types", type);
+        messager.printMessage(ERROR, "@EBuilder does not support enum types", type);
         throw new CannotGenerateCodeException();
 
       case INTERFACE:
@@ -455,7 +454,7 @@ class Analyser {
         if (constructor.getModifiers().contains(Modifier.PRIVATE)) {
           messager.printMessage(
               ERROR,
-              "@FreeBuilder types must have a package-visible no-args constructor",
+              "@EBuilder types must have a package-visible no-args constructor",
               constructor);
           throw new CannotGenerateCodeException();
         }
@@ -463,7 +462,7 @@ class Analyser {
       }
     }
     messager.printMessage(
-        ERROR, "@FreeBuilder types must have a package-visible no-args constructor", type);
+        ERROR, "@EBuilder types must have a package-visible no-args constructor", type);
     throw new CannotGenerateCodeException();
   }
 
@@ -484,7 +483,7 @@ class Analyser {
           ? standardMethods.get(StandardMethod.EQUALS)
           : standardMethods.get(StandardMethod.HASH_CODE);
       messager.printMessage(ERROR,
-          "hashCode and equals must be implemented together on @FreeBuilder types",
+          "hashCode and equals must be implemented together on @EBuilder types",
           underriddenMethod);
     }
     ImmutableMap.Builder<StandardMethod, UnderrideLevel> result = ImmutableMap.builder();
@@ -505,7 +504,7 @@ class Analyser {
   /**
    * Looks for a type called Builder, and verifies it extends the autogenerated superclass. Issues
    * an error if the wrong type is being subclassed&mdash;a typical copy-and-paste error when
-   * renaming an existing &#64;FreeBuilder type, or using one as a template.
+   * renaming an existing &#64;EBuilder type, or using one as a template.
    */
   private Optional<TypeElement> tryFindBuilder(
       final QualifiedName generatedBuilder, TypeElement type) {
@@ -526,14 +525,14 @@ class Analyser {
             NOTE,
             "Add \"class Builder extends "
                 + generatedBuilder.getSimpleName()
-                + " {}\" to your interface to enable the @FreeBuilder API",
+                + " {}\" to your interface to enable the @EBuilder API",
             type);
       } else {
         messager.printMessage(
             NOTE,
             "Add \"public static class Builder extends "
                 + generatedBuilder.getSimpleName()
-                + " {}\" to your class to enable the @FreeBuilder API",
+                + " {}\" to your class to enable the @EBuilder API",
             type);
       }
       return Optional.absent();
@@ -598,7 +597,7 @@ class Analyser {
       return Optional.of(NO_ARGS_CONSTRUCTOR);
     }
     if (!builder.get().getModifiers().contains(Modifier.STATIC)) {
-      messager.printMessage(ERROR, "Builder must be static on @FreeBuilder types", builder.get());
+      messager.printMessage(ERROR, "Builder must be static on @EBuilder types", builder.get());
       return Optional.absent();
     }
     return BuilderFactory.from(builder.get());
@@ -693,7 +692,7 @@ class Analyser {
    *    interface X&lt;T&gt; {
    *      T getProperty();
    *    }
-   *    &#64;FreeBuilder interface Y&lt;T&gt; extends X&lt;List&lt;T&gt;&gt; { }</pre></code>
+   *    &#64;EBuilder interface Y&lt;T&gt; extends X&lt;List&lt;T&gt;&gt; { }</pre></code>
    *
    * <p>(Unfortunately, a bug in Eclipse prevents us handling these cases correctly at the moment.
    * javac works fine.)
@@ -847,7 +846,7 @@ class Analyser {
         messager.printMessage(
             ERROR,
             "Only getter methods (starting with '" + GET_PREFIX
-                + "' or '" + IS_PREFIX + "') may be declared abstract on @FreeBuilder types",
+                + "' or '" + IS_PREFIX + "') may be declared abstract on @EBuilder types",
             method);
       } else {
         printNoImplementationMessage(valueType, method);
@@ -861,7 +860,7 @@ class Analyser {
         String message = new StringBuilder()
             .append("Getter methods cannot have a lowercase character immediately after the '")
             .append(prefix)
-            .append("' prefix on @FreeBuilder types (did you mean '")
+            .append("' prefix on @EBuilder types (did you mean '")
             .append(prefix)
             .appendCodePoint(Character.toUpperCase(suffix.codePointAt(0)))
             .append(suffix.substring(suffix.offsetByCodePoints(0, 1)))
@@ -877,7 +876,7 @@ class Analyser {
     if (returnType.getKind() == TypeKind.VOID) {
       if (declaredOnValueType) {
         messager.printMessage(
-            ERROR, "Getter methods must not be void on @FreeBuilder types", method);
+            ERROR, "Getter methods must not be void on @EBuilder types", method);
       } else {
         printNoImplementationMessage(valueType, method);
       }
@@ -888,7 +887,7 @@ class Analyser {
         messager.printMessage(
             ERROR,
             "Getter methods starting with '" + IS_PREFIX
-                + "' must return a boolean on @FreeBuilder types",
+                + "' must return a boolean on @EBuilder types",
             method);
       } else {
         printNoImplementationMessage(valueType, method);
@@ -898,7 +897,7 @@ class Analyser {
     if (!method.getParameters().isEmpty()) {
       if (declaredOnValueType) {
         messager.printMessage(
-            ERROR, "Getter methods cannot take parameters on @FreeBuilder types", method);
+            ERROR, "Getter methods cannot take parameters on @EBuilder types", method);
       } else {
         printNoImplementationMessage(valueType, method);
       }
@@ -915,7 +914,7 @@ class Analyser {
     messager.printMessage(
         ERROR,
         "No implementation found for non-getter method '" + method + "'; "
-            + "cannot generate @FreeBuilder implementation",
+            + "cannot generate @EBuilder implementation",
         valueType);
   }
 

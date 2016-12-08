@@ -20,7 +20,7 @@ import com.google.common.annotations.GwtCompatible;
 import java.io.Serializable;
 import java.util.Optional;
 
-@FreeBuilder
+@EBuilder
 @GwtCompatible(serializable = true)
 public interface OptionalPropertiesType extends Serializable {
   Optional<String> getFirstName();

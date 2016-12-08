@@ -19,8 +19,8 @@ import com.google.common.annotations.GwtCompatible;
 
 import java.io.Serializable;
 
-/** Simple GWT-compatible FreeBuilder type with a nested buildable type containing a list.  */
-@FreeBuilder
+/** Simple GWT-compatible EBuilder type with a nested buildable type containing a list.  */
+@EBuilder
 @GwtCompatible(serializable = true)
 public interface NestedListGwtType extends Serializable {
   StringListGwtType getItem();

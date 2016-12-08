@@ -1181,7 +1181,7 @@ public class SetSourceTest {
   }
 
   /**
-   * Returns a {@link Metadata} instance for a FreeBuilder type with a single property, name, of
+   * Returns a {@link Metadata} instance for a EBuilder type with a single property, name, of
    * type {@code Set<String>}, with no override on the add method.
    */
   private static Metadata createMetadata() {

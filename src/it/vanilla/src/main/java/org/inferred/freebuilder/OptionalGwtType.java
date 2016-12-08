@@ -20,8 +20,8 @@ import com.google.common.base.Optional;
 
 import java.io.Serializable;
 
-/** Simple GWT-compatible FreeBuilder type with a single optional String property.  */
-@FreeBuilder
+/** Simple GWT-compatible EBuilder type with a single optional String property.  */
+@EBuilder
 @GwtCompatible(serializable = true)
 public interface OptionalGwtType extends Serializable {
   Optional<String> getName();

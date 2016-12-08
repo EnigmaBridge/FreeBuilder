@@ -25,7 +25,7 @@ import com.google.common.testing.EqualsTester;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -58,7 +58,7 @@ public class ListPropertyFactoryTest {
 
   private static final JavaFileObject LIST_PROPERTY_AUTO_BUILT_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<%s> getItems();", List.class, String.class)
       .addLine("")
@@ -73,7 +73,7 @@ public class ListPropertyFactoryTest {
 
   private static final JavaFileObject VALIDATED_STRINGS = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<%s> getItems();", List.class, String.class)
       .addLine("")
@@ -91,7 +91,7 @@ public class ListPropertyFactoryTest {
 
   private static final JavaFileObject VALIDATED_INTS = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<Integer> getItems();", List.class)
       .addLine("")
@@ -340,7 +340,7 @@ public class ListPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<%s> getItems();", List.class, String.class)
             .addLine("")
@@ -507,7 +507,7 @@ public class ListPropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public abstract class DataType {")
             .addLine("  public abstract %s<%s> getItems();", ImmutableList.class, String.class)
             .addLine("")
@@ -581,7 +581,7 @@ public class ListPropertyFactoryTest {
         .with(new SourceBuilder()
             .addLine("package com.example;")
             .addLine("import " + JsonProperty.class.getName() + ";")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("@%s(builder = DataType.Builder.class)", JsonDeserialize.class)
             .addLine("public interface DataType {")
             .addLine("  @JsonProperty(\"stuff\") %s<%s> getItems();", List.class, String.class)

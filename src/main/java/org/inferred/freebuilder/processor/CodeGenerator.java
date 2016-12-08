@@ -31,11 +31,10 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.Metadata.Property;
 import org.inferred.freebuilder.processor.Metadata.StandardMethod;
 import org.inferred.freebuilder.processor.PropertyCodeGenerator.Type;
@@ -45,7 +44,7 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Code generation for the &#64;{@link FreeBuilder} annotation.
+ * Code generation for the &#64;{@link EBuilder} annotation.
  */
 public class CodeGenerator {
 

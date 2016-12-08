@@ -18,7 +18,7 @@ package org.inferred.freebuilder.processor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -51,7 +51,7 @@ public class MapMutateMethodTest {
 
   private static final JavaFileObject UNCHECKED_SET_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer, String> getProperties();", Map.class)
       .addLine("")
@@ -62,7 +62,7 @@ public class MapMutateMethodTest {
   private static final JavaFileObject CHECKED_SET_TYPE = new SourceBuilder()
       .addLine("package com.example;")
       .addLine("import static %s.checkArgument;", Preconditions.class)
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer, String> getProperties();", Map.class)
       .addLine("")

@@ -17,12 +17,12 @@ package org.inferred.freebuilder.client.rpc;
 
 import java.io.Serializable;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 
 import com.google.common.annotations.GwtCompatible;
 
-/** Simple GWT-compatible FreeBuilder type with a nested buildable type containing a list.  */
-@FreeBuilder
+/** Simple GWT-compatible EBuilder type with a nested buildable type containing a list.  */
+@EBuilder
 @GwtCompatible(serializable = true)
 public interface NestedListGwtType extends Serializable {
   StringListGwtType getItem();

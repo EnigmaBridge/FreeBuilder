@@ -17,7 +17,7 @@ package org.inferred.freebuilder.processor;
 
 import com.google.common.base.Preconditions;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -49,7 +49,7 @@ public class NullableMapperMethodTest {
 
   private static final JavaFileObject NULLABLE_INTEGER_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  @%s Integer getProperty();", Nullable.class)
       .addLine("")
@@ -85,7 +85,7 @@ public class NullableMapperMethodTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public interface DataType {")
             .addLine("  @%s Integer getProperty();", Nullable.class)
             .addLine("")

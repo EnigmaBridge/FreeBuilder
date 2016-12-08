@@ -1634,7 +1634,7 @@ public class ListSourceTest {
   }
 
   /**
-   * Returns a {@link Metadata} instance for a FreeBuilder type with two properties: name, of
+   * Returns a {@link Metadata} instance for a EBuilder type with two properties: name, of
    * type {@code List<String>}; and age, of type {@code List<Integer>}.
    */
   private static Metadata createMetadata() {

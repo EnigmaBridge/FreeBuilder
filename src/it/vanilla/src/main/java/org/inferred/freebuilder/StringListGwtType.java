@@ -20,8 +20,8 @@ import com.google.common.annotations.GwtCompatible;
 import java.io.Serializable;
 import java.util.List;
 
-/** Simple GWT-compatible FreeBuilder type with a list of strings.  */
-@FreeBuilder
+/** Simple GWT-compatible EBuilder type with a list of strings.  */
+@EBuilder
 @GwtCompatible(serializable = true)
 public interface StringListGwtType extends Serializable {
   List<String> getNames();

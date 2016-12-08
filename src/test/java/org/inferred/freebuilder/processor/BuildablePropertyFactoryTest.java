@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -55,9 +55,9 @@ public class BuildablePropertyFactoryTest {
 
   private static final JavaFileObject NO_DEFAULTS_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
-      .addLine("  @%s", FreeBuilder.class)
+      .addLine("  @%s", EBuilder.class)
       .addLine("  interface Item {")
       .addLine("    String getName();")
       .addLine("    int getPrice();")
@@ -74,9 +74,9 @@ public class BuildablePropertyFactoryTest {
 
   private static final JavaFileObject DEFAULTS_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
-      .addLine("  @%s", FreeBuilder.class)
+      .addLine("  @%s", EBuilder.class)
       .addLine("  interface Item {")
       .addLine("    String getName();")
       .addLine("    int getPrice();")
@@ -98,9 +98,9 @@ public class BuildablePropertyFactoryTest {
 
   private static final JavaFileObject NESTED_LIST_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
-      .addLine("  @%s", FreeBuilder.class)
+      .addLine("  @%s", EBuilder.class)
       .addLine("  interface Item {")
       .addLine("    %s<String> getNames();", List.class)
       .addLine("")
@@ -115,7 +115,7 @@ public class BuildablePropertyFactoryTest {
 
   private static final JavaFileObject PROTOLIKE_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  class Item {")
       .addLine("    public %s<String> getNames() {", ImmutableList.class)
@@ -173,7 +173,7 @@ public class BuildablePropertyFactoryTest {
 
   private static final JavaFileObject FREEBUILDERLIKE_TYPE = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  interface Item {")
       .addLine("    %s<String> getNames();", List.class)
@@ -821,14 +821,14 @@ public class BuildablePropertyFactoryTest {
         .with(new Processor())
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public interface PIdentityDefinition<T, U> {")
             .addLine("    class Builder<T, U> extends PIdentityDefinition_Builder<T, U> {}")
             .addLine("}")
             .build())
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public interface PAccess<T, U> {")
             .addLine("    class Builder<T, U> extends PAccess_Builder<T, U> {}")
             .addLine("")
@@ -846,7 +846,7 @@ public class BuildablePropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public interface DataType {")
             .addLine("  interface Value {")
             .addLine("    String getName();")
@@ -894,7 +894,7 @@ public class BuildablePropertyFactoryTest {
         .with(new Processor(features))
         .with(new SourceBuilder()
             .addLine("package com.example;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public interface DataType {")
             .addLine("  interface Template {")
             .addLine("    String getName();")
@@ -943,10 +943,10 @@ public class BuildablePropertyFactoryTest {
         .with(new SourceBuilder()
             .addLine("package com.example;")
             .addLine("import " + JsonProperty.class.getName() + ";")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("@%s(builder = DataType.Builder.class)", JsonDeserialize.class)
             .addLine("public interface DataType {")
-            .addLine("  @%s", FreeBuilder.class)
+            .addLine("  @%s", EBuilder.class)
             .addLine("  @%s(builder = Item.Builder.class)", JsonDeserialize.class)
             .addLine("  interface Item {")
             .addLine("    String getName();")
@@ -998,7 +998,7 @@ public class BuildablePropertyFactoryTest {
         .with(new SourceBuilder()
             .addLine("package com.example.bar;")
             .addLine("import com.example.foo.Item;")
-            .addLine("@%s", FreeBuilder.class)
+            .addLine("@%s", EBuilder.class)
             .addLine("public interface DataType {")
             .addLine("  Item getItem();")
             .addLine("  class Builder extends DataType_Builder {}")

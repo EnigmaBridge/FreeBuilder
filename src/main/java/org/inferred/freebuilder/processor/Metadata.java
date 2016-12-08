@@ -20,7 +20,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.Excerpt;
 import org.inferred.freebuilder.processor.util.ParameterizedType;
 import org.inferred.freebuilder.processor.util.QualifiedName;
@@ -32,9 +32,9 @@ import javax.lang.model.type.TypeMirror;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Metadata about a &#64;{@link org.inferred.freebuilder.FreeBuilder FreeBuilder} type.
+ * Metadata about a &#64;{@link EBuilder EBuilder} type.
  */
-@FreeBuilder
+@EBuilder
 public abstract class Metadata {
 
   /** Standard Java methods that may be underridden. */
@@ -188,7 +188,7 @@ public abstract class Metadata {
   }
 
   /** Metadata about a property of a {@link org.inferred.freebuilder.processor.Metadata}. */
-  @FreeBuilder
+  @EBuilder
   public abstract static class Property {
 
     /** Returns the type of the property. */

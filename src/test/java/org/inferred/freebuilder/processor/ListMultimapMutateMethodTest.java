@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -53,7 +53,7 @@ public class ListMultimapMutateMethodTest {
 
   private static final JavaFileObject UNCHECKED_PROPERTY = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<String, String> getItems();", ListMultimap.class)
       .addLine("")
@@ -63,7 +63,7 @@ public class ListMultimapMutateMethodTest {
 
   private static final JavaFileObject CHECKED_PROPERTY = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<String, String> getItems();", ListMultimap.class)
       .addLine("")
@@ -81,7 +81,7 @@ public class ListMultimapMutateMethodTest {
 
   private static final JavaFileObject INTERNED_PROPERTY = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public abstract class DataType {")
       .addLine("  public abstract %s<String, String> getItems();", ListMultimap.class)
       .addLine("")

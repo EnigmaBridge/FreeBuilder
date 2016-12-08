@@ -2,7 +2,7 @@ package org.inferred.freebuilder;
 
 import com.google.common.collect.Multiset;
 
-@FreeBuilder
+@EBuilder
 public interface MultisetPropertyType {
   Multiset<String> getNames();
 

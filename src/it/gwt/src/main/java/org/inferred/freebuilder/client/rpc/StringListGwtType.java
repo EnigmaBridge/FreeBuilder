@@ -18,12 +18,12 @@ package org.inferred.freebuilder.client.rpc;
 import java.io.Serializable;
 import java.util.List;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 
 import com.google.common.annotations.GwtCompatible;
 
-/** Simple GWT-compatible FreeBuilder type with a list of strings.  */
-@FreeBuilder
+/** Simple GWT-compatible EBuilder type with a list of strings.  */
+@EBuilder
 @GwtCompatible(serializable = true)
 public interface StringListGwtType extends Serializable {
   List<String> getNames();

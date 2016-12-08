@@ -18,7 +18,7 @@ package org.inferred.freebuilder;
 import java.io.Serializable;
 import java.util.Set;
 
-@FreeBuilder
+@EBuilder
 public interface SetProperty extends Serializable {
   Set<String> getNames();
 

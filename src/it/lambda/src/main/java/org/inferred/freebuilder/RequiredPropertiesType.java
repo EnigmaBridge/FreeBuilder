@@ -1,6 +1,6 @@
 package org.inferred.freebuilder;
 
-@FreeBuilder
+@EBuilder
 public interface RequiredPropertiesType {
   String getFirstName();
   String getSurname();

@@ -95,7 +95,7 @@ you must subclass. For instance:
 
 
 ```java
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 
 @FreeBuilder
 public interface Person {

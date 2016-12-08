@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 
-import org.inferred.freebuilder.FreeBuilder;
+import org.inferred.freebuilder.EBuilder;
 import org.inferred.freebuilder.processor.util.feature.FeatureSet;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTestRunner.Shared;
 import org.inferred.freebuilder.processor.util.testing.BehaviorTester;
@@ -51,7 +51,7 @@ public class MultisetMutateMethodTest {
 
   private static final JavaFileObject UNCHECKED_PROPERTY = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer> getProperties();", Multiset.class)
       .addLine("")
@@ -61,7 +61,7 @@ public class MultisetMutateMethodTest {
 
   private static final JavaFileObject CHECKED_PROPERTY = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<Integer> getProperties();", Multiset.class)
       .addLine("")
@@ -77,7 +77,7 @@ public class MultisetMutateMethodTest {
 
   private static final JavaFileObject INTERNED_PROPERTY = new SourceBuilder()
       .addLine("package com.example;")
-      .addLine("@%s", FreeBuilder.class)
+      .addLine("@%s", EBuilder.class)
       .addLine("public interface DataType {")
       .addLine("  %s<String> getProperties();", Multiset.class)
       .addLine("")
