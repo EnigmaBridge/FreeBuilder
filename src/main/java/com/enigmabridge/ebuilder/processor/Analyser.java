@@ -15,6 +15,8 @@
  */
 package com.enigmabridge.ebuilder.processor;
 
+import static com.enigmabridge.ebuilder.processor.util.ModelUtils.asElement;
+import static com.enigmabridge.ebuilder.processor.util.ModelUtils.findAnnotationMirror;
 import static com.google.common.base.Functions.toStringFunction;
 import static com.google.common.base.Objects.equal;
 import static com.google.common.base.Preconditions.checkState;
