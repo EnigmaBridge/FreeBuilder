@@ -319,8 +319,10 @@ public class MapPropertyFactory implements PropertyCodeGenerator.Factory {
 
     @Override
     public void addMergeFromSuperBuilder(Block code, String builder) {
-      Excerpt base = new Block(code).add(builder);
-      code.addLine("%s(%s.%s());", addAllMethod(property), base, getter(property));
+      code.addLine("%s(%s.%s());",
+          putAllMethod(property),
+          builder,
+          getter(property));
     }
 
     @Override
