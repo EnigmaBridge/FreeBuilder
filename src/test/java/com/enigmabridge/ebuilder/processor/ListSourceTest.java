@@ -22,6 +22,7 @@ import com.enigmabridge.ebuilder.processor.Metadata.Property;
 import com.enigmabridge.ebuilder.processor.util.*;
 import com.enigmabridge.ebuilder.processor.util.feature.Feature;
 import com.enigmabridge.ebuilder.processor.util.feature.GuavaLibrary;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

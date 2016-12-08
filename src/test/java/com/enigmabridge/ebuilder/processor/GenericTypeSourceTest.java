@@ -18,12 +18,14 @@ package com.enigmabridge.ebuilder.processor;
 import com.google.common.base.Joiner;
 import com.google.googlejavaformat.java.Formatter;
 import com.google.googlejavaformat.java.FormatterException;
+
 import com.enigmabridge.ebuilder.processor.Metadata.Property;
 import com.enigmabridge.ebuilder.processor.util.QualifiedName;
 import com.enigmabridge.ebuilder.processor.util.SourceBuilder;
 import com.enigmabridge.ebuilder.processor.util.SourceStringBuilder;
 import com.enigmabridge.ebuilder.processor.util.feature.Feature;
 import com.enigmabridge.ebuilder.processor.util.feature.GuavaLibrary;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -47,7 +49,7 @@ public class GenericTypeSourceTest {
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
+        "@Generated(\"com.enigmabridge.ebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder<A, B> {",
         "",
         "  /**",
@@ -333,7 +335,7 @@ public class GenericTypeSourceTest {
         " * Auto-generated superclass of {@link Person.Builder},",
         " * derived from the API of {@link Person}.",
         " */",
-        "@Generated(\"org.inferred.freebuilder.processor.CodeGenerator\")",
+        "@Generated(\"com.enigmabridge.ebuilder.processor.CodeGenerator\")",
         "abstract class Person_Builder<A, B> {",
         "",
         "  /**",
